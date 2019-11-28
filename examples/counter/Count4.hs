@@ -18,7 +18,7 @@ count4a reset = [x0,x1,x2,x3]
     x2 = dff (mux1 reset y2 zero)
     x3 = dff (mux1 reset y3 zero)
     (c0,y0) = halfAdd x0 c1
-    (c1,y1) = halfAdd x0 c2
+    (c1,y1) = halfAdd x1 c2
     (c2,y2) = halfAdd x2 c3
     (c3,y3) = halfAdd x3 one
 

@@ -1,7 +1,7 @@
 {-|
 Module       : HDL.Hydra.Circuits.Register
 Description  : Standard stateful circuits
-Copyright    : (c) John O'Donnell 2017
+Copyright    : (c) John O'Donnell 2019
 License      : GPL-3
 Maintainer   : john.t.odonnell9@gmail.com
 Stability    : experimental
@@ -84,22 +84,6 @@ regfile1 k ld d sa sb x
     (d1:ds) = d
     (sa1:sas) = sa
     (sb1:sbs) = sb
-
-
-{- older version with n+k pattern
-regfile1 :: CBit a => Int -> a -> [a] -> [a] -> [a] -> a -> (a,a)
-
-regfile1 0 ld d sa sb x = (r,r)
-  where r = reg1 ld x
-
-regfile1 (k+1) ld (d:ds) (sa:sas) (sb:sbs) x = (a,b)
-  where
-    (a0,b0) = regfile1 k ld0 ds sas sbs x
-    (a1,b1) = regfile1 k ld1 ds sas sbs x
-    (ld0,ld1) = demux1 d ld
-    a = mux1 sa a0 a1
-    b = mux1 sb b0 b1
--}
 
 regfile :: CBit a => Int -> Int
   -> a -> [a] -> [a] -> [a] -> [a] -> ([a],[a])

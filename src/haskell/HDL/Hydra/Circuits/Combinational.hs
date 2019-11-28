@@ -1,7 +1,7 @@
 {-|
 Module       : HDL.Hydra.Circuits.Combinational
 Description  : Standard combinational circuits
-Copyright    : (c) John O'Donnell 2016
+Copyright    : (c) John O'Donnell 2019
 License      : GPL-3
 Maintainer   : john.t.odonnell9@gmail.com
 Stability    : experimental
