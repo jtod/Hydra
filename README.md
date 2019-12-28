@@ -10,22 +10,18 @@ language implemented using Haskell.</p>
 
 ## Documentation
 
-* The <a href="./doc/userguide/html/index.html">User Guide
-  (html)</a> describes how to install and use the system. It
-        contains an introductory tutorial, a number of examples, and
-        discusses techniques for designing circuits. It explains how
-        the system is implemented and how it works.  If the link is
-        broken, here is a <a href="./src/docsrc/indexsrc.m4">plain
-        text version.
+* The [User Guide](./doc/userguide/html/index.html) describes how to
+  install and use the system. It contains an introductory tutorial, a
+  number of examples, and discusses techniques for designing
+  circuits. It explains how the system is implemented and how it
+  works.  If the link is broken, here is a [plain text
+  version](./src/docsrc/indexsrc.m4).
 
-* The <a href="./dist/doc/html/Hydra/index.html">Library
-  interface</a> is a reference document that gives precise
-        definitions of the circuit and function types.  If the link is
-        broken, see the Installation section in the User
-        Guide.</p></li>
+* The [Library interface reference](./dist/doc/html/Hydra/index.html)
+  is specifies the API, including circuit and function types.  If the
+  link is broken, see the Installation section in the User Guide.
 
-* <a href="./Hydra.cabal">Hydra.cabal</a> gives metadata
-  for the software, including version and date</p></li>
+* [Hydra.cabal](./Hydra.cabal) defines metadata for the software.
 
 ## About Hydra
 
