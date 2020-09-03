@@ -1,3 +1,8 @@
+-- HelloWorldRun: simplest example of a circuit
+-- This file (HelloWorldRun) defines the simulation driver
+-- To run a simulation, enter hydra HelloWorldRun
+-- This file is part of Hydra, see Hydra/README.md
+
 module Main where
 import HDL.Hydra.Core.Lib
 import HelloWorld
