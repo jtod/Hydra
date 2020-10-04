@@ -106,8 +106,8 @@ instance Sgl (Component a) where
 -- The CBit class is for signals that are clocked, so they can support
 -- a flip flop.  The type c is the tag.
 
-instance (Sgl a, Static a) => CBit (Component a) where
-  dff_ tag x = delayState initial (MDstring "dff") tag x
+-- instance (Sgl a, Static a) => CBit (Component a) where
+--   dff_ tag x = delayState initial (MDstring "dff") tag x
 
 {-
 instance (Sgl a, Static a) => CBit (Component a) a where

@@ -8,6 +8,25 @@ for simulating circuits, generating netlists, and emulating
 instruction set architectures. It is an embedded domain specific
 language implemented using Haskell.</p>
 
+## Installation
+
+The documentation for cabal is incorrect, and has been incorrect since
+at least September 2019. It does not describe the .cabal file format
+correctly; it describes the commands incorrectly; it describes the
+locations of installed files incorrectly. The cabal user guide does
+not say what version it is talking about.  Its instructions do not
+work for cabal-2* or for cabal-3.2.0.0, and appear to be wrong for all
+versions of the software.
+
+As of October 2020, using cabal-3.2.0.0, the following commands
+partially work:
+
+~~~~
+cabal configure
+cabal build
+cabal install --lib
+~~~~
+
 ## Documentation
 
 * The [User Guide](./doc/userguide/html/index.html) describes how to
@@ -25,7 +44,7 @@ language implemented using Haskell.</p>
 
 ## About Hydra
 
-Copyright (c) 2019 John T. O'Donnell.  This software is free and open
+Copyright (c) 2020 John T. O'Donnell.  This software is free and open
 source; see LICENSE.txt.
 
 --------  -----------------------------------------------------

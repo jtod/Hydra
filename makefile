@@ -17,12 +17,6 @@
 #  make veryclean       also delete generated doc/html files
 #  make snapshot        save a .tgz tarball in archive directory
 #  make fullcopy        save a full copy in archive directory
-#  make listarchive     list the archive directory
-
-# The ArchiveLocation is relative to the parent directory of
-# Hydra-i.j.k
-
-ArchiveLocation := ../../Hydra/archive
 
 #----------------------------------------------------------------------
 # Calculate locations and times, don't need to edit these
