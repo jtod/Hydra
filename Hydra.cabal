@@ -1,46 +1,46 @@
-name:	     Hydra
-version:     2.4.0
-author:	     John T. O'Donnell
-copyright:   Copyright (c) 2019 John T. O'Donnell
-license:     GPL
-
-synopsis:    Computer hardware description language
+cabal-version: 2.2
+name:	       Hydra
+version:       2.4.1
+synopsis:      Computer hardware description language
+author:	       John T. O'Donnell
+copyright:     (c) 2020 John T. O'Donnell
+maintainer:    john.t.odonnell9@gmail.com
+license:       GPL-3.0-or-later
+license-file:  LICENSE.txt
+category:      Language Hardware Circuit
+stability:     experimental
+homepage:      http://www.dcs.gla.ac.uk/~jtod/hydra/
+build-type:    Simple
+tested-with:   GHC == 8.10.2
+extra-doc-files: docs/userguide/HydraUserGuide.html
 
 description: Hydra is a functional computer hardware description
              language for specifying the structure and behavior of
-             digital circuits.  It supports several levels of
-             abstraction, including logic gates, register transfer
-             level, datapath and control, and processors.  It can
-             simulate circuits, generating netlists, and emulating
-             instruction set architectures.  It is an embedded domain
-             specific language implemented using Haskell.
+             synchronouse digital circuits.  It supports several
+             levels of abstraction, including logic gates, register
+             transfer level, datapath and control, and processors.  It
+             can simulate circuits, generate netlists, and emulate
+             instruction set architectures.
 
-category:          Language Hardware
-stability:         experimental
-license-file:      LICENSE.txt
-homepage:          http://www.dcs.gla.ac.uk/~jtod/hydra/
-package-URL:       http://www.dcs.gla.ac.uk/~jtod/hydra/download
-maintainer:        john.t.odonnell9@gmail.com
-cabal-version:     >= 1.6
-build-type:        Simple
-tested-with:       GHC == 8.0.2
+source-repository head
+  type:     git
+  location: https://github.com/jtod/Hydra
 
 library
-  build-depends:   base >= 4 && <5,
-                   transformers >= 0.3 && < 0.6,
-                   syb
-  hs-source-dirs:  src/haskell
-
-  exposed-modules:
-    HDL.Hydra.Core.Lib,
-    HDL.Hydra.Core.Signal,
-    HDL.Hydra.Core.Driver,
-    HDL.Hydra.Core.SigBool
-    HDL.Hydra.Core.PrimData,
-    HDL.Hydra.Core.SigStream,
---    HDL.Hydra.Core.SigState,
-    HDL.Hydra.Core.Pattern,
-    HDL.Hydra.Core.RTL,
-    HDL.Hydra.Circuits.Combinational,
-    HDL.Hydra.Circuits.Register
-
+  default-language: Haskell2010
+  build-depends:    base >= 4 && < 5,
+                    transformers >= 0.3 && < 0.6,
+                    syb
+  hs-source-dirs:   src
+  exposed-modules:  HDL.Hydra.Core.CombTools,
+                    HDL.Hydra.Core.Lib,
+                    HDL.Hydra.Core.Signal,
+                    HDL.Hydra.Core.Driver,
+                    HDL.Hydra.Core.SigBool,
+                    HDL.Hydra.Core.PrimData,
+                    HDL.Hydra.Core.Pattern,
+                    HDL.Hydra.Core.RTL,
+                    HDL.Hydra.Circuits.Combinational,
+                    HDL.Hydra.Circuits.Register
+  other-modules:    HDL.Hydra.Core.SigStream
+                    --  HDL.Hydra.Core.SigState,
