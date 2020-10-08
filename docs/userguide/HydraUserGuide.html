@@ -75,7 +75,7 @@ code span.va { color: #19177c; } /* Variable */
 code span.vs { color: #4070a0; } /* VerbatimString */
 code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
   </style>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="userguide-style.css" />
   <!--[if lt IE 9]>
     <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
   <![endif]-->
@@ -85,7 +85,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <header id="title-block-header">
 <h1 class="title">Hydra User Guide</h1>
 <p class="author">John T. O'Donnell</p>
-<p class="date">version:       2.4.1</p>
+<p class="date">version:         2.4.1</p>
 </header>
 <nav id="TOC" role="doc-toc">
 <ul>
@@ -102,6 +102,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </nav>
 <h1 id="hydra-a-language-for-circuit-specification">Hydra: a language for circuit specification</h1>
 <p>Some references to include <span class="citation" data-cites="J84-app-prog-dig-design"></span> <span class="citation" data-cites="2002-OD-PDSECA-Hydra"></span> <span class="citation" data-cites="1995-OD-Hydra-FPLE"></span>.</p>
+<p>&lt;a name="exercise:or2-and2"&gt;**Exercise**&lt;/a&gt; &lt;a href="#solution:or2-and2"&gt;*(Go to solution)*&lt;/a&gt; Write the Hydra notation for this schematic diagram: ![](figures/xfig/andor.svg "schematic diagram")</p>
+<p>&lt;a name="exercise:inv-and2"&gt;**Exercise**&lt;/a&gt; &lt;a href="#solution:inv-and2"&gt;*(Go to solution)*&lt;/a&gt; Draw a schematic diagram for <strong>inv (and2 a b)</strong>.</p>
+<p>&lt;a name="exercise:xor2-nand3"&gt;**Exercise**&lt;/a&gt; &lt;a href="#solution:xor2-nand3"&gt;*(Go to solution)*&lt;/a&gt; Draw a schematic diagram for <strong>xor2 (nand3 p q r) (or2 x y)</strong>.</p>
 <p>To design a circuit, and to do anything useful with it, we need a way to describe it. The description must be understandable, and it also needs to be clear, complete, and precise. Such a description is called a <em>circuit specification</em>.</p>
 <p>This chapter introduces circuit specification using Hydra, a <em>functional hardware description language</em> which is used throughout this book. The focus is on the basic concepts and notations. Later chapters describe features relating to circuit models and simulation, sequential circuits, design patterns, and more.</p>
 <p>Hydra is implemented using Haskell, a general purpose functional programming language. Hydra is a subset of Haskell, augmented with libraries. A circuit specification is compiled using the Haskell compiler, and there is no separate Hydra compiler. However, it's better to think of Hydra as a distinct language, and some of the software tools will give an error message if you try to step outside of Hydra and write general Haskell code in a circuit specification. You don't need to know how Hydra is implemented in order to use it, but Chapter ?? explains how the implementation works.</p>
@@ -112,7 +115,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>A specification may take the form of a diagram or a piece of text. For digital circuits, a pictorial specification is called a <em>schematic diagram</em> while a textual specification uses a <em>hardware description language</em>. Both forms can also be used for software: a textual specification of an algorithm uses a programming language, but there are also visual programming languages that used diagrams to describe algorithms.</p>
 <p>A schematic diagram is an abstract picture of a circuit. It shows the components and how they are connected with wires, but it does not directly describe the circuit's function. A schematic diagram implies some geometric information, such as the relative placement of components, and this geometry may be used in fabricating the circuit.</p>
 <h2 id="hardware-description-languages">Hardware description languages</h2>
-<p>An alternative approach is to use a computer hardware description language (``CHDL'' or just ``HDL'', for hardware description language). A circuit specification using an HDL is a text document, so it looks superficially like a computer program, but it describes hardware rather than software.</p>
+<p>An alternative approach is to use a computer hardware description language (`CHDL' or just `HDL', for hardware description language). A circuit specification using an HDL is a text document, so it looks superficially like a computer program, but it describes hardware rather than software.</p>
 <p>Schematic diagrams and hardware description languages each have their merits. A diagram may be easier for a beginner to understand, and it is more obvious that a schematic describes hardware, and isn't just a computer program. However, hardware description languages scale up better to large and complex circuits, and fit better with software tools that perform actions using a specification (simulation, analysis, etc.).</p>
 <p>Hardware description languages use many of the same concepts that appear in programming languages. This is natural, because the purpose of both hardware and software is to express algorithms, and both benefit from abstraction, repetition, and similar concepts. Some hardware description languages are based on imperative languages. We will be using Hydra, which is based on Haskell, a pure functional language.</p>
 <h2 id="functional-hardware-description">Functional hardware description</h2>
@@ -177,7 +180,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <a class="sourceLine" id="cb13-3" title="3">p <span class="fu">=</span> xor2 a b</a>
 <a class="sourceLine" id="cb13-4" title="4">x <span class="fu">=</span> nand2 p q</a></code></pre></div>
 <p>The order of the equations makes no difference at all to the circuit; it's best to put them in whatever order seems to be easiest to understand. If a top-down view of the circuit seems natural, then the first set of equations is suitable, but if a bottom-up view is clearer, then the second set is better.</p>
-<p>There is another important consequence of the fact that we are working with mathematical equations. We can perform <em>equational reasoning</em> to transform a circuit specification into a different form, with a guarantee that the circuit itself has not been affected. Suppose that we have an equation |x = e|. Equational reasoning means that if |x| appears in |e'|, we can replace it with |e|; conversely, if |e| appears in |e'| we can replace it with |x|. This process is sometimes called ``substituting equals with equals'', and it is central in algebraic reasoning.</p>
+<p>There is another important consequence of the fact that we are working with mathematical equations. We can perform <em>equational reasoning</em> to transform a circuit specification into a different form, with a guarantee that the circuit itself has not been affected. Suppose that we have an equation |x = e|. Equational reasoning means that if |x| appears in |e'|, we can replace it with |e|; conversely, if |e| appears in |e'| we can replace it with |x|. This process is sometimes called `substituting equals with equals', and it is central in algebraic reasoning.</p>
 <p>Equational reasoning is one of the central advantages to a functional hardware description language. It has many applications: it can be used to rewrite a circuit to make it more readable; it can be used to transform a circuit to calculate the same result but do it faster; it can be used to prove that a circuit is correct according to an abstract specification. Equational reasoning can even be used to derive an implementation from a specification.</p>
 <p>Here is a simple example of equational reasoning. Start with the set of equations discussed above:</p>
 <div class="sourceCode" id="cb14"><pre class="sourceCode Haskell"><code class="sourceCode haskell"><a class="sourceLine" id="cb14-1" title="1">x <span class="fu">=</span> nand2 p q</a>
@@ -231,5 +234,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <ul>
 <li>C-c C-e h h org-html-export-to-html</li>
 </ul>
+<p>&lt;p&gt; &lt;a name="solution:or2-and2"&gt;**Solution**&lt;/a&gt; &lt;a href="#exercise:or2-and2"&gt;*(Go to exercise)*&lt;/a&gt; <strong>x = or2 (and2 a b) c</strong></p>
+<p>&lt;/p&gt;&lt;p&gt; &lt;a name="solution:inv-and2"&gt;**Solution**&lt;/a&gt; &lt;a href="#exercise:inv-and2"&gt;*(Go to exercise)*&lt;/a&gt; The diagram for inv and2 a b goes here.</p>
+<p>&lt;/p&gt;&lt;p&gt; &lt;a name="solution:xor2-nand3"&gt;**Solution**&lt;/a&gt; &lt;a href="#exercise:xor2-nand3"&gt;*(Go to exercise)*&lt;/a&gt; The diagram for xor2-nand3 goes here.</p>
+<p>&lt;/p&gt;</p>
 </body>
 </html>

@@ -1,7 +1,7 @@
 {-|
 Module       : HDL.Hydra.Core.Lib
 Description  : Hydra core library
-Copyright    : (c) John O'Donnell 2017
+Copyright    : (c) John O'Donnell 2020
 License      : GPL-3
 Maintainer   : john.t.odonnell9@gmail.com
 Stability    : experimental

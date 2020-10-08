@@ -56,7 +56,27 @@ all :
 #----------------------------------------------------------------------
 # User guide
 
+# The source for the user guide (in src/docsrc) is written in org.
+# The m4 and pandoc programs are needed to build the html.
+
+.PHONY : olduserguide
+olduserguide :
+	mkdir -p doc/userguide/html
+	cp -r -u src/docsrc/figures doc/userguide
+	cp src/docsrc/style.css doc/userguide/html
+	m4 -P src/docsrc/indexsrc.m4 \
+	  >doc/userguide/html/indextemp.txt
+	pandoc --standalone \
+          --read markdown --write html \
+          --table-of-contents --toc-depth=4 \
+          --variable=date:'$(VersionDate)' \
+          --variable=css:style.css \
+          -o doc/userguide/html/index.html \
+	    doc/userguide/html/indextemp.txt
+
 docs/userguide/HydraUserGuide.html : docs/userguide/HydraUserGuide.org
+	m4 -P docs/userguide/HydraUserGuide.org \
+	  >docs/userguide/ugTEMP.org
 	pandoc --standalone \
           --from=org \
           --to=html \
@@ -64,7 +84,6 @@ docs/userguide/HydraUserGuide.html : docs/userguide/HydraUserGuide.org
           --table-of-contents --toc-depth=4 \
           --metadata title="Hydra User Guide" \
           --variable=date:'$(VersionDate)' \
-          --variable=css:style.css \
-          --output=docs/html/userguide/userguide.html \
+          --variable=css:HydraUserGuide.css \
           -o docs/userguide/HydraUserGuide.html \
-	  docs/userguide/HydraUserGuide.org
+	  docs/userguide/ugTEMP.org
