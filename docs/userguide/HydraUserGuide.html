@@ -4,7 +4,6 @@
   <meta charset="utf-8" />
   <meta name="generator" content="pandoc" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
-  <meta name="author" content="John T. O'Donnell" />
   <title>Hydra User Guide</title>
   <style>
       code{white-space: pre-wrap;}
@@ -75,36 +74,991 @@ code span.va { color: #19177c; } /* Variable */
 code span.vs { color: #4070a0; } /* VerbatimString */
 code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
   </style>
-  <link rel="stylesheet" href="userguide-style.css" />
+  <link rel="stylesheet" href="./HydraUserGuide.css" />
   <!--[if lt IE 9]>
     <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
   <![endif]-->
-  <link rel="stylesheet" type="text/css" href="style.css" />
 </head>
 <body>
 <header id="title-block-header">
 <h1 class="title">Hydra User Guide</h1>
-<p class="author">John T. O'Donnell</p>
-<p class="date">version:         2.4.1</p>
+<p class="date">version:         2.4.1, October 2020. Copyright 2020 John T. O&apos;Donnell. For latest version, see <a href='https://github.com/jtod/Hydra' target='_blank'>https://github.com/jtod/Hydra</a>.</p>
 </header>
 <nav id="TOC" role="doc-toc">
 <ul>
-<li><a href="#hydra-a-language-for-circuit-specification">Hydra: a language for circuit specification</a><ul>
-<li><a href="#specifications">Specifications</a></li>
+<li><a href="#introduction">Introduction</a><ul>
 <li><a href="#hardware-description-languages">Hardware description languages</a></li>
+<li><a href="#modeling-circuits-as-functions">Modeling circuits as functions</a></li>
+</ul></li>
+<li><a href="#installation">Installation</a></li>
+<li><a href="#hello-world-running-a-simulation">Hello world! Running a simulation</a></li>
+<li><a href="#a-quick-overview-with-examples">A quick overview with examples</a><ul>
+<li><a href="#a-minimal-circuit-helloworld">A minimal circuit: helloWorld</a></li>
+<li><a href="#connecting-several-logic-gates-mux1">Connecting several logic gates: mux1</a></li>
+<li><a href="#producing-several-outputs-halfadd">Producing several outputs: halfAdd</a></li>
+<li><a href="#black-box-with-internal-signals-add4">Black box with internal signals: add4</a></li>
+<li><a href="#feedback-and-changing-state-bsr4">Feedback and changing state: BSR4</a></li>
+</ul></li>
+<li><a href="#modules-and-files">Modules and files</a></li>
+<li><a href="#connecting-components-with-signals">Connecting components with signals</a><ul>
+<li><a href="#logic-gates">Logic gates</a></li>
+<li><a href="#connecting-a-circuit-to-inputs">Connecting a circuit to inputs</a></li>
+<li><a href="#anonymous-signals">Anonymous signals</a></li>
+<li><a href="#named-signals-and-equations">Named signals and equations</a></li>
+<li><a href="#constant-signals">Constant signals</a></li>
+</ul></li>
+<li><a href="#defining-new-circuits">Defining new circuits</a><ul>
+<li><a href="#circuit-type">Circuit type</a></li>
+<li><a href="#interface">Interface</a></li>
+<li><a href="#internal-signals">Internal signals</a></li>
+<li><a href="#multiple-outputs">Multiple outputs</a></li>
+<li><a href="#feedback">Feedback</a></li>
+</ul></li>
+<li><a href="#signal-and-circuit-types">Signal and circuit types</a><ul>
+<li><a href="#signal-types-and-classes">Signal types and classes</a></li>
+<li><a href="#combinational-signals-bit-a">Combinational signals: Bit a</a></li>
+<li><a href="#clocked-signals-cbit-a">Clocked signals: CBit a</a></li>
+<li><a href="#inputs-and-outputs">Inputs and outputs</a></li>
+</ul></li>
+<li><a href="#containers">Containers</a><ul>
+<li><a href="#tuples">Tuples</a></li>
+<li><a href="#words">Words</a></li>
+<li><a href="#example-2-a-circuit-with-words-and-internal-signals">Example 2: A circuit with words and internal signals</a><ul>
+<li><a href="#building-words">Building words</a></li>
+<li><a href="#accessing-parts-of-a-word">Accessing parts of a word</a></li>
+</ul></li>
+<li><a href="#nested-clusters">Nested clusters</a></li>
+</ul></li>
+<li><a href="#combinational-simulation">Combinational simulation</a></li>
+<li><a href="#synchronous-sequential-simulation">Synchronous sequential simulation</a><ul>
+<li><a href="#general-form">General form</a></li>
+<li><a href="#parsing-the-inputs">Parsing the inputs</a></li>
+<li><a href="#formatting-the-outputs">Formatting the outputs</a></li>
+<li><a href="#defining-a-main-program">Defining a main program</a></li>
+<li><a href="#modules-and-libraries">Modules and libraries</a></li>
+<li><a href="#compilation-and-interpretation">Compilation and interpretation</a></li>
+</ul></li>
+<li><a href="#standard-library-for-bits">Standard library for bits</a><ul>
+<li><a href="#constant-signals-1">Constant signals</a></li>
+<li><a href="#logic-gates-1">Logic gates</a></li>
+<li><a href="#replicating-a-signal">Replicating a signal</a></li>
+<li><a href="#multiplexers-and-demultiplexers">Multiplexers and demultiplexers</a></li>
+<li><a href="#bit-addition">Bit addition</a></li>
+<li><a href="#flip-flops-and-registers">Flip flops and registers</a></li>
+</ul></li>
+<li><a href="#standard-library-for-words">Standard library for words</a><ul>
+<li><a href="#replication-and-constant-words">Replication and constant words</a></li>
+<li><a href="#replicating-a-word">Replicating a word</a></li>
+<li><a href="#rearranging-bits-in-a-word">Rearranging bits in a word</a><ul>
+<li><a href="#combinational-shifting">Combinational shifting</a></li>
+<li><a href="#bit-slice-representation">Bit slice representation</a></li>
+</ul></li>
+<li><a href="#logic-on-words">Logic on words</a></li>
+<li><a href="#conditionals-and-addresses">Conditionals and addresses</a><ul>
+<li><a href="#multiplexers">Multiplexers</a></li>
+<li><a href="#demultiplexers">Demultiplexers</a></li>
+</ul></li>
+<li><a href="#arithmetic">Arithmetic</a><ul>
+<li><a href="#binary-addition">Binary addition</a></li>
+</ul></li>
+<li><a href="#registers">Registers</a></li>
+<li><a href="#registers-1">Registers</a></li>
+</ul></li>
+<li><a href="#circuit-generators">Circuit generators</a><ul>
+<li><a href="#operating-on-words">Operating on words</a></li>
+<li><a href="#recursive-circuit-definitions">Recursive circuit definitions</a></li>
+<li><a href="#tree-structured-circuits">Tree structured circuits</a></li>
+<li><a href="#memory">Memory</a></li>
+</ul></li>
+<li><a href="#combinators">Combinators</a><ul>
+<li><a href="#map">Map</a><ul>
+<li><a href="#sized-map">Sized map</a></li>
+</ul></li>
+<li><a href="#fold">Fold</a><ul>
+<li><a href="#fold-from-the-left">Fold from the left</a></li>
+<li><a href="#binary-comparison-using-foldl">Binary comparison using foldl</a></li>
+<li><a href="#fold-from-the-right-foldr">Fold from the right: foldr</a></li>
+</ul></li>
+<li><a href="#scan">Scan</a><ul>
+<li><a href="#scan-from-the-left-scanl">Scan from the left: scanl</a></li>
+<li><a href="#scan-from-the-right-scanr">Scan from the right: scanr</a></li>
+<li><a href="#combining-a-map-with-a-scan">Combining a map with a scan</a></li>
+<li><a href="#ripple-carry-addition">Ripple carry addition</a></li>
+<li><a href="#bidirectional-scan">Bidirectional scan</a></li>
+</ul></li>
+</ul></li>
+<li><a href="#circuit-semantics">Circuit semantics</a><ul>
+<li><a href="#boolean-signals">Boolean signals</a></li>
+<li><a href="#streams">Streams</a></li>
+<li><a href="#synchronous-circuits">Synchronous circuits</a></li>
+<li><a href="#multiple-semantics">Multiple semantics</a></li>
+<li><a href="#path-depth">Path depth</a></li>
+<li><a href="#netlists">Netlists</a></li>
+</ul></li>
+<li><a href="#equational-reasoning">Equational reasoning</a><ul>
+<li><a href="#substituting-equals-for-equals">Substituting equals for equals</a></li>
+<li><a href="#equivalent-ways-to-describe-a-circuit">Equivalent ways to describe a circuit</a></li>
+</ul></li>
+<li><a href="#summary-of-syntax">Summary of syntax</a><ul>
+<li><a href="#indentation">Indentation</a></li>
+<li><a href="#names">Names</a></li>
+<li><a href="#signal-expressions">Signal expressions</a></li>
+<li><a href="#specifications">Specifications</a></li>
+<li><a href="#hardware-description-languages-1">Hardware description languages</a></li>
 <li><a href="#functional-hardware-description">Functional hardware description</a></li>
 <li><a href="#signals">Signals</a></li>
 <li><a href="#circuits">Circuits</a></li>
 <li><a href="#equations">Equations</a></li>
-<li><a href="#typesetting-notes">Typesetting notes</a></li>
 </ul></li>
 </ul>
 </nav>
-<h1 id="hydra-a-language-for-circuit-specification">Hydra: a language for circuit specification</h1>
-<p>Some references to include <span class="citation" data-cites="J84-app-prog-dig-design"></span> <span class="citation" data-cites="2002-OD-PDSECA-Hydra"></span> <span class="citation" data-cites="1995-OD-Hydra-FPLE"></span>.</p>
-<p>&lt;a name="exercise:or2-and2"&gt;**Exercise**&lt;/a&gt; &lt;a href="#solution:or2-and2"&gt;*(Go to solution)*&lt;/a&gt; Write the Hydra notation for this schematic diagram: ![](figures/xfig/andor.svg "schematic diagram")</p>
-<p>&lt;a name="exercise:inv-and2"&gt;**Exercise**&lt;/a&gt; &lt;a href="#solution:inv-and2"&gt;*(Go to solution)*&lt;/a&gt; Draw a schematic diagram for <strong>inv (and2 a b)</strong>.</p>
-<p>&lt;a name="exercise:xor2-nand3"&gt;**Exercise**&lt;/a&gt; &lt;a href="#solution:xor2-nand3"&gt;*(Go to solution)*&lt;/a&gt; Draw a schematic diagram for <strong>xor2 (nand3 p q r) (or2 x y)</strong>.</p>
+<h1 id="introduction">Introduction</h1>
+<p>Hydra is a computer hardware description language (CHDL or HDL) that enables you to design, analyse, and simulate digital circuits. It focuses on logic design, not on the physics of electronic components. It is concerned with how to connect logic gates into a system, but not with the electronic characteristics of an individual transistor. Hydra supports <strong>synchronous circuits</strong>, where a clock keeps all the flip flops synchronised with each other.</p>
+<p>This is free and open source software; see LICENSE.txt for details. To use the system you need the ghc compiler suite for Haskell (this is needed to use Hydra, not just to install it). See the sections Getting started and Installation.</p>
+<p>The language provides facilities that help to design complex circuits as well as small ones. The notation is concise and readable. Large circuits can be described using <strong>circuit generators</strong>, which remove most of the repetition in a circuit description without losing any of the detail. New circuit generators can be defined: you aren't limited to the ones that are built in.</p>
+<p>Hydra has a semantic foundation for circuits that supports the use of <strong>equational reasoning</strong>. This is a formal method that can be used to transform a circuit to make it more efficient according to a cost model, as well as to prove that an implementation satisfies a specification. In some cases, it is possible to start with an abstract specification of the desired behavior, and to derive mathematically a circuit that implements it.</p>
+<p>Hydra is not suitable for all design problems. It assumes that all the values on wires are digital, rather than continuously varying analogue voltages. There are other hardware description languages that can handle analogue circuits.</p>
+<h2 id="hardware-description-languages">Hardware description languages</h2>
+<p>To design a circuit, and to do anything useful with it, we need a way to describe it. The description can take two forms. A <strong>specification</strong> is a clear statement of what the system is intended to do, while an <strong>implementation</strong> shows how the primitive operations that are available can achieve that result. Both the specification and implementation need to be clear, complete, and precise.</p>
+<p>An implementation may take the form of a diagram or a piece of text. For digital circuits, a pictorial specification is called a <strong>schematic diagram</strong> while a textual specification uses a <strong>hardware description language</strong>. Both forms can also be used for software: a textual specification of an algorithm uses a programming language, but there are also visual programming languages that used diagrams to describe algorithms.</p>
+<p>A schematic diagram is an abstract picture of a circuit. It shows the components and how they are connected with wires, but it does not directly describe the circuit's function. A schematic diagram implies some geometric information, such as the relative placement of components, and this geometry may be used in fabricating the circuit.</p>
+<p>An alternative approach is to use a computer hardware description language (CHDL or HDL). A circuit specification using an HDL is a text document, so it looks superficially like a computer program, but it describes hardware rather than software. Most hardware description languages are based on existing programming languages intended for software, and they model circuits using the paradigms of programming.</p>
+<p>Schematic diagrams and hardware description languages each have their merits. A diagram may be easier for a beginner to understand, and it's more obvious that a schematic describes hardware and isn't just a computer program. However, hardware description languages scale up better to large and complex circuits, and fit better with software tools that can analyse a circuit and simulate it.</p>
+<h2 id="modeling-circuits-as-functions">Modeling circuits as functions</h2>
+<p>Some HDLs are based on imperative programming languages, using the assignment statement to model a state change in a circuit. In contrast, Hydra is based on pure functional programming, and it models a circuit as a function that takes inputs and produces outputs. This is natural, because a circuit and a function are both a black box that takes some inputs and produces some outputs. The underlying model – circuits as functions rather than state changes as assignments – is the fundamental difference between Hydra and imperative HDLs.</p>
+<p>Hydra is an example of an <strong>embedded domain-specific language</strong> (DSL or EDSL). A domain-specific language is a language intended for one specific application domain, not for general purpose programming. Hydra is suitable specifically for expressing algorithms as digital circuits, but it isn't a general purpose programming language. It is implemented by <strong>embedding</strong> in Haskell, a general purpose functional language. This means that Hydra doesn't have a separate compiler; instead, its implementation consists of a library of Haskell modules. A circuit specification written in Hydra is compiled by the Haskell compiler and linked with the Hydra library. However, it is best to think of Hydra as a distinct language: designing a circuit is not the same as writing a program in Haskell, and some Haskell programs don't correspond to circuits.</p>
+<p>Hydra is implemented using Haskell, a general purpose functional programming language. Hydra is a subset of Haskell, augmented with libraries. A circuit specification is compiled using the Haskell compiler, and there is no separate Hydra compiler. However, it's better to think of Hydra as a distinct language, and some of the software tools will give an error message if you try to step outside of Hydra and write general Haskell code in a circuit specification. You don't need to know how Hydra is implemented in order to use it, but Chapter ?? explains how the implementation works.</p>
+<h1 id="installation">Installation</h1>
+<p>See <strong>README.md</strong> for current notes on installation.</p>
+<p>You need two pieces of software: ghc, a Haskell compiler, and the Hydra source. Both are free software, and they run on Windows, Macintosh, and Gnu/Linux.</p>
+<ul>
+<li><p>The ghc compiler for Haskell. To find out whether you have it, enter ghc –version. If it isn't installed, go to www.haskell.org. It's easiest to get the Haskell Platform, not just the ghc compiler.</p></li>
+<li><p>Download Hydra from <a href="https://github.com/jtod/Hydra">https://github.com/jtod/Hydra</a>. The installation file is Hydra-i.j.k.zip (or .tgz). Put the file somewhere in your user workspace and uppack it: on Linux, tar -xzf Hydra-i.j.k.tgz and on Windows use 7zip or tar.</p></li>
+<li><p>The User Guide is in docs/userguide/HydraUserGuide.html. If that file is missing, the source is docs/userguide/HydraUserGuide.org</p></li>
+<li><p>There is also an API reference; see README.md for how to find it.</p></li>
+<li><p>To build Hydra and make it available so you can use it in your circuits, see README.md.</p></li>
+</ul>
+<h1 id="hello-world-running-a-simulation">Hello world! Running a simulation</h1>
+<p>Let's start by running a circuit simulation. For now, just run the examples, and refer back to them as the subsequent sections explain the language. The examples directory contains a variety of circuits, and the simplest is in examples/helloworld.</p>
+<p>To run a circuit, two definitions are needed: the <strong>circuit specification</strong>, and a <strong>simulation driver</strong>. The circuit specification states precisely the interface to the circuit, what components it contains, and how they are connected. The simulation driver says how to parse the inputs using a readable input format, and how to format the outputs to make them readable.</p>
+<p>It's good practice to place the circuit definition and its simulation driver in separate files. By convention, the filename of the driver ends in "Run". The files in examples/helloworld are:</p>
+<ul>
+<li><p>HelloWorld.hs defines a circuit named hello, which takes two input bits and outputs their logical and.</p></li>
+<li><p>HelloWorldRun.hs defines a simulation driver for the circuit. Usually, a simulation driver file provides a main program named <strong>main</strong> which runs the simulation on test data which is also defined in the file. In HelloWorldRun.hs, the test data runs the circuit on all possible inputs 00, 01, 10, 11. Since the hello circuit is really just an and2 gate, the results should be 0, 0, 0, 1.</p></li>
+</ul>
+<p>You can tell ghc, the Haskell compiler, to compile the circuit and simulation driver and to execute the <strong>main</strong> in the driver.</p>
+<p><code>~~</code> cd examples/helloworld hydra HelloWorldRun <code>~~</code></p>
+<p>An alternative is to use the interactive ghci interpreter, using the hydrai command. This is sometimes quicker than using the ghc compiler, but the primary advantage is that it allows interactive testing. You aren't limited to executing <strong>main</strong>; you can enter expressions interactively.</p>
+<p><code>~~</code> hydrai :load HelloWorldRun :main <code>~~</code></p>
+<h1 id="a-quick-overview-with-examples">A quick overview with examples</h1>
+<p>This section shows several examples of circuits of increasing complexity. You may be able to design and simulate some circuits on your own by following and modifying these examples. The various design techniques are described in more detail in later sections.</p>
+<h2 id="a-minimal-circuit-helloworld">A minimal circuit: helloWorld</h2>
+<p>Files: <strong>examples/helloworld/HelloWorld.hs</strong> and <strong>examples/helloworld/HelloWorldRun.hs</strong></p>
+<p>The HelloWorld circuit just contains one logic gate.</p>
+<p><code>~~~</code> m4<sub>include</sub>(`examples/helloworld/HelloWorld.hs') <code>~~~</code></p>
+<p>The circuit itself is defined in a module HelloWorld, which is in the file named HelloWorld.hs. A module may contain any number of definitions. The module imports the standard library with <strong>import HDL.Hydra.Core.Lib</strong>. All circuit modules need this import; some modules will need additional import statements.</p>
+<p>The circuit specification has two parts: a <strong>type declaration</strong> which contains the symbol :: and a <strong>defining equation</strong> which contains the symbol =.</p>
+<p>To test the circuit, we can simulate it with some inputs. This requires a <strong>simulation driver</strong> which is defined in a separate module in the file HelloWorldRun.hs.</p>
+<p><code>~~~</code> m4<sub>include</sub>(`examples/helloworld/HelloWorldRun.hs') <code>~~~</code></p>
+<p>Simulation drivers can be standalone modules containing the test data, as in HelloWorldRun. In this case, the name of the module should be <strong>Main</strong>. As well as importing the standard library, the module also needs to import the circuit.</p>
+<p>A Main module should define a function <strong>main</strong> which will run the simulation. This defines one or more actions to perform; in this case there is only one action, which is to execute the simulation driver (helloRun) on the circuit's inputs (testdata).</p>
+<p>The test data itself is a list of lists. The outer list gives the inputs for each clock cycle:</p>
+<p><code>~~</code> testdata = [ inputs for clock cycle 0 , inputs for clock cycle 1 , inputs for clock cycle 2 , inputs for clock cycle 3 ] <code>~~</code></p>
+<p>For any clock cycle, there is a list of inputs. Since the circuit has two inputs, each clock cycle gets a list of two values.</p>
+<p><code>~~</code> testdata = [ [0, 0] – in cycle 0, x=0 y=0 , [0, 1] – in cycle 1, x=0 y=1 , [1, 0] – in cycle 2, x=1 y=0 , [1, 1] – in cycle 3, x=1 y=1 ] <code>~~</code></p>
+<p>The simulation driver itself begins with <strong>helloRun input = runAllInput input output</strong>. See the section on simulation drivers for more details. In brief, the purpose of the driver is to convert inputs and outputs between a readable textual form and the internal signal representations needed by the circuit. It contains three sections. The first section defines the input signals for the circuit (x, y). The second section defines the output from the circuit (z). The third section formats what will be printed, which may include any of the signals along with label strings.</p>
+<h2 id="connecting-several-logic-gates-mux1">Connecting several logic gates: mux1</h2>
+<p>Files: <strong>examples/mux/Mux1.hs</strong> and <strong>examples/mux/Mux1Run.hs</strong></p>
+<p>The <strong>multiplexer</strong> is an example of a circuit that can be defined by conecting several logic gates together. It's not just an arbitrary example: the multiplexer is one of the most important building blocks for larger systems. There are many varieties of multiplexer; here we look at the 1-bit multiplexer, called <strong>mux1</strong>.</p>
+<p>A multiplexer is a hardware version of the if-then-else expression, and is used to perform conditional actions in a circuit. It takes three inputs: a control input <strong>c</strong>, and two data inputs <strong>x</strong> and <strong>y</strong>.</p>
+<p>The idea is that the multiplexer will choose one of the data inputs (<strong>x</strong> or <strong>y</strong>) and output it. The data input that is not chosen is simply ignored. The choice is determined by the value of <strong>c</strong>. Informally, the behavior of the multiplexer is:</p>
+<p><code>~~~</code> mux1 c x y = if c is zero then x else y <code>~~~</code></p>
+<p>(Aside: Sometimes it's helpful to describe some signals as <strong>control signals</strong> because they affect what the circuit does, and to describe others as <strong>data signals</strong> because they carry variable values. Since the behavior of the mux1 is controlled by <strong>c</strong>, this is a control input. Since <strong>x</strong> and <strong>y</strong> are just arbitrary values, these are called data signals. But it's important to realise that this terminology – control and data signal – is just a way of talking about the signals. As far as the actual components and wires are concerned, there is no difference between data and control.)</p>
+<p>This if-then-else expression is a programming construct, and it doesn't directly correspond to digital hardware. The multiplexer can be implemented with logic gates.</p>
+<p>To connect a circuit to an input, write the circuit followed by the input. Thus <strong>inv c</strong> says there is an inverter, and its input is connected to <strong>c</strong>, and the entire expression <strong>inv c</strong> denotes the output signal produced by the inverter. Similarly, <strong>and2 (inv c) a</strong> denotes the output of an and2 gate; its first input is the output of the inverter and its second input is <strong>a</strong>.</p>
+<p><code>~~~</code> mux1 c x y = or2 (and2 (inv c) x) (and2 c y) <code>~~~</code></p>
+<p>Here is the complete module defining the multiplexer:</p>
+<p><code>~~~</code> m4<sub>include</sub>(`examples/mux/Mux1.hs') <code>~~~</code></p>
+<p>We can run it with a simulation driver that runs the circuit on all possible inputs, so the outputs form a truth table. It's good practice to write the test data with clean indentation, so the inputs line up in columns, and to include the expected outputs in comments.</p>
+<p><code>~~~</code> m4<sub>include</sub>(`examples/mux/Mux1Run.hs') <code>~~~</code></p>
+<h2 id="producing-several-outputs-halfadd">Producing several outputs: halfAdd</h2>
+<p>Files: <strong>examples/adder/HalfAdd.hs</strong> and <strong>examples/adder/HalfAddRun.hs</strong></p>
+<p>A half adder circuit takes two inputs <strong>x</strong> and <strong>y</strong>, and produces a pair of outputs, the carry output and the sum output. The carry is the logical <strong>and</strong> of <strong>x</strong> and <strong>y</strong>, while the sum is their exclusive <strong>or</strong>. Here is the circuit specification (file <strong>HalfAdd.hs</strong>):</p>
+<p><code>~~~</code> m4<sub>include</sub>(`examples/adder/HalfAdd.hs') <code>~~~</code></p>
+<p>The module statement gives a name to this module, and the import statement brings in the essential Hydra library definitions. The circuit definition is a one-line equation which says <strong>halfAdd</strong> is a circuit, gives names <strong>x</strong> and <strong>y</strong> to its inputs, and calculates the outputs using <strong>and2</strong> and <strong>xor2</strong> logic gates.</p>
+<p>To see the circuit working, we can simulate it. This requires three things, all provided in <strong>HalfAddRun.hs</strong>:</p>
+<ul>
+<li><p>Suitable test data, expressed as a list of <strong>[x,y]</strong> inputs</p></li>
+<li><p>A [Simulation driver](#simulation-drivers), which converts between human readable input and output and the internal signal representations. The simulation driver is not part of the circuit; it's simply formatting inputs and outputs.</p></li>
+<li><p>A main program that runs the simulation driver on the test data.</p></li>
+</ul>
+<p><code>~~~</code> m4<sub>include</sub>(`examples/adder/HalfAddRun.hs') <code>~~~</code></p>
+<p>Run the simulation using any of the methods given above, e.g. enter <strong>ghc -e main HalfAddRun</strong>. Here is the result:</p>
+<p><code>~~~</code> $ ghc -e main HalfAddRun Input: x = 0 y = 0 Output: c = 0 s = 0 Input: x = 0 y = 1 Output: c = 0 s = 1 Input: x = 1 y = 0 Output: c = 0 s = 1 Input: x = 1 y = 1 Output: c = 1 s = 0 <code>~~~</code></p>
+<h2 id="black-box-with-internal-signals-add4">Black box with internal signals: add4</h2>
+<p>Files: <strong>adder/Add4.hs</strong> and <strong>examples/Add4Run.hs</strong></p>
+<p><code>~~~</code> m4<sub>include</sub>(`examples/adder/Add4.hs') <code>~~~</code></p>
+<p><code>~~~</code> m4<sub>include</sub>(`examples/adder/Add4Run.hs') <code>~~~</code></p>
+<p><code>~~</code> *Main&gt; :main x = 5 y = 8 cin = 0 ==&gt; cout = 0 s = 13 x = 7 y = 3 cin = 0 ==&gt; cout = 0 s = 10 x = 8 y = 12 cin = 0 ==&gt; cout = 1 s = 4 x = 8 y = 1 cin = 0 ==&gt; cout = 0 s = 9 x = 12 y = 1 cin = 1 ==&gt; cout = 0 s = 14 x = 2 y = 3 cin = 1 ==&gt; cout = 0 s = 6 x = 15 y = 15 cin = 1 ==&gt; cout = 1 s = 15 (0.00 secs, 252,808 bytes) *Main&gt; <code>~~</code></p>
+<h2 id="feedback-and-changing-state-bsr4">Feedback and changing state: BSR4</h2>
+<p>Files: <strong>BSR4.hs</strong> and <strong>BSR4Run.hs</strong></p>
+<p>A bidirectional shift register</p>
+<p>Define a shift register that takes an operation code op and data inputs x, li, ri, and performs an a state change depending on op:</p>
+<ul>
+<li>op=0 – no state change</li>
+<li>op=1 – load input word x</li>
+<li>op=2 – shift right</li>
+<li>op=3 – shift left</li>
+</ul>
+<p>The circuit uses a building block srb ("shift register block") which has an internal state to hold the bit in that position in the word. The inputs to an srb are an input from the left (for shifting to the right), an input from the right (for shifting to the left), and a bit input from the word x (for loading a word). The circuit outputs a triple: the left and right outputs, and the word giving the current state of the register. (Minor point: the left and right outputs aren't essential, as they also appear as the most and least significant bits of the word output, but this approach makes it easier to connect several sr4 circuits together, and it also fits well with the definition of the more general sr circuit below.)</p>
+<p>The structure of the 4-bit version comes directly from the data dependencies.</p>
+<p>The shift register block uses a dff to hold the state, and it uses a mux2 to determine the new value of the state. This is either the old value, the data bit x from a load, or the input from the left or right in case of a shift.</p>
+<p><code>~~~</code> m4<sub>include</sub>(`examples/shift/BSR4.hs') <code>~~~</code></p>
+<p>The test data and simulation driver are defined in <strong>BSR4Run.hs</strong>.</p>
+<p><code>~~~</code> m4<sub>include</sub>(`examples/shift/BSR4Run.hs') <code>~~~</code></p>
+<p>Running the circuit produces this:</p>
+<p><code>~~~</code> $ ghc -e main BSR4Run op=01 l=0 r=0 x=9 Output lo=0 ro=0 y=0 op=00 l=0 r=0 x=0 Output lo=1 ro=1 y=9 op=11 l=0 r=0 x=0 Output lo=1 ro=1 y=9 op=11 l=0 r=1 x=0 Output lo=0 ro=0 y=2 op=00 l=0 r=0 x=0 Output lo=0 ro=1 y=5 op=01 l=0 r=0 x=4 Output lo=0 ro=1 y=5 op=10 l=1 r=0 x=0 Output lo=0 ro=0 y=4 op=10 l=0 r=0 x=0 Output lo=1 ro=0 y=a op=10 l=0 r=0 x=0 Output lo=0 ro=1 y=5 op=10 l=1 r=0 x=0 Output lo=0 ro=0 y=2 op=00 l=0 r=0 x=0 Output lo=1 ro=1 y=9 <code>~~~</code></p>
+<h1 id="modules-and-files">Modules and files</h1>
+<h1 id="connecting-components-with-signals">Connecting components with signals</h1>
+<p>A data value in a circuit is called a <strong>signal</strong>. A signal is carried by a wire, and it transmits information from one component to another. In logic design we don't usually care about the physical characteristics of a wire, although these can be important at the lower levels of chip design. Therefore we will usually refer to signals rather than wires.</p>
+<p>The information carried by a signal may be represented as an individual bit or a cluster comprising several bits. We can also describe circuits at a higher level, where signals represent integers or other data types.</p>
+<p>A bit (binary digit) can have one of two distinct values. Several names are commonly used for these values, including 0/1, Low/High, False/True, and F/T. In real hardware a bit signal is represented by a voltage, but the precise voltage value is unimportant at the level of logic design. The particular names chosen for the two bit values are also unimportant, although they can affect the readability of a table showing the behavior of a circuit. When Hydra prints out the values of bit signals, it will normally use 0 and 1, but you can tell it to use False and True, or any other names you prefer. One advantage of 0/1 is that they are consistent with treating a bit as a binary digit (False/True suggest treating a bit as a Boolean). Another advantage of 0 and 1 is that they take up only one character and they look different. (Try reading a table showing thousands of F and T characters – they can be hard to tell apart!).</p>
+<h2 id="logic-gates">Logic gates</h2>
+<p>To design a new circuit, you need to take a set of existing circuits and connect them with signals. There are several libraries of existing circuits that you can start with, and you can also define libraries of your own circuits for further use. The Hydra libraries provide as primitives the standard logic gates, summarised in the following table.</p>
+<p>The buffer simply produces an output that is the same as the input; it is the identify function. The inverter outputs 0 if its input is 1, and outputs 1 if its input is 0.</p>
+<p>Many of the logical operations can be performed on any number of inputs. For example, there is the logical conjunction (<strong>and</strong>) of two, three, or four inputs. These correspond to distinct logic gates: the <strong>and2</strong> gate has two input ports and there is no way to connect three inputs to it. Therefore Hydra doesn't have an <strong>and</strong> gate; it has distinct <strong>and2</strong>, <strong>and3</strong>, <strong>and4</strong> gates. This doesn't go on indefinitely; Hydra does not define the <strong>and5</strong> gate or the <strong>and73</strong> gate! (A convenient way to <strong>and</strong> together large number of inputs is to use <strong>andw</strong>.)</p>
+<p>Component Description —————- ———————– buf a buffer inv a inverter and2 a b 2-input and gate and3 a b c 3-input and gate and4 a b c d 4-input and gate or2 a b 2-input or gate or3 a b c 3-input or gate or4 a b c d 4-input or gate xor2 a b 2-input xor gate xor3 a b c 3-input xor gate xor4 a b c d 4-input xor gate nand2 a b 2-input nand gate nand3 a b c 3-input nand gate nand4 a b c d 4-input nand gate nor2 a b 2-input nor gate nor3 a b c 3-input nor gate nor4 a b c d 4-input nor gate xnor2 a b 2-input xnor gate xnor3 a b c 3-input xnor gate xnor4 a b c d 4-input xnor gate</p>
+<p>Most of these logic gates are provided for convenience, but only a few of them are necessary. For example, you can replace <strong>and3 a b c</strong> by <strong>and2 a (and2 b c)</strong>. However, logic gates with several inputs can be fabricated on chips, they are slightly more efficient, and most importantly, it's more readable to use <strong>and3</strong> rather than two <strong>and2</strong> gates.</p>
+<h2 id="connecting-a-circuit-to-inputs">Connecting a circuit to inputs</h2>
+<p>Suppose we have two signals named <strong>x</strong> and <strong>y</strong>, and want to connect them to the inputs of an <strong>or2</strong> gate. This is done by writing the name of the component, followed by the names of the input signals:</p>
+<p><code>~~~</code> or2 x y <code>~~~</code></p>
+<p>The value of this expression is the output of the <strong>or2</strong> gate. Such an expression is called an <strong>application</strong> because the component is applied to its input signals.</p>
+<p>Each circuit takes a specific number of inputs, and an application using that circuit must supply the corresponding number of input signals. Here are several applications of logic gates, each with the right number of inputs.</p>
+<p><code>~~~</code> inv x and2 a one xor3 p q r nor4 a zero c d <code>~~~</code></p>
+<h2 id="anonymous-signals">Anonymous signals</h2>
+<p>A signal may be given a name, such as <strong>x</strong> or <strong>y</strong>, although this is optional. You can also refer to a signal using an application of a component to its inputs, such as <strong>inv x</strong>; the output of the inverter is an anonymous signal as it has no name.</p>
+<p>An anonymous signal is described by an expression with several tokens. When you use it as an input to a circuit, this expression must be enclosed by parentheses, to turn it into a single object. For example, suppose we want to connect the first input to an <strong>and2</strong> gate to the output of an inverter whose input is <strong>x</strong>. The second input to the <strong>and2</strong> gate should be <strong>y</strong>. Here is the correct way to write it:</p>
+<p><code>~~~</code> and2 (inv x) y <code>~~~</code></p>
+<p>There are two expressions following <strong>and2</strong>, denoting its two inputs. The following notation would be wrong:</p>
+<p><code>~~~</code> and2 inv x y – Wrong! <code>~~~</code></p>
+<p>Here, it looks like the <strong>and2</strong> gate is being given three inputs, and the first one isn't even a signal.</p>
+<p>Parentheses are used in Hydra for grouping, just as in mathematics. You don't need to use parentheses just to specify the arguments to a function (that is, the inputs to a circuit). Some programming languages requires lots of punctuation to indicate function application:</p>
+<p><code>~~~</code> nand3 (x, and2 (p,q), z); – Wrong! <code>~~~</code></p>
+<p>In Hydra (as in Haskell) you don't need the extra parentheses and commas, and they will lead to error messages. Use parentheses only when they are necessary to get the right grouping:</p>
+<p><code>~~~</code> nand3 x (and2 p q) z <code>~~~</code></p>
+<p>It can be helpful to give both a schematic diagram and a textual specification for a circuit. Each form of description provides insight, and having both together is often worthwhile. It's important to check that the two descriptions of the circuit are consistent with each other. To do this, check that every box in the diagram corresponds to a circuit (function) in the text, and check that the wires in the diagram correspond to the signals in the text.</p>
+<p>BeginExercise(or2-and2) Write the Hydra notation for this schematic diagram: ![](figures/xfig/andor.svg "schematic diagram")</p>
+<p>BeginSolution(or2-and2) <strong>x = or2 (and2 a b) c</strong></p>
+<p>EndSolution</p>
+<p>BeginExercise(inv-and2) Draw a schematic diagram for <strong>inv (and2 a b)</strong>.</p>
+<p>BeginSolution(inv-and2) The diagram for inv and2 a b goes here.</p>
+<p>EndSolution</p>
+<p>BeginExercise(xor2-nand3) Draw a schematic diagram for <strong>xor2 (nand3 p q r) (or2 x y)</strong>.</p>
+<p>BeginSolution(xor2-nand3) The diagram for xor2-nand3 goes here.</p>
+<p>EndSolution</p>
+<h2 id="named-signals-and-equations">Named signals and equations</h2>
+<p>Sometimes it's useful to give a name to a signal, rather than using it anonymously. A named signal can be used as an input to several different components, but an anonymous signal cannot. Names can also make it easier to explain the circuit, and well chosen names help document the purpose of a signal.</p>
+<p>A signal can be named using an equation. The left hand side of the equation is the name, and the right hand side is an expression that defines the signal. The following equation says that the output of the <strong>and3</strong> gate has the name <strong>x</strong>.</p>
+<p><code>~~~</code> x = and3 a (inv b) c <code>~~~</code></p>
+<p>Sometimes the choice between anonymous and named signals is just a matter of style. Here is a signal defined using three anonymous signals:</p>
+<p><code>~~~</code> x = nand2 (xor2 a b) (inv (nor2 c d)) <code>~~~</code></p>
+<p>This can be rewritten so as to give every signal an explicit name, by introducing additional equations:</p>
+<p><code>~~~</code> x = nand2 p q p = xor2 a b q = inv r r = nor2 c d <code>~~~</code></p>
+<p>An equation like this is called a <strong>defining equation</strong>, because the left hand side has to be a signal name whose value is defined to be the right hand side. It would be wrong, for example, to write</p>
+<p><code>~~~</code> nand2 p q = x – Wrong! <code>~~~</code></p>
+<p>When using <strong>equational reasoning</strong> you will encounter equations with a more general form, but in defining signals, the left hand side is always a signal name.</p>
+<h2 id="constant-signals">Constant signals</h2>
+<p>A constant signal always carries the same value: either it is always 0, or always 1. The names of these two constants are written as <strong>zero</strong> and <strong>one</strong>. Names in Hydra always begin with a lower case letter, never with a digit. Don't use 0/1, or T/F, or True/False in a circuit specification; those notations have other meanings and will lead to bizarre error messages.</p>
+<h1 id="defining-new-circuits">Defining new circuits</h1>
+<p>A new circuit can be designed by connecting together a number of existing ones. The examples given so far consist of logic gates, which are primitive components. To design larger scale systems, we need the ability to define a circuit as a new <strong>black box</strong> component and reuse it. This is similar to using abstraction in a programming language by defining a function or procedure for a commonly used computation. A circuit definition contains up to three parts:</p>
+<ol>
+<li><p>Circuit type (optional)</p></li>
+<li><p>Interface (mandatory)</p></li>
+<li><p>Internal signals (optional)</p></li>
+</ol>
+<h2 id="circuit-type">Circuit type</h2>
+<p>The circuit type is covered in a later section. It's optional, although it is generally best to include it. If present, the type can be recognized by the :: symbol and a number of right arrow symbols; a typical example is</p>
+<p><code>~~</code> halfAdd :: Bit a =&gt; a -&gt; a -&gt; (a,a) <code>~~</code></p>
+<h2 id="interface">Interface</h2>
+<p>The interface gives the name of the circuit and names its inputs and outputs. A circuit is created with a <strong>circuit defining equation</strong>. The left hand side of the equation is the name of the circuit followed by the names of the input signals. There may be any number of inputs. The right hand side is an expression giving the value of the output signal:</p>
+<p><code>~~~</code> circ<sub>name</sub> input1 input2 = expression <code>~~~</code></p>
+<p>This defines a circuit whose name is <strong>circ<sub>name</sub></strong>, which takes two inputs named <strong>input1</strong> and <strong>input2</strong>, and produces an output with the specified signal value. Here is an example:</p>
+<p><code>~~~</code> mycirc a b c = and3 a (inv b) c <code>~~~</code></p>
+<p>The input names <strong>a</strong>, <strong>b</strong>, and <strong>c</strong>, are local to the definition of <strong>mycirc</strong>, and they can be used to calculate the value of the output. Another circuit can connect signals with arbitrary names, or no names at all, to the inputs of <strong>mycirc</strong>.</p>
+<h2 id="internal-signals">Internal signals</h2>
+<p>This part of a definition is optional; if present it follows the <strong>where</strong> keyword.</p>
+<p>The expression that defines the circuit's output can become fairly complicated, and it's often simpler to define it using several other named signals. Each of these needs a defining equation which is inside the circuit. To do this, write the keyword <strong>where</strong> after the equation, and after the <strong>where</strong> you can write any number of signal defining equations. The general form is:</p>
+<p><code>~~~</code> circuit<sub>name</sub> input1 input2 = output where output = … x = … (internal signals…) y = … <code>~~~</code></p>
+<p>Here is an example of a circuit named c22 that takes three inputs and produces one output.</p>
+<p><code>~~~</code> c22 a b c = x where x = xor2 p q p = and2 a b q = or2 b c <code>~~~</code></p>
+<p>The equations should be indented consistently, and there is no extra punctuation (no curly braces, no semicolons). The compiler determines the structure of a definition from the indentation, not from punctuation. Therefore the indentation is essential, and if it's wrong then the specification will be parsed incorrectly.</p>
+<h2 id="multiple-outputs">Multiple outputs</h2>
+<h2 id="feedback">Feedback</h2>
+<p>A register is a circuit with an internal state, and with the ability to load an external value into the state and to read out the state.</p>
+<p><code>~~~</code> reg1 :: CBit a =&gt; a -&gt; a -&gt; a reg1 ld x = r where r = dff (mux1 ld r x) <code>~~~</code></p>
+<p>The reg1 circuit has a feedback loop: the output of the flip flop is connected to one of the inputs to the mux1, whose output in turn is input to the flip flop. Hydra does not allow feedback loops in pure combinational logic, but feedback that goes through a flip flop is fine. When a circuit contains a feedback loop, there will be a circular path in the schematic diagram, and there will be circular equations in its specification. For the reg1 circuit. the feedback loop can be seen in the equation which has r on both the left and right hand side. Thus r is being defined in terms of itself. The way this works, and the reason that r is well-defined, is explained in the section on circuit semantics.</p>
+<h1 id="signal-and-circuit-types">Signal and circuit types</h1>
+<p>The <strong>type</strong> of a value determines what operations you can perform on it. This holds for hardware description just as for programming. The type of a signal determines what kind of information it carries, and the type of a circuit specifies the types and organisation of its input and output signals.</p>
+<p>A circuit has an interface to the outside world, and an internal organization. To use the circuit, all we need to know about is the interface: what inputs need to be provided and what the outputs mean. The type expresses a useful portion of this information: it describes the number and organization of the inputs and outputs. The meanings of the circuit outputs are not specified by the type; they should be described in documentation for the circuit. Since Hydra models a circuit as a function, a circuit type looks just like a function type.</p>
+<p>The type declaration for a circuit is optional, as the compiler can work out the type for itself. If you omit the type, your circuit will still run. However, there are several benefits in writing out the type explicitly:</p>
+<ul>
+<li><p>The type gives useful information about the interface to the circuit. Later on, if you want to use this circuit in a larger one, you will be more interested in the interface than the internal components inside the circuit.</p></li>
+<li><p>There is some redundancy between the type and the defining equation. If there is any inconsistency between the two, the compiler will give a type error message. That may be annoying, but at least you know that the error lies somewhere in the (small) specification of this one circuit. If you omit the type declaration, but there is an error in the defining equation, you may get an error message that says, in effect, ``there is an error somewhere in the (large) file'', but it's up to you to figure out <strong>where</strong> the error is.</p></li>
+<li><p>If you do get a type error message, the compiler will do its best to give a helpful and informative message. In practice, though, the error messages will be far more understandable if you include type declarations for your circuits.</p></li>
+</ul>
+<p>If present, the type of a circuit should come immediately before the defining equation. Type declarations are easily recognizable: they always contain the symbol <strong>::</strong>, and usually contain some arrows <strong>=&gt;</strong> and <strong>-&gt;</strong>. A typical example is</p>
+<p><code>~~</code> reg1 :: CBit a =&gt; a -&gt; a <code>~~</code></p>
+<p>A type declaration contains several parts:</p>
+<ul>
+<li>The circuit name (e.g. reg1)</li>
+<li>The :: symbol, read as "has type"</li>
+<li>The signal class ending with =&gt; (e.g. CBit a =&gt;)</li>
+<li>The input and output signal types (e.g. a -&gt; a)</li>
+</ul>
+<h2 id="signal-types-and-classes">Signal types and classes</h2>
+<p><strong>Short version.</strong> If you're writing a routine circuit and just want to simulate it, you can just write <strong>CBit a =&gt;</strong> for the signal class constraint and then use <strong>a</strong> as the type for every bit signal. In more complicated situations, or if you want to know what this means, read on.</p>
+<p>When a circuit specification is executed, each signal has a specific type. Many types can be used, for example <strong>Bool</strong> or <strong>Stream Lattice</strong>. The choice of type determines what happens during execution. Some types lead to combinational simulation, others lead to synchronous simulation, others perform a path depth analysis, or generate a netlist.</p>
+<p>It's possible to define a circuit with a specific type, and if you do this the class constraint (the part before =&gt;) is omitted. For example, we could define a Bool version of the mux1 circuit (call it halfAddB) to operate in signals of type Bool:</p>
+<p><code>~~</code> halfAddB :: Bool -&gt; Bool -&gt; (Bool,Bool) halfAddB x y = (and2 x y, xor2 x y) <code>~~</code></p>
+<p>This is a little simpler than the standard definition halfAdd, which (1) uses the type class constraint Bit a =&gt;, and (2) uses <strong>a</strong> rather than <strong>Bool</strong> as the bit signal type.</p>
+<h2 id="combinational-signals-bit-a">Combinational signals: Bit a</h2>
+<p><code>~~</code> halfAdd :: Bit a =&gt; a -&gt; a -&gt; (a,a) halfAdd x y = (and2 x y, xor2 x y) <code>~~</code></p>
+<p>The main disadvantage of using Bool as the signal type is that combinational simulation is the <strong>only</strong> thing you can do with the circuit. However, Hydra provides many other options. For example, you can perform synchronous simulations over many clock cycles, but to do that, the signals must have a different type. You can do these other things with <strong>halfAdd</strong>, but not with <strong>halfAddB</strong>.</p>
+<p>There are several different types that can be used to represent a signal. These are organized into two main sets: <strong>Bit</strong> and <strong>CBit</strong>. <strong>Bit</strong> is used for combinational circuits, and <strong>CBit</strong> ("clocked bit") is used for sequential circuits.</p>
+<p>signal. The notation <strong>Bit a =&gt;</strong> means that <strong>a</strong> can be any type in the set <strong>Bit</strong>, and therefore all of the Bit operations can be performed on a signal of type <strong>a</strong>.</p>
+<p>The commonest signal class constraints are:</p>
+<ul>
+<li><p><strong>Bit a =&gt;</strong> is used when <strong>a</strong> is a bit signal in a combinational circuit. The circuit may contain logic gates, but not flip flops.</p></li>
+<li><p><strong>CBit a =&gt;</strong> is used when <strong>a</strong> is a bit signal in a sequential circuit, which may contain flip flops and feedback loops as well as logic gates.</p></li>
+</ul>
+<h2 id="clocked-signals-cbit-a">Clocked signals: CBit a</h2>
+<p>The signal class constraint Classes</p>
+<p>Base signal types</p>
+<ul>
+<li><p>Bool (defined in Haskell standard libraries)</p></li>
+<li><p>Word16 (defined in Haskell standard libraries)</p></li>
+<li><p>Word32 (defined in Haskell standard libraries)</p></li>
+<li><p>Lattice (defined in Hydra Core library)</p></li>
+</ul>
+<h2 id="inputs-and-outputs">Inputs and outputs</h2>
+<p>After the signal class (i.e. after the <strong>=&gt;</strong> symbol) come the types of the inputs and output of the circuit. In the simplest case, each input or output signal is just a bit of type <strong>a</strong>. There may be any number of input arguments, and there must be one output result. A single arrow <strong>-&gt;</strong> must follow each input; thus the number of single arrows in the type is the same as the number of inputs.</p>
+<p>The inverter has one input of type <strong>a</strong>, which is followed by <strong>-&gt;</strong>, and the type <strong>a</strong> of the output appears last. The type declaration can be read as "inv uses signals in the Bit class; it takes one input and produces one output": Thus the entire type declaration ``*inv :: Bit a =&gt; a -&gt; a*'' says ``*inv* is a circuit that takes an input bit signal, and produces an output bit signal.''</p>
+<p><code>~~~</code> inv :: Bit a =&gt; a -&gt; a <code>~~~</code></p>
+<p>The notation <strong>a -&gt; a</strong> means "the circuit takes an input signal and produces an output signal". This is similar to conventional mathematical notation; for example in mathematics there is a function <strong>im</strong> that is given a complex number (type <span class="math inline"><em>C</em></span>) and returns its imaginary part (type <span class="math inline"><em>R</em></span>), and a mathematician might write its type as im : C -&gt; R. (The reason :: is used in Haskell (and Hydra) is that : is used for something else.)</p>
+<p>Circuits that take several inputs have a slightly more complicated type. For example, here are the types for the family of and-gates:</p>
+<p><code>~~~</code> and2 :: Bit a =&gt; a -&gt; a -&gt; a and3 :: Bit a =&gt; a -&gt; a -&gt; a -&gt; a and4 :: Bit a =&gt; a -&gt; a -&gt; a -&gt; a -&gt; a <code>~~~</code></p>
+<p>There is always one output, but any number of inputs, and every input is followed by <strong>-&gt;</strong>. To find out how many inputs a circuit takes, just count the number of times <strong>-&gt;</strong> appears in its type.</p>
+<p>If a circuit has several outputs, they must be enclosed in a container, and this is reflected in the type. See the section on Containers.</p>
+<h1 id="containers">Containers</h1>
+<p>In a physical circuit, every wire carries one bit, and doesn't have any relationship to any other wire (unless it is actually connected to that other wire). When we design a circuit, however, it takes several wires to carry any data value that isn't just a Boolean. For example, it takes 16 wires to transmit a 16-bit word, and to the designer there is definitely a clear relationship among these wires.</p>
+<p>Circuits may contain large numbers of signals, and it would be tiresome to name them all. You can simplify the description of a circuit by defining <strong>containers</strong> that hold a collection of signals. Then you can use the container as a single object, without referring explicitly to its components.</p>
+<p>A design is clearer if related signals together are grouped together, with a name for the entire collection. For example, we could give the name <strong>x</strong> to a 16-bit word, and just use <strong>x</strong> to refer to all the wires collectively.</p>
+<p>Hydra provides two kinds of container: <strong>tuples</strong> and <strong>words</strong>. Tuples are useful for circuits that have multiple inputs and outputs; an example of a tuple is <strong>(x, (a,b))</strong>. Words are appropriate when several signals are used to represent a number, for example <strong>[x0,x1,x2,x3]</strong>.</p>
+<p>Both kinds of container are written with several elements separated by commas. A quick way to tell them apart is that tuples use round parentheses <strong>( … )</strong> but words use square brackets <strong>[ … ]</strong>.</p>
+<p>Containers are just notations that help to simplify the description of large circuits. If you look at the layout of a chip under a microscope, you won't see any tuples or words—just thousands of individual wires and components. A circuit specification that names each one explicitly would be long and unreadable; containers enable us to write compact and readable descriptions of such large circuits.</p>
+<h2 id="tuples">Tuples</h2>
+<p>Tuples provide the simplest way to give a single name to a bundle of signals.</p>
+<p>Suppose we have a couple of signals named <strong>a</strong> and <strong>b</strong>. They can be collected together into a tuple by writing <strong>(a,b)</strong>. The elements are written inside round parentheses ( … ) and separated by commas.</p>
+<p>The elements of the tuple are expressions that describe signals. Any expression can be used; it doesn't have to be a signal name. For example, the tuple <strong>(and2 x y, or2 x y)</strong> is a tuple consisting of two signals, the outputs of two logic gates. In this example, the actual signals in the tuple don't have names.</p>
+<p>A tuple can have any number of elements. Thus <strong>(inv x, y, z)</strong> is a 3-tuple and <strong>(a,b,c,d)</strong> is a 4-tuple.</p>
+<p>If the basic signal type is <strong>a</strong>, as usual, then a 2-tuple has type <strong>(a,a)</strong>, a 3-tuple has type <strong>(a,a,a)</strong>, and so on. The type shows explicitly the number of elements.</p>
+<p>One of the commonest ways to use a tuple is to describe a circuit that has several outputs. Indeed, there is no way to do this without using a cluster (a tuple or a word). Recall that the type of a circuit contains a number of arrows (<strong>-&gt;</strong>) and the type of the output comes after the last arrow. If there are actually several outputs, we need to combine them into a cluster and give the cluster's type as the type of the output.</p>
+<p>Here is an example. Suppose we want to define a circuit that has two input bit signals, called <strong>x</strong> and <strong>y</strong>. The circuit produces two outputs, <strong>and2 x y</strong> as well as <strong>or2 x y</strong>. Let's name the circuit <strong>aor2</strong>. Here is a full definition:</p>
+<p><code>~~~</code> aor :: Bit a =&gt; a -&gt; a -&gt; (a,a) aor x y = (and2 x y, or2 x y) <code>~~~</code></p>
+<p>The definition of <strong>aor</strong> consists of two parts: a type declaration (the line containing <strong>::</strong>), and a defining equation (thie line containing the <strong>=</strong>). In general, every circuit specification should contain these two parts.</p>
+<p>Notice that there are two arrows (<strong>-&gt;</strong>) in the type. This means that there are two inputs, and each has type <strong>a</strong> — that is, each input is a bit signal. The type of the output comes after the last arrow, and it is <strong>(a,a)</strong>, so the output of the circuit is a tuple containing two bit signals.</p>
+<p>The signal defining equations we have considered up to now have had a signal name on the left hand side: <strong>x = …</strong>. In general, however, the left hand side of an equation is a <strong>pattern</strong>.</p>
+<p>It is also possible to have an input cluster. The <strong>aor</strong> circuit above has two inputs, and these were treated separately: there are two arrows in the type, one after each input type. An alternative notation is to say that the circuit has just one input, which is a cluster containing two elements:</p>
+<p><code>~~~</code> aorTup :: Bit a =&gt; (a,a) -&gt; (a,a) aorTup (x,y) = (and2 x y, or2 x y) <code>~~~</code></p>
+<p>Compare the definitions of <strong>aorTup</strong> and <strong>aor</strong>. Both of them have two input bits named <strong>x</strong> and <strong>y</strong>, but they are organized differently. In <strong>aor</strong>, the inputs are treated as separate arguments, each of type <strong>a</strong>, and each followed by an arrow <strong>-&gt;</strong>. In <strong>aorTup</strong>, the input bits are collected together into the tuple <strong>(x,y)</strong> which has type <strong>(a,a)</strong>, and this tuple is the sole argument.</p>
+<p>These two circuits, <strong>aor</strong> and <strong>aorTup</strong>, are essentially the same. They would look identical on a VLSI chip under the microscope. The only difference between them is the notation used to describe them.</p>
+<p>There is an asymmetry in the notation. If a circuit has several inputs, there is a choice of notation: they can be treated as separate arguments, or they can be collected together into a tuple. However, if a circuit has several outputs, there is no choice: they <strong>must</strong> be collected together into a tuple.</p>
+<p>This notation for types, with the arrows and the (apparently) different treatment of circuit inputs and outputs, may look strange and counterintuitive. There is actually a very good reason the type notation is designed this way, but it involves some techniques we are not ready to discuss yet (see the chapter on design patterns).</p>
+<p>There are other uses for tuples besides just handling circuits with multiple outputs. Sometimes tuples are useful just for cutting some of the boilerplate in a specification, making it shorter and easier to read. Suppose we have a circuit where two signals, say <strong>x</strong> and <strong>y</strong>, are needed as inputs to several other building block circuits <strong>f1</strong>, <strong>f2</strong>, and <strong>f3</strong>. We could write the specification with all the signals written out explicitly:</p>
+<p><code>~~~</code> circ :: Bit a =&gt; a -&gt; a -&gt; a circ x y = z where p = f1 x y q = f2 x y r = f3 x y z = xor3 p q r <code>~~~</code></p>
+<p>But we might be able to simplify this by changing the types of <strong>circ</strong>, <strong>f1</strong>, <strong>f2</strong>, and <strong>f3</strong> to collect <strong>x</strong> and <strong>y</strong> into a tuple.</p>
+<p><code>~~~</code> circ :: Bit a =&gt; (a,a) -&gt; a circ xy = z where p = f1 xy q = f2 xy r = f3 xy z = xor3 p q r <code>~~~</code></p>
+<p>In a large and complicated system, this technique can make a big difference. For example, in a processor circuit there may be a number of signals needed to control the arithmetic-logic unit, and those signals travel together. It can cut down on the notation significantly just to combine them into a tuple, give the tuple a name, and pass around the whole cluster without mentioning the individual components.</p>
+<p>Sometimes you may have a cluster, but you need to extract its elements and give them individual names. This can be done in a circuit black box definition using a signal defining equation. For example, the following equation defines <strong>alpha</strong> and <strong>beta</strong> to be the names of the elements of a tuple named <strong>pair</strong>:</p>
+<p><code>~~~</code> (alpha,beta) = pair <code>~~~</code></p>
+<p>Tuples can be nested. For example, <strong>(p, (x,y,z))</strong> is a 2-tuple (<strong>not</strong> a 4-tuple!). The first element is <strong>p</strong>, and the second element is a 3-tuple <strong>(x,y,z)</strong>. The type is</p>
+<p><code>~~~</code> (p, (x,y,z)) :: (a, (a,a,a)) <code>~~~</code></p>
+<p>This example shows a crucial property of tuples: their elements may have different types; in this case the type of the first element is <strong>a</strong> and the type of the second element is <strong>(a,a,a)</strong> and those types are different, just as a physical wire is not the same thing as a bundle of three physical wires.</p>
+<p>Why use a tuple type like <strong>(a,(a,a,a))</strong> when a simple 4-tuple would seem simpler? The reason is that sometimes, in larger systems, a sub-circuit produces many outputs, and groups of them will then be connected to different destinations. The notation to describe this is simpler if the tuple structure matches the logical organization of the circuit. We will see several examples of this, especially in the design of processors.</p>
+<p>It is also possible to have two different signal representations in a specification. Each one needs its own distinct type variable name. For example, suppose we are designing a circuit that has a basic bit signal type <strong>a</strong>, but the circuit also has some values where we aren't concerned about the bit representation (floating point numbers, perhaps). To abstract away from the bit representation, we could give another type <strong>b</strong> to these abstract values. Then a black box circuit that outputs both a bit and a floating point number would have the output type <strong>(a,b)</strong>.</p>
+<h2 id="words">Words</h2>
+<p>There are two kinds of cluster that allow several signals to be collected together into one entity. The previous section discussed tuples, and now we introduce words. Tuples allow arbitrary groupings, while words have a regular structure and their elements can be accessed by indexing. Words are frequently used for collections of bits that represent binary numbers.</p>
+<p>In a word, bit indices are 0, 1, …, n-1 where bit 0 is most significant. The expression <strong>[x0,x1,x2,x3]</strong> denotes a word containing the individual signals <strong>x0</strong>, …, <strong>x3</strong>. The syntax is similar to a tuple; the difference is that an expression for a word uses square brackets <strong>[ \ ]</strong> while a tuple uses round parentheses <strong>( \ )</strong>.</p>
+<p>The basic usage of a word is similar to a tuple. For example, a circuit could collect several signals into a word and output that. Here is an alternative definition of the half adder:</p>
+<p><code>~~~</code> halfAddw :: Bit a -&gt; a -&gt; a -&gt; [a] halfAddw x y = [c,s] where c = and2 x y s = xor2 x y <code>~~~</code></p>
+<p>There two differences between this definition and the one given earlier. First the output expression here is <strong>[c,s]</strong>, so it's a word, while the output expression given for the original <strong>halfAdd</strong> is <strong>(c,s)</strong>, which is a tuple. The other difference is quite important: the output type is <strong>[a]</strong>, rather than <strong>(a,a)</strong> for the original <strong>halfAdd</strong>.</p>
+<p>All the elements of a word must have the same type. If this type is <strong>a</strong>, then the word has type <strong>[a]</strong>. The type of a word doesn't specify how many elements the word contains. This is different from a tuple, where <strong>(a,a)</strong> contains exactly two elements, and <strong>(a,a,a,a)</strong> contains exactly four elements.</p>
+<p>Each element of a word has an index, a natural number that gives its position within the word. You can think of a word as an array or vector. The index of the leftmost position is 0, and the index of the rightmost position is <strong>k-1</strong>, where <strong>k</strong> is the length of the word. If we have defined some bit signals <strong>x0</strong>, <strong>x1</strong>, <strong>x2</strong>, and <strong>x3</strong>, then we could define a word <strong>x</strong> of these bits with the equation</p>
+<p><code>~~~</code> w = [x0,x1,x2,x3] <code>~~~</code></p>
+<p>There are actually two conventions commonly used in computer systems. One convention starts with position 0 at the left end, and counts up going to the right. This is called <strong>big Endian</strong> notation. The other convention, naturally called <strong>little Endian</strong>, starts with 0 as the index of the rightmost element, and the indices count up going to the left.</p>
+<p><code>~~~</code> [x0,x1,x2,x3] – Big Endian convention [x3,x2,x1,x0] – Little Endian convention <code>~~~</code></p>
+<p>As you might imagine, neither convention is fundamentally better than the other, but there are all sorts of minor issues that might cause one to be preferred over the other. Hydra allows both conventions, but in this book we will stick to Big Endian consistently.</p>
+<p>There seems to be a phenomenon in computer systems, where the less significant an issue is, the more heated debate there is about it. This phenomenon was actually the inspiration for the odd names Big/Little Endian. The names come from Gullivers Travels, by Jonathan Swift, where the citizens of the kingdom of Blefuscu open their eggs at the big end, while the citizens of Lilliput open their eggs at the little end. The application of this story to computer systems comes from an article by Danny Cohen, ``On Holy Wars and a Plea for Peach'' (IEEE Computer, October 1981).</p>
+<p>The point here (aside from an entertaining digression) is that having a standard is a good idea, and arguments for one particular choice are less compelling than having a consistent standard. Nevertheless, there is one situation in hardware description where Little Endian is slightly more convenient than Big Endian (see ref????) and some authors actually combine both conventions. The confusion isn't worth it!</p>
+<p>The size or length of a word is the number of elements it contains. If a word contains <span class="math inline"><em>k</em></span> elements, then their indices range from 0 to <span class="math inline"><em>k</em> − 1</span>. Hydra provides a meta-function <strong>length</strong> that takes a word and returns an integer giving its size.</p>
+<p><code>~~~</code> length :: [a] -&gt; Int <code>~~~</code></p>
+<p>For example, <strong>length [x0,x1,x2] = 3</strong>. With just the parts of Hydra covered so far, there is no way to use the length of a word, but later we will encounter some more powerful features where an algorithm will generate a circuit of a given size, and then the <strong>length</strong> function will be useful. It's important to remember that <strong>length</strong> is not a circuit; it is part of the notation used to describe circuits.</p>
+<p>There are several notations and operators that can be used to build words from signals, and for extracting the signals within a word. The following sections introduce these notations, and then a couple of example circuits will be presented.</p>
+<h2 id="example-2-a-circuit-with-words-and-internal-signals">Example 2: A circuit with words and internal signals</h2>
+<p>Files: <strong>Add4.hs</strong> and <strong>Add4Run.hs</strong></p>
+<p>The <strong>add4</strong> circuit takes two 4-bit binary numbers <strong>x</strong> and <strong>y</strong>, and a carry input <strong>c</strong>. It adds them and outputs a carry output bit and a 4 bit sum. The circuit is defined in <strong>Add4.hs</strong>.</p>
+<p><code>~~~</code> m4<sub>include</sub>(`examples/adder/Add4.hs') <code>~~~</code></p>
+<p>A main program containing test data and a simulation driver is in <strong>Add4Run.hs</strong>.</p>
+<p><code>~~~</code> m4<sub>include</sub>(`examples/adder/Add4Run.hs') <code>~~~</code></p>
+<p>To run the simulation, enter <strong>ghc -e main Add4Run</strong>. Here is the output:</p>
+<p><code>~~~</code> $ ghc -e main Add4Run x = 5 y = 8 cin = 0 ==&gt; cout = 0 s = 13 x = 7 y = 3 cin = 0 ==&gt; cout = 0 s = 10 x = 8 y = 12 cin = 0 ==&gt; cout = 1 s = 4 x = 8 y = 1 cin = 0 ==&gt; cout = 0 s = 9 x = 12 y = 1 cin = 1 ==&gt; cout = 0 s = 14 x = 2 y = 3 cin = 1 ==&gt; cout = 0 s = 6 x = 15 y = 15 cin = 1 ==&gt; cout = 1 s = 15 <code>~~~</code></p>
+<h3 id="building-words">Building words</h3>
+<p>If you have expressions that define some signals, a word comprising the signals can be constructed by writing the expressions in square brackets, separated by commas.</p>
+<p><code>~~~</code> [p,q,r,s] <code>~~~</code></p>
+<p>The length of a word can be any natural number. Thus <strong>[]</strong> is the empty word, <strong>[x]</strong> is a word containing just one element, and so on.</p>
+<p><code>~~~</code> [] – length = 0 [x] – length = 1 [x,y] – length = 2 [x0,x1,x2,x3,x4,x5,x6,x7] – length = 8 <code>~~~</code></p>
+<p>Suppose you have a word <strong>w</strong>, of any length, and a bit signal <strong>x</strong>. Thus <strong>w :: [a]</strong> and <strong>x :: a</strong>, where <strong>a</strong> is the basic signal type. Then we can construct a new word which is just like <strong>w</strong> except that the singleton <strong>x</strong> is attached to the front. The notation for this is <strong>x:w</strong>, which is pronounced ``*x cons w*''. For example, suppose <strong>w = [p,q,r,s]</strong>. Then <strong>(x:w) = [x,p,q,r,s]</strong>. The properties of the <strong>(:)</strong> operator are summarized as follows:</p>
+<p><code>~~~</code> x :: a w :: [a] (x:w) :: [a] length (x:w) = 1 + length w <code>~~~</code></p>
+<p>It's often useful to take two words that have already been defined, and to define a bigger one that contains the elements of both. This is called <strong>append</strong> or <strong>concatenation</strong>, and is done using the <strong>(++)</strong> operator. The word <strong>w1 ++ w2</strong> is a word containing first the elements of <strong>w1</strong>, and then the elements of <strong>w2</strong>. Here are some examples and properties of append:</p>
+<p><code>~~~</code> [x0,x1,x2,x3] ++ [y0,y1] = [x0,x1,x2,x3,y0,y1] length (w1 ++ w2) = length w1 + length w2 <code>~~~</code></p>
+<p><code>~~</code> (++) <code>~~</code></p>
+<h3 id="accessing-parts-of-a-word">Accessing parts of a word</h3>
+<p>Often we can perform operations on entire words, using word-oriented digital circuits, without ever accessing individual elements of a word. Later we will see a family of building block circuits that operate on words. Normally this is the best way to organize a circuit that works with words.</p>
+<p>Sometimes, however, it's necessary to extract one or more elements of a word. One way to do this is by <strong>indexing</strong>. Each element of a word <strong>w</strong> has an index, ranging from 0 to <span class="math inline"><em>k</em> − 1</span>, where <strong>k = length w</strong>. The <strong>(!!)</strong> operator uses an index to extract the element; thus <strong>w!!i</strong> gives the $i$th element of the word <strong>w</strong>. This is well defined if the index <strong>i</strong> is in range: <span class="math inline"><em>i</em> ≤ <em>l</em><em>e</em><em>n</em><em>g</em><em>t</em><em>h</em> <em>w</em></span>. If <span class="math inline"><em>i</em> &lt; 0</span>, or <span class="math inline"><em>i</em> ≥ <em>l</em><em>e</em><em>n</em><em>g</em><em>t</em><em>h</em> <em>W</em></span>, then <strong>w!!i</strong> is an error.</p>
+<p><code>~~</code> w!!i i'th bit of word w field w i j bits i..i+j-1 of word w <code>~~</code></p>
+<p>There are two special cases for indexing that are supported by specific operators: you can get the least significant (or most significant) bit of a word <strong>w</strong> using <strong>lsb w</strong> (or <strong>msb w</strong>). The least significant bit <strong>lsb w</strong> is equivalent to <strong>w !! (length w -1)</strong>, and the most significant bit <strong>msb w</strong> is equivalent to <strong>w !! 0</strong>.</p>
+<p><code>~~~</code> w !! i (!!) :: [a] -&gt; Int -&gt; a lsb w lsb :: [a] -&gt; a msb w msb :: [a] -&gt; a <code>~~~</code></p>
+<p>There are three functions that give a field from a word; that is, the result is itself a (smaller) word, not just an individual bit. The <strong>take</strong> and <strong>drop</strong> functions give a sub-word that is at the beginning or end of a word. Thus <strong>take i w</strong> gives a word consisting of the leftmost <span class="math inline"><em>i</em></span> elements of <strong>w</strong>, while <strong>drop i w</strong> gives a word consisting of all the elements of <strong>w</strong> <strong>except for</strong> the leftmost <span class="math inline"><em>i</em></span> elements.</p>
+<p>More generally, it is sometimes necessary to extract an arbitrary field from a word. A <strong>field</strong> is a word consisting of any consecutive set of elements. A field has type <strong>Field</strong>, and it consists of a pair of integers <strong>(i,s)</strong> where <strong>i</strong> is the index of the starting position of the field, and <strong>s</strong> is its size. Thus <strong>field (i,s) w = [w!!i, w!!(i+1), …, w!!(i+s-1)]</strong>.</p>
+<p><code>~~~</code> type Field = (Int,Int) take i w take :: Int -&gt; [a] -&gt; [a] drop i w drop :: Int -&gt; [a] -&gt; [a] field f w field :: Field -&gt; [a] -&gt; [a] <code>~~~</code></p>
+<p>An example of a circuit that operates on words is the 4-bit word inverter <strong>inv4</strong>. Its input and output are both 4-bit words, and each output bit is the inversion of the corresponding input bit. The type notation for the word is concise, since the types of the individual bits don't have to be repeated, but on the other hand the type doesn't express the fact that this circuit works only on 4-bit words.</p>
+<p>![](figures/xfig/inv4-wsig.svg)</p>
+<p>![](figures/xfig/map4inv.svg)</p>
+<p>![](figures/xfig/map4invbox.png)</p>
+<p>![](figures/xfig/inv4-wsig.png)</p>
+<p><code>~~~</code> inv4 :: Bit a =&gt; [a] -&gt; [a] inv4 [x0,x1,x2,x3] = [inv x0, inv x1, inv x2, inv x3] <code>~~~</code></p>
+<p>The circuit specification for <strong>inv4</strong> is simple enough, but it would be painful to extend this to much larger sizes, say 64-bit words. The chapter on design patterns shows a more elegant approach, but for small words the style used here is adequate. The Hydra libraries provide a collection of straightforward circuit specifications written in the same style as <strong>inv4</strong>, and they also provide circuits that are defined using design patterns and that work for arbitrary word sizes, no matter how large.</p>
+<h2 id="nested-clusters">Nested clusters</h2>
+<p>The cluster types can be nested. A tuple may contain words (or deeper tuples), and a word may contain tuples (or deeper words, although that is unusual).</p>
+<p>There is a style of circuit design called <strong>bit slice organization</strong>. The idea is that a building block circuit is defined for an arbitrary position within a word, and these building blocks can then be combined. Bit slice style often results in complex groupings, with words of tuples, and notwithstanding the relatively complex types it can result in simple specifications of efficient circuits. The essence of bit slice organization is to keep the corresponding bits of several words together. Thus two words <span class="math inline"><em>x</em></span> and <span class="math inline"><em>y</em></span> could be represented as a word of pairs, rather than two separate words:</p>
+<p><span class="math inline">[(<em>x</em>0, <em>y</em>0), (<em>x</em>1, <em>y</em>1), (<em>x</em>2, <em>y</em>2), (<em>x</em>3, <em>y</em>3)] :  : [(<em>a</em>, <em>a</em>)]</span></p>
+<p>Collecting a group of signals into a cluster is just a notational convenience; it doesn't affect the actual circuit. However, grouping can simplify the way you <strong>describe</strong> the circuit, and this is essential for large and complex circuits.</p>
+<p>When you are designing a circuit with several input signals, you can decide whether to treat them as separate arguments (each followed by an arrow <strong>-&gt;</strong>) or as a single argument which is a tuple or word. However, if you are using a circuit that has already been specified, you need to follow the type used in its specification.</p>
+<p>When a circuit has several outputs, there is no choice—the output signals must be collected into a tuple or a word. The reason for this is that the underlying functional language requires that each function has one result. This does not limit our ability to express complex circuits; it simply means that we need to use tuples or words.</p>
+<p>Grouping is often helpful just to simplify the notation and to make specifications more readable.</p>
+<p>A tuple (x, (a,b)) is used to collect several values which may be unrelated to each other. Tuples are used for groups where the components are unrelated, and indexing doesn't make sense. The components may have different types: <span class="math inline">(<em>a</em>, (<em>a</em>, <em>a</em>), <em>a</em>)</span> A word is used to collect values that belong to specific bit positions, typically to form a binary number. Tuples and words can be combined to form complex clusters.</p>
+<p>Example: a 4-Bit ripple carry adder</p>
+<p>For the multiplexer (the hardware equivalent of an if-then-else) there is little to gain by grouping the inputs, so we use separate parameters without grouping: *mux1 c x y = … *</p>
+<p>For the full-adder, which adds three bits, it's convenient to group the bits <span class="math inline"><em>x</em></span> and <span class="math inline"><em>y</em></span> from the $i$th position in a word together, and to keep them separate from the carry input bit <span class="math inline"><em>c</em></span>. *fullAdd (x,y) c = … *</p>
+<p>Don't worry—the reasons for these decisions will become clear later, when we start making advanced uses of these circuits. It's common to make some changes to the grouping notation for a circuit after you start using it extensively!</p>
+<p>![](figures/xfig/rippleAdd4.svg)</p>
+<p><code>~~~</code> rippleAdd4 c [(x0,y0), (x1,y1), (x2,y2), (x3,y3)] = (c0, [s0,s1,s2,s3]) where (c0,s0) = fullAdd c1 (x0,y0) (c1,s1) = fullAdd c2 (x1,y1) (c2,s2) = fullAdd c3 (x2,y2) (c3,s3) = fullAdd c (x3,y3) <code>~~~</code></p>
+<p><strong><strong>Exercise.</strong></strong> A circuit has the type declaration <strong>circ :: Bit a =&gt; a -&gt; (a,a) -&gt; [a] -&gt; (a,[a])</strong>. How many groups of input bits are there? How are they structured? How is the output structured?</p>
+<p><strong><strong>Exercise.</strong></strong> Modify the definition of <strong>rippleAdd4</strong> to handle 6-bit words.</p>
+<p><strong><strong>Exercise.</strong></strong> Define an 8-bit adder, named <strong>rippleAdd8</strong>. Don't follow the pattern of <strong>rippleAdd4</strong>, with eight equations. Instead, use <strong>rippleAdd4</strong> as a building block circuit. In your definition of <strong>rippleAdd8</strong>, use two separate internal <strong>rippleAdd4</strong> circuits, and connect them up appropriately.</p>
+<p><strong><strong>Exercise.</strong></strong> Suppose <strong>x = [x0,x1,x2]</strong>, <strong>y = [y0,y1,y2,y3]</strong>, and <strong>z = x++y</strong>. What are the values of <strong>z</strong>, <strong>length z</strong>, and <strong>z!!4</strong>?</p>
+<h1 id="combinational-simulation">Combinational simulation</h1>
+<p>One way to simulate a combinational circuit is to apply it directly to its inputs. This works best if the circuit is defined with Bool as the signal type. Here is an example:</p>
+<p><code>~~</code> module HalfAddB where import HDL.Hydra.Core.Lib</p>
+<p>– Demonstrate a circuit with a concrete type Bool, instead of a type – class constraint Bit a =&gt;.</p>
+<p>halfAddB :: Bool -&gt; Bool -&gt; (Bool,Bool) halfAddB x y = (and2 x y, xor2 x y) <code>~~</code></p>
+<p>To simulate the circuit, the HalfAddB module is loaded, and then the circuit is applied to several values of the input signals. For a bit signal of 0, use False as the input, and use True for a 1 bit.</p>
+<p><code>~~</code> $ ghci GHCi, version 8.0.1: <a href="http://www.haskell.org/ghc/">http://www.haskell.org/ghc/</a> :? for help Prelude&gt; :load HalfAddB [1 of 1] Compiling HalfAddB *HalfAddB&gt; halfAddB False False (False,False) *HalfAddB&gt; halfAddB False True (False,True) *HalfAddB&gt; halfAddB True False (False,True) *HalfAddB&gt; halfAddB True True (True,False) <code>~~</code></p>
+<p>This approach works only for combinational circuits because the Bool type does not support clocked signals. For sequential circuits, see the following section.</p>
+<h1 id="synchronous-sequential-simulation">Synchronous sequential simulation</h1>
+<p>A sequential circuit may have feedback and state. A sequential circuit is <strong>synchronous</strong> if it uses a clock to ensure that all flip flops change state simultaneously.</p>
+<p>The execution of a synchronous circuit can be</p>
+<h2 id="general-form">General form</h2>
+<p><code>~~</code> simCirc input = runAllInput input output where – Extract input signals from the input data (equation for each input signal) …</p>
+<p>– The circuit to be simulated output<sub>signals</sub> = circ input<sub>signals</sub></p>
+<p>– Format the outputs output = [ (formatted signal values)… ] <code>~~</code></p>
+<p><code>~~</code> simCirc input = runAllInput input output where – Extract input signals from the input data cin = getbit input 0 x = getbit input 1 y = getbit input 2</p>
+<p>– The circuit to be simulated (cout,sum) = fullAdd a b c</p>
+<p>– Format the outputs output = [string "Inputs: cin=", bit cin, string " x=", bit x, string " y=", bit y, string " Outputs: cout=", bit cout, string " sum=", bit sum] <code>~~</code></p>
+<h2 id="parsing-the-inputs">Parsing the inputs</h2>
+<p>The input data is written as a list of lists. For the outer list, the ith element is a list giving all the input values for clock cycle i. The simulation will run for cycle 0, cycle 1, …, until it runs out of input data, and then it will terminate. Each element of the outer list is a list of integers from which the input signals are derived.</p>
+<p>Each input signal (or container) should be defined with an equation. The left hand side of the equation is the name of the signal, which can be used as an input to the circuit. The right hand side of the equation says how an element of the input list is used to define the signal; this is analogous to an input format specifier.</p>
+<ul>
+<li>b = getbit input i</li>
+<li>xy = getbit2 input i</li>
+<li>n = getbin k input i</li>
+<li>m = gettc k input i</li>
+</ul>
+<h2 id="formatting-the-outputs">Formatting the outputs</h2>
+<h2 id="defining-a-main-program">Defining a main program</h2>
+<h2 id="modules-and-libraries">Modules and libraries</h2>
+<h2 id="compilation-and-interpretation">Compilation and interpretation</h2>
+<h1 id="standard-library-for-bits">Standard library for bits</h1>
+<h2 id="constant-signals-1">Constant signals</h2>
+<p><code>~~</code> zero signal with constant 0 value one signal with constant 1 value <code>~~</code></p>
+<h2 id="logic-gates-1">Logic gates</h2>
+<p><code>~~</code> inv inverter and2, and3, and4 and gate with 2, 3, 4 inputs nand2, nand3, nand4 and gate with 2, 3, 4 inputs or2, or3, or4 or gate with 2, 3, 4 inputs nor2, nor3, nor4 nor gate with 2, 3, 4 inputs xor2, xor3, xor4 xor gate with 2, 3, 4 inputs <code>~~</code></p>
+<h2 id="replicating-a-signal">Replicating a signal</h2>
+<p>Fanout takes a signal and splits it to several outputs.</p>
+<p><code>~~~</code> fanout2 :: a -&gt; (a,a) fanout2 x = (x,x)</p>
+<p>fanout3 :: a -&gt; (a,a,a) fanout3 x = (x,x,x)</p>
+<p>fanout4 :: a -&gt; (a,a,a,a) fanout4 x = (x,x,x,x) <code>~~~</code></p>
+<h2 id="multiplexers-and-demultiplexers">Multiplexers and demultiplexers</h2>
+<p><code>~~~</code> mux1 :: Bit a =&gt; a -&gt; a -&gt; a -&gt; a mux1 p a b = x where x = or2 (and2 (inv p) a) (and2 p b)</p>
+<p>mux2 :: Bit a =&gt; (a,a) -&gt; a -&gt; a -&gt; a -&gt; a -&gt; a mux2 (c,d) p q r s = mux1 c (mux1 d p q) (mux1 d r s)</p>
+<p>mux3 :: Bit a =&gt; (a,a,a) -&gt; a -&gt; a -&gt; a -&gt; a -&gt; a-&gt; a -&gt; a -&gt; a -&gt; a mux3 (c0,c1,c2) a0 a1 a2 a3 a4 a5 a6 a7 = mux1 c0 (mux1 c1 (mux1 c2 a0 a1) (mux1 c2 a2 a3)) (mux1 c1 (mux1 c2 a4 a5) (mux1 c2 a6 a7))</p>
+<p>mux22 :: Bit a =&gt; (a,a) -&gt; (a,a) -&gt; (a,a) -&gt; (a,a) -&gt; (a,a) -&gt; (a,a) mux22 (p0,p1) (a0,a1) (b0,b1) (c0,c1) (d0,d1) = (x,y) where x = mux2 (p0,p1) a0 b0 c0 d0 y = mux2 (p0,p1) a1 b1 c1 d1 <code>~~~</code></p>
+<p><code>~~~</code> mux1 :: Bit a =&gt; a -&gt; a -&gt; a -&gt; a mux1 p a b = x where x = or2 (and2 (inv p) a) (and2 p b) <code>~~~</code></p>
+<p><code>~~~</code> mux2 :: Bit a =&gt; (a,a) -&gt; a -&gt; a -&gt; a -&gt; a -&gt; a mux2 (c,d) p q r s = mux1 c (mux1 d p q) (mux1 d r s) <code>~~~</code></p>
+<p><code>~~~</code> mux3 :: Bit a =&gt; (a,a,a) -&gt; a -&gt; a -&gt; a -&gt; a -&gt; a-&gt; a -&gt; a -&gt; a -&gt; a mux3 (c0,c1,c2) a0 a1 a2 a3 a4 a5 a6 a7 = mux1 c0 (mux1 c1 (mux1 c2 a0 a1) (mux1 c2 a2 a3)) (mux1 c1 (mux1 c2 a4 a5) (mux1 c2 a6 a7)) <code>~~~</code></p>
+<p><code>~~~</code> mux22 :: Bit a =&gt; (a,a) -&gt; (a,a) -&gt; (a,a) -&gt; (a,a) -&gt; (a,a) -&gt; (a,a) mux22 (p0,p1) (a0,a1) (b0,b1) (c0,c1) (d0,d1) = (x,y) where x = mux2 (p0,p1) a0 b0 c0 d0 y = mux2 (p0,p1) a1 b1 c1 d1 <code>~~~</code></p>
+<p>A demultiplexer is an important building block circuit which is related to the multiplexer. It plays a central role in digital circuit design, and we will see many applications that require them. A common application a demultiplexer is to decode binary numbers. For example, we will use them later to implement memories (since the address needs to be decoded), and they are also crucial in a computer's control unit (where they are used to decode instruction opcodes).</p>
+<p>A 1-bit demultiplexer, called <strong>demux1</strong>, takes a control input <strong>c</strong> and a data input <strong>x</strong>. It produces two outputs <strong>y0</strong> and <strong>y1</strong> — so it provides a good practical example of the use of tuples.</p>
+<p><code>~~~</code> (y0,y1) = demux1 c x <code>~~~</code></p>
+<p>The idea of <strong>demux1</strong> is that we want to send the data input <strong>x</strong> to one of the two outputs, and the choice depends on the control input <strong>c</strong> — thus if <strong>c=0</strong> then <strong>y0=x</strong>, but if <strong>c=1</strong> then <strong>y1=x</strong>. But what happens to the output that is <strong>not</strong> selected by <strong>c</strong>? That output has to have a well-defined value too, and we will set it to the constant 0. To summarize, the behavior of the <strong>demux1</strong> is</p>
+<p><code>~~~</code> y0 = if c==0 then x else 0 y1 = if c==1 then x else 0 <code>~~~</code></p>
+<p>c x y0 y1 — — —- —- 0 0 0 0 0 1 1 0 1 0 0 0 1 1 0 1</p>
+<p>Here is the same thing but without any leading spaces</p>
+<p>c x y0 y1 — — —- —- 0 0 0 0 0 1 1 0 1 0 0 0 1 1 0 1</p>
+<p>Table: Truth table for <strong>(y0,y1) = demux1 c x</strong></p>
+<p>The implementation is straightforward. From the truth table, you can see that the <strong>y1</strong> has the same truth table as the <strong>and2</strong> gate, and <strong>y0=1</strong> if <strong>c=0</strong> and <strong>x=1</strong>.</p>
+<p><code>~~~</code> demux1 :: Bit a =&gt; a -&gt; a -&gt; (a,a) demux1 c x = (y0,y1) where y0 = and2 (inv c) x y1 = and2 c x <code>~~~</code></p>
+<p>It isn't actually necessary to define the names of the outputs; here is an alternative definition that outputs a tuple of anonymous signals. The two circuits are identical; the only difference is in the way they are described. One advantage of the first definition is that it offers the names <strong>y0</strong> and <strong>y1</strong> that may be helpful in discussing how the circuit works, but the definitions yield the same circuit and the choice between them is a matter of style.</p>
+<p><code>~~~</code> demux1 :: Bit a =&gt; a -&gt; a -&gt; (a,a) demux1 c x = (and2 (inv c) x, and2 c x) <code>~~~</code></p>
+<p>There are several ways that a larger circuit could incorporate a <strong>demux1</strong>. If the pair <strong>(y0,y1)</strong> is being connected to the input of some other circuit <strong>circ</strong> that takes a pair, then we could simply write <strong>circ (demux1 c x)</strong>. However, if the larger circuit needs explicit access to <strong>y0</strong> or <strong>y1</strong>, then they should be given names using an equation.</p>
+<p>A demux2 circuit takes a two-bit control and produces <span class="math inline">2<sup>2</sup> = 4</span> outputs.</p>
+<p><code>~~~</code> demux2 :: Bit a =&gt; (a,a) -&gt; a -&gt; (a,a,a,a) demux2 (c0,c1) x = (y0,y1,y2,y3) where (p,q) = demux1 c0 x (y0,y1) = demux1 c1 p (y2,y3) = demux1 c1 q <code>~~~</code></p>
+<h2 id="bit-addition">Bit addition</h2>
+<p>When two bits are added together, the result could be 0, 1, or 2. Two bits are needed to represent the result, so a bit adder is an example of a circuit that needs to output several signals. The circuit that does this is called a ``half adder'', and its name is <strong>halfAdd</strong>. (Later we will discuss the ``full adder'', which adds three bits.) The half adder can be specified with a truth table:</p>
+<table>
+<thead>
+<tr class="header">
+<th>x y</th>
+<th>x+y</th>
+<th>c s</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>0 0</td>
+<td>0</td>
+<td>0 0</td>
+</tr>
+<tr class="even">
+<td>0 1</td>
+<td>1</td>
+<td>0 1</td>
+</tr>
+<tr class="odd">
+<td>1 0</td>
+<td>1</td>
+<td>0 1</td>
+</tr>
+<tr class="even">
+<td>1 1</td>
+<td>2</td>
+<td>1 0</td>
+</tr>
+</tbody>
+</table>
+<p>Table: Truth table for halfAdd</p>
+<table>
+<thead>
+<tr class="header">
+<th>x</th>
+<th>y</th>
+<th>x+y</th>
+<th>c</th>
+<th>s</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr class="even">
+<td>0</td>
+<td>1</td>
+<td>1</td>
+<td>0</td>
+<td>1</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>0</td>
+<td>1</td>
+<td>0</td>
+<td>1</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>1</td>
+<td>2</td>
+<td>1</td>
+<td>0</td>
+</tr>
+</tbody>
+</table>
+<p>From the table, it is clear that the carry function is just <strong>and2</strong>, and the sum function is <strong>xor2</strong>.</p>
+<p><code>~~~</code> halfAdd :: Bit a =&gt; a -&gt; a -&gt; (a,a) halfAdd x y = (c,s) where c = and2 x y s = xor2 x y <code>~~~</code></p>
+<p>If you don't want to give names to the outputs <strong>c</strong> and <strong>s</strong>, the definition can be shortened by putting the expressions for the signals directly in the output tuple:</p>
+<p><code>~~~</code> halfAdd :: Bit a =&gt; a -&gt; a -&gt; (a,a) halfAdd x y = (and2 x y, xor2 x y) <code>~~~</code></p>
+<p>The choice between these alternative definitions is a matter of style: both are correct and both describe the same circuit. The definition with anonymous signals is shorter, while the definition with named outputs uses simpler expressions and gives standard names for talking about the outputs.</p>
+<p>There is another bit adder circuit that illustrates how inputs can be handled using either separate arguments or tuples. This is the <strong>full adder</strong>, which adds three bits. Full adders are needed to add binary numbers, because we have to add the carry as well as the two data bits at each position.</p>
+<table>
+<thead>
+<tr class="header">
+<th>x y z</th>
+<th>x+y+z</th>
+<th>c s</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>0 0 0</td>
+<td>0</td>
+<td>0 0</td>
+</tr>
+<tr class="even">
+<td>0 0 1</td>
+<td>1</td>
+<td>0 1</td>
+</tr>
+<tr class="odd">
+<td>0 1 0</td>
+<td>1</td>
+<td>0 1</td>
+</tr>
+<tr class="even">
+<td>0 1 1</td>
+<td>2</td>
+<td>1 0</td>
+</tr>
+<tr class="odd">
+<td>1 0 0</td>
+<td>1</td>
+<td>0 1</td>
+</tr>
+<tr class="even">
+<td>1 0 1</td>
+<td>2</td>
+<td>1 0</td>
+</tr>
+<tr class="odd">
+<td>1 1 0</td>
+<td>2</td>
+<td>1 0</td>
+</tr>
+<tr class="even">
+<td>1 1 1</td>
+<td>3</td>
+<td>1 1</td>
+</tr>
+</tbody>
+</table>
+<p>Table: Truth table for fullAdd. The three input bits x, y, z are added to produce a two-bit result consisting of a carry c and a sum s. (Note that the input bits do <strong>not</strong> represent a 3-bit binary number; they are simply three separate variables to be added.)</p>
+<p>Since there are two output signals, it is necessary to combine them in a tuple, so the type will have the form <strong>… -&gt; (a,a)</strong>. We have a choice for handling the three input signals. They could be treated as separate arguments:</p>
+<p><code>~~~</code> (1) fullAdd :: Bit a =&gt; a -&gt; a -&gt; a -&gt; (a,a) <code>~~~</code></p>
+<p>Alternatively, the three inputs could be collected into a tuple:</p>
+<p><code>~~~</code> (2) fullAdd :: Bit a =&gt; (a,a,a) -&gt; (a,a) <code>~~~</code></p>
+<p>But those are not the only possibilities. Another approach is to collect just two of the signals into a tuple, so there would be two arguments, a tuple and a bit. This gives two more ways to organize the inputs:</p>
+<p><code>~~~</code> (3) fullAdd :: Bit a =&gt; (a,a) -&gt; a -&gt; (a,a) (4) fullAdd :: Bit a =&gt; a -&gt; (a,a) -&gt; (a,a) <code>~~~</code></p>
+<p>At this point, there is little reason to prefer one of these types over another. Later, however, when design patterns are introduced, it will turn out that the design of larger circuits can be simplified if we choose version (3), so that is the type actually used for the half adder in the Hydra circuit library.</p>
+<p>Don't worry about making the ``best'' choice for such decisions. No one always can make the best choice among the possible alternatives while designing a large system. What happens in the real world is that systems are designed according to experience, judgment, and taste. If it turns out later that the design could be made clearer or more elegant by changing one of these arbitrary choices, then that can be done when the system is cleaned up. The Hydra libraries have going through this process several times.</p>
+<p>Now we can define the full adder circuit. For convenience, the calculation of the carry and sum results will be performed by auxiliary circuits, <strong>bcarry</strong> and <strong>bsum</strong>.</p>
+<p><code>~~~</code> fullAdd :: Bit a =&gt; (a,a) -&gt; a -&gt; (a,a) fullAdd (x,y) c = (bcarry (x,y) c, bsum (x,y) c) <code>~~~</code></p>
+<p>It isn't necessary to name the <strong>x</strong> and <strong>y</strong> signals individually. Notice that the pair <strong>(x,y)</strong> comes into the circuit, and is then passed to <strong>bcarry</strong> and <strong>bsum</strong>. The <strong>fullAdd</strong> circuit itself doesn't use either <strong>x</strong> or <strong>y</strong> directly. Therefore we could just give a name, such as <strong>xy</strong>, to the cluster <strong>(x,y)</strong>. This shortens the notation:</p>
+<p><code>~~~</code> fullAdd :: Bit a =&gt; (a,a) -&gt; a -&gt; (a,a) fullAdd xy c = (bcarry xy c, bsum xy c) <code>~~~</code></p>
+<p>Note that the signals <strong>x</strong> and <strong>y</strong> in the previous definition have the bit signal type <strong>a</strong>. This can be stated as <strong>x :: a</strong> and <strong>y :: a</strong>. In the simplified definition, the argument <strong>xy</strong> is a pair of bits, so <strong>xy :: (a,a)</strong>.</p>
+<p>To complete the circuit, we need to implement <strong>bcarry</strong> and <strong>bsum</strong>. There are many ways to do this; the following specifications are reasonable. Since <strong>bsum</strong> and <strong>bcarry</strong> have the same type, we can declare those types in one statement. Read this as ``*bsum* and <strong>bcarry</strong> both have type …''.</p>
+<p><code>~~~</code> bsum, bcarry :: Bit a =&gt; (a,a) -&gt; a -&gt; a bsum (x,y) c = xor3 x y c bcarry (x,y) c = or3 (and2 x y) (and2 x c) (and2 y c) <code>~~~</code></p>
+<h2 id="flip-flops-and-registers">Flip flops and registers</h2>
+<p><code>~~</code> dff delay flip flop <code>~~</code></p>
+<p><code>~~</code> reg1 :: CBit a =&gt; a -&gt; a -&gt; a <code>~~</code></p>
+<h1 id="standard-library-for-words">Standard library for words</h1>
+<p><code>~~</code></p>
+<p>winv w invert the bits in a word mux1w use 1-bit control to select between two words bitslice2 x y convert pair of words to word of pairs mux2 use two bit control to select one of four inputs <code>~~</code></p>
+<h2 id="replication-and-constant-words">Replication and constant words</h2>
+<h2 id="replicating-a-word">Replicating a word</h2>
+<p>fanout :: Bit a =&gt; Int -&gt; a -&gt; [a] fanout k x = take k (repeat x) <code>~~~</code></p>
+<p>Buffered fanout takes a signal and splits it to several outputs, and inserts a buffer to ensure the outputs are strong enough.</p>
+<p><code>~~~</code> fanoutbuf2 :: Bit a =&gt; a -&gt; (a,a) fanoutbuf2 x = (y,y) where y = buf x</p>
+<p>fanoutbuf3 :: Bit a =&gt; a -&gt; (a,a,a) fanoutbuf3 x = (y,y,y) where y = buf x</p>
+<p>fanoutbuf4 :: Bit a =&gt; a -&gt; (a,a,a,a) fanoutbuf4 x = (y,y,y,y) where y = buf x <code>~~~</code></p>
+<p><code>~~~</code> fanout2 :: a -&gt; (a,a) fanout2 x = (x,x)</p>
+<p>fanout3 :: a -&gt; (a,a,a) fanout3 x = (x,x,x)</p>
+<p>fanout4 :: a -&gt; (a,a,a,a) fanout4 x = (x,x,x,x) <code>~~~</code></p>
+<p><code>~~</code> fanout :: Bit a =&gt; Int -&gt; a -&gt; [a] fanout n b connect bit b to n outputs, forming a word <code>~~</code></p>
+<p>A wiring pattern that replicates a singleton signal to form a word. The input x is a signal, which is replicated n times to form a word w of size n.</p>
+<p><code>~~</code> w = fanout n x <code>~~</code></p>
+<p>Representing a boolean bit as a word: boolword takes a bit x, and pads it to the left with 0s to form a word. If the input x is False (0), the result is the integer 0 (i.e. n 0-bits), and if x is True (1) the result is the integer 1 (rightmost bit is 1, all others are 0).</p>
+<p><code>~~~</code> boolword :: Bit a =&gt; Int -&gt; a -&gt; [a] boolword n x = fanout (n-1) zero ++ [x] <code>~~~</code></p>
+<p><code>~~</code> boolword n b form an n-bit word, lsb = b, other bits = 0 <code>~~</code></p>
+<h2 id="rearranging-bits-in-a-word">Rearranging bits in a word</h2>
+<h3 id="combinational-shifting">Combinational shifting</h3>
+<p>Shift a word to the right (shr) or to the left (shl). In both cases, this is just a wiring pattern. A 0 is brought in on one side, and the bit on the other side is just thrown away.</p>
+<p><code>~~</code> shl :: Bit a =&gt; [a] -&gt; [a] <code>~~</code></p>
+<p>shl is a wiring pattern that shifts a word to the left. A zero is brought in on the right side, and the value on the left is discarded. This is a circuit generator that works for words of any size. It is a wiring pattern; no logic gates are generated. Similar to shr.</p>
+<p>Example:</p>
+<p><code>~~</code> shl [a,b,c,d] = [b,c,d,zero] <code>~~</code></p>
+<p><code>~~</code> shr :: Bit a =&gt; [a] -&gt; [a] <code>~~</code></p>
+<p>shr is a wiring pattern that shifts a word to the right. A zero is brought in on the left side, and the value on the right is discarded. This is a circuit generator that works for words of any size. It is a wiring pattern; no logic gates are generated. Similar to shl.</p>
+<p>Example:</p>
+<p><code>~~</code> shl [a,b,c,d] = [zero,a,b,c] <code>~~</code></p>
+<p><code>~~~</code> shr x = zero : [x!!i | i &lt;- [0..k-2]] where k = length x shl x = [x!!i | i &lt;- [1..k-1]] ++ [zero] where k = length x <code>~~~</code></p>
+<h3 id="bit-slice-representation">Bit slice representation</h3>
+<p><code>~~</code> bitslice2 :: [a] -&gt; [a] -&gt; [(a,a)] <code>~~</code></p>
+<p><code>~~</code> unbitslice2 :: [(a,b)] -&gt; ([a], [b]) <code>~~</code></p>
+<h2 id="logic-on-words">Logic on words</h2>
+<p>Calculating a bit from a word</p>
+<p><code>~~</code> any1 or the bits in a word: result is 1 if any 1 bit <code>~~</code></p>
+<p><code>~~</code> orw :: Bit a -&gt; [a] -&gt; a <code>~~</code></p>
+<p><code>~~</code> andw :: Bit a -&gt; [a] -&gt; a <code>~~</code></p>
+<p>And/Or over a word: Determine whether there exists a 1 in a word, or whether all the bits are 0. A tree fold can do this in log time, but for simplicity this is just a linear time fold.</p>
+<p><code>~~~</code> orw, andw :: Bit a =&gt; [a] -&gt; a orw = foldl or2 zero andw = foldl and2 one <code>~~~</code></p>
+<p>Logic on each bit in a word</p>
+<p>Word inverter: winv takes a word and inverts each of its bits</p>
+<p><code>~~~</code> winv :: Bit a =&gt; [a] -&gt; [a] winv x = map inv x <code>~~~</code></p>
+<h2 id="conditionals-and-addresses">Conditionals and addresses</h2>
+<h3 id="multiplexers">Multiplexers</h3>
+<p><code>~~</code> mux1w :: Bit a =&gt; a -&gt; [a] -&gt; [a] -&gt; [a] <code>~~</code></p>
+<p><code>~~</code> z = mux1w c x y If c=zero, then z=x, but otherwise z=y <code>~~</code></p>
+<p>A singleton control signal is used to choose between two data words. If the control is zero the first data word is sent to the output, otherwise the second data word is sent to the output. The two input data words should have the same size, and the output word automatically has that size as well. This is a circuit generator that works for any word size.</p>
+<p><code>~~</code> mux1w c x y = map2 (mux1 c) x y <code>~~</code></p>
+<p><code>~~</code> mux2w cc = map4 (mux2 cc) <code>~~</code></p>
+<p>BeginExercise(use-mux1w) We have two word signals <strong>x</strong> and <strong>y</strong>, which have the same word size (but we don't know or care exactly what the size is). There is a single control bit <strong>c</strong>. Define a signal <strong>z</strong> which is a word; on each clock cycle, <strong>z</strong> is the same as <strong>x</strong> if <strong>c=0</strong> during that cycle, but <strong>z</strong> is the same as <strong>y</strong> if <strong>c=1</strong>.</p>
+<p>BeginSolution(use-mux1w) <strong>z = mux1w c x y</strong></p>
+<p>EndSolution</p>
+<h3 id="demultiplexers">Demultiplexers</h3>
+<p><code>~~~</code> demux1w :: Bit a =&gt; [a] -&gt; a -&gt; [a] demux1w [c0] x = let (a0,a1) = demux1 c0 x in [a0,a1] <code>~~~</code></p>
+<p><code>~~~</code> demux2w :: Bit a =&gt; [a] -&gt; a -&gt; [a] demux2w [c0,c1] x = let (a0,a1) = demux1 c0 x w0 = demux1w [c1] a0 w1 = demux1w [c1] a1 in w0++w1 <code>~~~</code></p>
+<p><code>~~~</code> demux3w :: Bit a =&gt; [a] -&gt; a -&gt; [a] demux3w [c0,c1,c2] x = let (a0,a1) = demux1 c0 x w0 = demux2w [c1,c2] a0 w1 = demux2w [c1,c2] a1 in w0++w1 <code>~~~</code></p>
+<p><code>~~~</code> demux4w :: Bit a =&gt; [a] -&gt; a -&gt; [a] demux4w [c0,c1,c2,c3] x = let (a0,a1) = demux1 c0 x w0 = demux3w [c1,c2,c3] a0 w1 = demux3w [c1,c2,c3] a1 in w0++w1 <code>~~~</code></p>
+<h2 id="arithmetic">Arithmetic</h2>
+<h3 id="binary-addition">Binary addition</h3>
+<p><code>~~~</code> bsum, bcarry :: Bit a =&gt; (a,a) -&gt; a -&gt; a bsum (x,y) c = xor3 x y c bcarry (x,y) c = or3 (and2 x y) (and2 x c) (and2 y c) <code>~~~</code></p>
+<p><code>~~</code> rippleAdd :: Bit a =&gt; a -&gt; [(a,a)] -&gt; (a,[a]) <code>~~</code></p>
+<p>The ripple carry adder takes a carry input, and two words organised in bit slice form. It produces a carry output and a sum word. This is a circuit generator, which allows input words of any size.</p>
+<h2 id="registers">Registers</h2>
+<p><code>~~</code> wlatch :: CBit a =&gt; Int -&gt; [a] -&gt; [a] <code>~~</code></p>
+<p>Defines a register with output r, containing n bits, and with input x. At every clock cycle, the register discards its old state and replaces it with the current value of the input.</p>
+<p><code>~~</code> r = wlatch n x <code>~~</code></p>
+<p><code>~~</code> reg :: CBit a =&gt; Int -&gt; a -&gt; [a] -&gt; [a] <code>~~</code></p>
+<p><code>~~</code> reg n ld x n-bit register with load control ld, data input x <code>~~</code></p>
+<h2 id="registers-1">Registers</h2>
+<p><code>~~</code> reg :: CBit a =&gt; Int – ^ k = the word size -&gt; a – ^ ld = the load control signal -&gt; [a] – ^ input word of size k -&gt; [a] – ^ output is the register state</p>
+<p>reg k ld x = mapn (reg1 ld) k x <code>~~</code></p>
+<p><code>~~</code> regfile n k ld d sa sb x register file with 2<sup>k</sup> registers, each n-bits wide, load control ld, destination address d, reads out registers sa and sb, data input x <code>~~</code></p>
+<h1 id="circuit-generators">Circuit generators</h1>
+<h2 id="operating-on-words">Operating on words</h2>
+<p>Duplicating a bit to form a word: fanout takes a wordsize k and a signal x, and produces a word of size k each of whose bits takes the value of x.</p>
+<p><code>~~~</code> fanout :: Bit a =&gt; Int -&gt; a -&gt; [a] fanout k x = take k (repeat x) <code>~~~</code></p>
+<p>Buffered Fanout</p>
+<p><code>~~~</code> fanoutbuf2 :: Bit a =&gt; a -&gt; (a,a) fanoutbuf2 x = (y,y) where y = buf x</p>
+<p>fanoutbuf3 :: Bit a =&gt; a -&gt; (a,a,a) fanoutbuf3 x = (y,y,y) where y = buf x</p>
+<p>fanoutbuf4 :: Bit a =&gt; a -&gt; (a,a,a,a) fanoutbuf4 x = (y,y,y,y) where y = buf x <code>~~~</code></p>
+<p>Building a constant integer word</p>
+<p>Representing a boolean bit as a word: boolword takes a bit x, and pads it to the left with 0s to form a word. If the input x is False (0), the result is the integer 0 (i.e. n 0-bits), and if x is True (1) the result is the integer 1 (rightmost bit is 1, all others are 0).</p>
+<p><code>~~~</code> boolword :: Bit a =&gt; Int -&gt; a -&gt; [a] boolword n x = fanout (n-1) zero ++ [x] <code>~~~</code></p>
+<p>Combinational shifting</p>
+<p>Shift a word to the right (shr) or to the left (shl). In both cases, this is just a wiring pattern. A 0 is brought in on one side, and the bit on the other side is just thrown away.</p>
+<p><code>~~~</code> shr x = zero : [x!!i * i &lt;- [0..k-2]] where k = length x shl x = [x!!i * i &lt;- [1..k-1]] ++ [zero] where k = length x <code>~~~</code></p>
+<h2 id="recursive-circuit-definitions">Recursive circuit definitions</h2>
+<p><code>~~~</code> demux1w :: Bit a =&gt; [a] -&gt; a -&gt; [a] demux1w [c0] x = let (a0,a1) = demux1 c0 x in [a0,a1]</p>
+<p>demux2w :: Bit a =&gt; [a] -&gt; a -&gt; [a] demux2w [c0,c1] x = let (a0,a1) = demux1 c0 x w0 = demux1w [c1] a0 w1 = demux1w [c1] a1 in w0++w1</p>
+<p>demux3w :: Bit a =&gt; [a] -&gt; a -&gt; [a] demux3w [c0,c1,c2] x = let (a0,a1) = demux1 c0 x w0 = demux2w [c1,c2] a0 w1 = demux2w [c1,c2] a1 in w0++w1</p>
+<p>demux4w :: Bit a =&gt; [a] -&gt; a -&gt; [a] demux4w [c0,c1,c2,c3] x = let (a0,a1) = demux1 c0 x w0 = demux3w [c1,c2,c3] a0 w1 = demux3w [c1,c2,c3] a1 in w0++w1 <code>~~~</code></p>
+<h2 id="tree-structured-circuits">Tree structured circuits</h2>
+<p><code>~~~</code> regfile1 :: CBit a =&gt; Int -&gt; a -&gt; [a] -&gt; [a] -&gt; [a] -&gt; a -&gt; (a,a)</p>
+<p>regfile1 0 ld d sa sb x = (r,r) where r = reg1 ld x</p>
+<p>regfile1 (k+1) ld (d:ds) (sa:sas) (sb:sbs) x = (a,b) where (a0,b0) = regfile1 k ld0 ds sas sbs x (a1,b1) = regfile1 k ld1 ds sas sbs x (ld0,ld1) = demux1 d ld a = mux1 sa a0 a1 b = mux1 sb b0 b1 <code>~~~</code></p>
+<p><code>~~~</code> regfile :: CBit a =&gt; Int -&gt; Int -&gt; a -&gt; [a] -&gt; [a] -&gt; [a] -&gt; [a] -&gt; ([a],[a])</p>
+<p>regfile n k ld d sa sb x = unbitslice2 [regfile1 k ld d sa sb (x!!i) * i &lt;- [0..n-1]] <code>~~~</code></p>
+<h2 id="memory">Memory</h2>
+<p><code>~~~</code> mem1 :: CBit a =&gt; Int -&gt; a -&gt; [a] -&gt; [a] -&gt; a -&gt; a</p>
+<p><code>~~~</code></p>
+<p><code>~~~</code> mem1 0 ld d sa x = reg1 ld x mem1 (k+1) ld (d:ds) (sa:sas) x = a where (ld0,ld1) = demux1 d ld a0 = mem1 k ld0 ds sas x a1 = mem1 k ld1 ds sas x a = mux1 sa a0 a1 <code>~~~</code></p>
+<p><code>~~</code> mem1a :: CBit a =&gt; Int -&gt; a -&gt; [a] -&gt; a -&gt; a mem1a 0 sto p x = reg1 sto x mem1a (k+1) sto (p:ps) x = let (sto0,sto1) = demux1 p sto m0 = mem1a k sto0 ps x m1 = mem1a k sto1 ps x in mux1 p m0 m1 <code>~~</code></p>
+<p><code>~~</code> memw :: CBit a =&gt; Int -&gt; Int -&gt; a -&gt; [a] -&gt; [a] -&gt; [a]</p>
+<p>memw n k sto p x = [mem1a k sto p (x!!i) | i &lt;- [0..n-1]] <code>~~</code></p>
+<h1 id="combinators">Combinators</h1>
+<p>We will generally specify large circuits using a circuit generator, not by drawing every component individually. There are two kinds of circuit generator. Design patterns (higher order functions) are the focus of this chapter. Special languages for special kinds of circuit (e.g. control algorithms) are covered later.</p>
+<p>Design patterns use circuits as building blocks</p>
+<p>Design patterns are <strong>higher order</strong> functions: they take one or more <strong>circuit specifications</strong> as parameters. The pattern defines how to connect up these given circuits in a regular pattern. A pattern definition looks just like an ordinary circuit specification, except It uses recursion to decompose groups of signals. It uses abstract circuits, supplied as parameters, instead of specific circuits. Its type may include building block circuits (these parameters contain an <strong>-&gt;</strong> in their type) and/or size parameters (with a type like <strong>Int</strong>).</p>
+<h2 id="map">Map</h2>
+<p>Word inverter: winv takes a word and inverts each of its bits</p>
+<p><code>~~~</code> winv :: Bit a =&gt; [a] -&gt; [a] winv x = map inv x <code>~~~</code></p>
+<p>Operating on each element of a word of known size: mapn</p>
+<p><code>~~</code> wlatch :: CBit a =&gt; Int -&gt; [a] -&gt; [a] wlatch k x = mapn dff k x <code>~~</code></p>
+<p>The word register</p>
+<p><code>~~~</code> reg :: CBit a =&gt; Int – ** k = the word size -&gt; a – ** ld = the load control signal -&gt; [a] – ** input word of size k -&gt; [a] – ** output is the register state reg k ld x = mapn (reg1 ld) k x <code>~~~</code></p>
+<p>Mapping a circuit with multiple inputs</p>
+<p><code>~~~</code> mux1w :: Bit a =&gt; a -&gt; [a] -&gt; [a] -&gt; [a] mux1w c x y = map2 (mux1 c) x y <code>~~~</code></p>
+<p><code>~~~</code> mux2w cc = map4 (mux2 cc) <code>~~~</code></p>
+<p>Sometimes you have a circuit (it's arbitrary, so call it <span class="math inline"><em>f</em></span>) that takes an input (say it has type <span class="math inline"><em>a</em></span>) and produces an output (call its type <span class="math inline"><em>b</em></span>). You need to take a word of signals, and process each one with the circuit <span class="math inline"><em>f</em></span>. For example, <strong>inv4</strong> processes each signal with an <strong>inv</strong>. The <strong>map</strong> pattern describes this in general.</p>
+<p><code>~~</code> map :: (a-&gt;b) -&gt; [a] -&gt; [b] <code>~~</code></p>
+<p>The first argument to the pattern is a circuit with type <strong>a-&gt;b</strong> The pattern then generates a circuits, which takes an input word of type <strong>[a]</strong> and produces an output word of type <strong>[b]</strong>.</p>
+<p>Example of map</p>
+<p>We can define a word inverter using the pattern that places an inverter on each input signal, to produce the corresponding output signals.</p>
+<p><code>~~</code> winv :: Bit a =&gt; [a] -&gt; [a] winv x = map inv x <code>~~</code></p>
+<p>Technical note: in a defining equation of the form <strong>f a b c = g c</strong>, you can ``factor out'' the rightmost parameter from both sides, giving a slightly shorter form.</p>
+<p><code>~~</code> winv :: Bit a =&gt; [a] -&gt; [a] winv = map inv <code>~~</code></p>
+<p>This is attractive because it describes just the pattern.</p>
+<p>Word inverter: ys = map inv xs</p>
+<p><embed src="figures/xfig/map4inv.eps" /></p>
+<p><embed src="figures/xfig/map4invbox.eps" /></p>
+<p>Definition of map</p>
+<p><code>~~</code> map :: (a-&gt;b) -&gt; [a] -&gt; [b] map f [] = [] map f (x:xs) = f x : map f xs <code>~~</code></p>
+<p>A recursion, based on the word structure of the input.</p>
+<p>The base case is an empty input word <strong>[]</strong>. In this case, the output is also empty.</p>
+<p>The recursion (or induction) case has an input word <strong>x:xs</strong> consisting of an initial bit <strong>x</strong> followed by the rest of the word, <strong>xs</strong>. The circuit introduces a copy of the <strong>f</strong> circuit to process <strong>x</strong>, and handles the rest recursively.</p>
+<p>The following figure illustrates the structure of map recursion</p>
+<p><embed src="figures/xfig/map-recursion.eps" /></p>
+<p>After the recursion has completed:</p>
+<p><embed src="figures/xfig/map4.eps" /></p>
+<p><embed src="figures/xfig/map4box.eps" /></p>
+<p>Extending map to multiple inputs</p>
+<p>The <strong>map2</strong> pattern is similar to <strong>map</strong>, but it uses a circuit that takes two inputs (thus its type is <strong>a-&gt;b-&gt;c</strong>). Note that <strong>map2</strong> is <strong>not</strong> a bit-slice pattern; it uses separate words.</p>
+<p><code>~~</code> map2 :: (a-&gt;b-&gt;c) -&gt; [a] -&gt; [b] -&gt; [c] <code>~~</code></p>
+<p>We can extend the basic multiplexor to handle words:</p>
+<p><code>~~</code> mux1w :: Bit a =&gt; a -&gt; [a] -&gt; [a] -&gt; [a] mux1w c x y = map2 (mux1 c) x y <code>~~</code></p>
+<h3 id="sized-map">Sized map</h3>
+<p>The <strong>mapn</strong> pattern is similar to <strong>map</strong>, except it takes a size parameter, and guarantees to produce an output of that size.</p>
+<p><code>~~</code> mapn :: (a-&gt;b) -&gt; Int -&gt; [a] -&gt; [b] <code>~~</code></p>
+<p>Registers are defined using <strong>mapn</strong>, to ensure that the number of flip flops is defined Combinational circuits may be defined using <strong>map</strong>, so they inherit the word size of their input</p>
+<h2 id="fold">Fold</h2>
+<p>The folding patterns define a linear circuit structure.</p>
+<p>There is an input word of type <strong>[b]</strong>.</p>
+<p>The elements of the word are combined using a building block <strong>f</strong>.</p>
+<p>There is a ``horizontal'' signal of some type (call it <strong>a</strong>), which is goes across the word from left to right.</p>
+<p>An initial horizontal input, of type <strong>a</strong> is provided.</p>
+<p>The output is the final horizontal output (produced by the rightmost <strong>f</strong> circuit).</p>
+<p>Folding corresponds to a linear computation from one end of the word to the other, starting with an initial value a (sometimes called an accumulator, but this is not to be confused with accumulator registers!).</p>
+<h3 id="fold-from-the-left">Fold from the left</h3>
+<p>In general, a fold can proceed either direction across the word. The <strong>foldl</strong> pattern describes a <strong>fold from the left</strong>; i.e. the information flows from left to right across the word.</p>
+<p><code>~~</code> foldl :: (a-&gt;b-&gt;a) -&gt; a -&gt; [b] -&gt; a <code>~~</code></p>
+<p>The pattern is defined recursively:</p>
+<p><code>~~</code> foldl f a [] = a foldl f a (x:xs) = foldl f (f a x) xs <code>~~</code></p>
+<p><embed src="figures/xfig/foldl4.eps" /></p>
+<p><embed src="figures/xfig/foldl4box.eps" /></p>
+<p>\subsection{Examples: orw, andw}</p>
+<p>The <strong>orw</strong> circuit determines whether there is any 1 bit in a word.</p>
+<p><code>~~</code> orw :: Bit a =&gt; [a] -&gt; a orw = foldl or2 zero <code>~~</code></p>
+<p>The <strong>andw</strong> circuit determines whether all the bits in a word are 1.</p>
+<p>And/Or over a word</p>
+<p><code>~~~</code> orw, andw :: Bit a =&gt; [a] -&gt; a orw = foldl or2 zero andw = foldl and2 one <code>~~~</code></p>
+<p><code>~~</code> andw :: Bit a =&gt; [a] -&gt; a andw = foldl and2 one <code>~~</code></p>
+<p>The time required (the path depth) is linear in the word size. There are also tree-structured patterns that can do these computations in logarithmic time.</p>
+<p>Efficiency</p>
+<p>The definitions of <strong>orw</strong> and <strong>andw</strong> are not very efficient</p>
+<p>If a large number of signals are being combined, a tree structure of logic gates reduces the path depth. If this circuit is on the critical path, that will help. If the technology supplies 3 or 4 input gates, it would likely be faster to use some of those, rather than just the 2 input gates. The <strong>foldl</strong> pattern uses one extra gate to include the ``default'' value of zero or one. This is overhead.</p>
+<p>This inefficiency is not a concern, because</p>
+<p>There are alternative patterns that generate more efficient circuits A circuit optimiser can generate optimal results If the circuit isn't on the critical path, it makes no difference anyway.</p>
+<h3 id="binary-comparison-using-foldl">Binary comparison using foldl</h3>
+<p>The problem: input two binary numbers, in bit slice form: <strong>[(x0,y0), (x1,y1), …, (xk,yk)]</strong> Output the result of a comparision: <strong>(lt,eq,gt)</strong>, giving the values of <span class="math inline">(<em>x</em> &lt; <em>y</em>, <em>x</em> = <em>y</em>, <em>x</em> &gt; <em>y</em>)</span>. Exactly one of the three output bits must be 1. Idea: start from left, assuming the numbers are equal so far: <strong>(0,1,0)</strong>. Move over the columns from left to right, updating the results of the comparision using a building block circuit <strong>cmp1</strong>. Going from left to right, once we have established either <span class="math inline">&lt;</span> or <span class="math inline">&gt;</span>, that result will never change. If the current result is <span class="math inline">=</span> and <span class="math inline"><em>x</em> = <em>y</em></span>, it's still <span class="math inline">=</span>. If the current result is <span class="math inline">=</span> but <span class="math inline"><em>x</em></span> and <span class="math inline"><em>y</em></span> are different, the new result becomes <span class="math inline">&lt;</span> or <span class="math inline">&gt;</span>.</p>
+<p>A bit comparison building block circuit:</p>
+<p><code>~~</code> cmp1 :: Bit a =&gt; (a,a,a) -&gt; (a,a) -&gt; (a,a,a) cmp1 (lt,eq,gt) (x,y) = (or2 lt (and3 eq (inv x) y), and2 eq (inv (xor2 x y)), or2 gt (and3 eq x (inv y)) ) <code>~~</code></p>
+<p>The ripple comparison circuit is defined simply using the pattern:</p>
+<p><code>~~</code> rippleCmp :: Bit a =&gt; [(a,a)] -&gt; (a,a,a) rippleCmp = foldl cmp1 (zero,one,zero) <code>~~</code></p>
+<h3 id="fold-from-the-right-foldr">Fold from the right: foldr</h3>
+<p>You can also run a fold across a word from the right to the left.</p>
+<p><code>~~</code> foldr :: (b-&gt;a-&gt;a) -&gt; a -&gt; [b] -&gt; a foldr f a [] = a foldr f a (x:xs) = f x (foldr f a xs) <code>~~</code></p>
+<p>This is symmetric with <strong>foldl</strong>.</p>
+<p>The foldr pattern</p>
+<p><embed src="figures/xfig/foldr4.eps" /></p>
+<p><embed src="figures/xfig/foldr4box.eps" /></p>
+<h2 id="scan">Scan</h2>
+<p>A fold calculates a sequence of intermediate values, one for every bit position. A more general kind of pattern—a <strong>scan</strong>—outputs this word of intermediate values. For every kind of fold, there is a corresponding scan, and there are also some more general patterns that are based on scan. Scans are important because many important computations can be expressed via scans, and a variety of patterns exist that implement scans efficiently.</p>
+<h3 id="scan-from-the-left-scanl">Scan from the left: scanl</h3>
+<p><embed src="figures/xfig/scanl4.eps" /></p>
+<p><code>~~</code> <br /><span class="math display">[<em>y</em><sub>0</sub>, <em>y</em><sub>1</sub>, <em>y</em><sub>2</sub>, <em>y</em><sub>3</sub>, <em>y</em><sub>4</sub>] =  * <em>s</em><em>c</em><em>a</em><em>n</em><em>l</em>* <em>f</em> <em>a</em> [<em>x</em><sub>0</sub>, <em>x</em><sub>1</sub>, <em>x</em><sub>2</sub>, <em>x</em><sub>3</sub>]</span><br /></p>
+<p><br /><span class="math display"> * <em>y</em><em>s</em>* =  * <em>s</em><em>c</em><em>a</em><em>n</em><em>l</em>* <em>f</em> <em>a</em>  * <em>x</em><em>s</em>*</span><br /> <code>~~</code></p>
+<h3 id="scan-from-the-right-scanr">Scan from the right: scanr</h3>
+<p>The <strong>ascanr</strong> pattern yields the word of intermediate results that would occur during a <strong>foldr</strong>. Specifically, it gives the horizontal <strong>input</strong> to each box in the <strong>foldr</strong>.</p>
+<p><code>~~</code> ascanr :: (b-&gt;a-&gt;a) -&gt; a -&gt; [b] -&gt; [a] <code>~~</code></p>
+<p>The value of the output word can be defined directly in terms of <strong>foldr</strong> of portions of the input word. This is useful for intuition and for formal mathematical reasoning.</p>
+<p><code>~~</code> ascanr :: (b-&gt;a-&gt;a) -&gt; a -&gt; [b] -&gt; (a,[a]) ascanr f a [] = (a,[]) ascanr f a (x:xs) = (f x a', a':xs') where (a',xs') = ascanr f a xs <code>~~</code></p>
+<p><embed src="figures/xfig/scanr4.eps" /></p>
+<p><code>~~</code> <br /><span class="math display">[<em>y</em><sub>0</sub>, <em>y</em><sub>1</sub>, <em>y</em><sub>2</sub>, <em>y</em><sub>3</sub>, <em>y</em><sub>4</sub>] =  * <em>s</em><em>c</em><em>a</em><em>n</em><em>r</em>* <em>f</em> <em>a</em> [<em>x</em><sub>0</sub>, <em>x</em><sub>1</sub>, <em>x</em><sub>2</sub>, <em>x</em><sub>3</sub>]</span><br /></p>
+<p><br /><span class="math display"> * <em>y</em><em>s</em>* =  * <em>s</em><em>c</em><em>a</em><em>n</em><em>r</em>* <em>f</em> <em>a</em>  * <em>x</em><em>s</em>*</span><br /> <code>~~</code></p>
+<h3 id="combining-a-map-with-a-scan">Combining a map with a scan</h3>
+<p>Many circuits combine a map with a scan: they output a value in each bit position that depends on both horizontal input and the value of the word in that bit position.</p>
+<p>The <strong>mscanr</strong> pattern is useful for such cases (and there is a corresponding <strong>mscanl</strong>).</p>
+<p><code>~~</code> mscanr :: (a-&gt;b-&gt;(b,c)) -&gt; b -&gt; [a] -&gt; (b,[c]) mscanr f a [] = (a,[]) mscanr f a (x:xs) = (a'',y:ys) where (a',ys) = mscanr f a xs (a'',y) = f x a' <code>~~</code></p>
+<p>Unidirectional mapping scan: mscanl, mscanr</p>
+<p><embed src="figures/xfig/mscanl4.eps" /></p>
+<p>(z, [y<sub>0</sub>, y<sub>1</sub>, y<sub>2</sub>, y<sub>3</sub>] = mscanr f a [x<sub>0</sub>, x<sub>1</sub>, x<sub>2</sub>, x<sub>3</sub>]</p>
+<p>(z,ys) = mscanr f a xs</p>
+<p><embed src="figures/xfig/mscanr4.eps" /></p>
+<p>(z, [y<sub>0</sub>, y<sub>1</sub>, y<sub>2</sub>, y<sub>3</sub>] = mscanr f a [x<sub>0</sub>, x<sub>1</sub>, x<sub>2</sub>, x<sub>3</sub>]</p>
+<p>(z,ys) = mscanr f a <strong>xs</strong></p>
+<p>The ripple carry adder is an excellent example of scanr.</p>
+<p><code>~~</code> fullAdd :: Bit a =&gt; (a,a) -&gt; a -&gt; (a,a) fullAdd (x,y) c = (bcarry (x,y) c, bsum (x,y) c) <code>~~</code></p>
+<h3 id="ripple-carry-addition">Ripple carry addition</h3>
+<p>rippleAdd4</p>
+<p><embed src="figures/xfig/rippleAdd4.eps" /></p>
+<p><code>~~~</code> rippleAdd4 :: Bit a =&gt; a -&gt; [(a,a)] -&gt; (a,[a]) rippleAdd4 cin [(x0,y0),(x1,y1),(x2,y2),(x3,y3)] = (c0, [s0,s1,s2,s3]) where (c0,s0) = fullAdd (x0,y0) c1 (c1,s1) = fullAdd (x1,y1) c2 (c2,s2) = fullAdd (x2,y2) c3 (c3,s3) = fullAdd (x3,y3) cin <code>~~~</code></p>
+<p><code>~~</code> rippleAdd :: Bit a =&gt; a -&gt; [(a,a)] -&gt; (a,[a]) rippleAdd = mscanr fullAdd <code>~~</code></p>
+<p>Two's complement addition and subtraction</p>
+<p><code>~~</code> addSub :: Bit a =&gt; a -&gt; [(a,a)] -&gt; (a,[a]) addSub sub xy = rippleAdd sub (map f xy) where f (x,y) = (x, xor2 sub y) <code>~~</code></p>
+<p>Circuit specifications using patterns can often be simplified if you pay attention to the order of parameters. For example, the ripple carry adder specification would be clunkier if we had defined the full adder as <strong>fullAddInelegant :: Bit a =&gt; a -&gt; (a,a) -&gt; (a,a)</strong>.</p>
+<p>How can you make the definitions work out cleanly? Often there are choices that seem arbitrary at first, but later on you realise things would be simpler if the choice had been different. This is a good time to go back and clean up your specifications.</p>
+<p>Two's complement addition and subtraction</p>
+<p><code>~~~</code> addSub :: Bit a =&gt; a -&gt; [(a,a)] -&gt; (a,[a]) addSub sub xy = rippleAdd sub (map f xy) where f (x,y) = (x, xor2 sub y) <code>~~~</code></p>
+<h3 id="bidirectional-scan">Bidirectional scan</h3>
+<p>A very general pattern is the <strong>mscan</strong> pattern, which takes a word, and <strong>two</strong> horizontal values, one moving from left to right and the other from right to left. The pattern combines a <strong>foldl</strong>, a <strong>foldr</strong>, and a <strong>map</strong>.</p>
+<p>ALU circuits often use the <strong>mscan</strong> pattern.</p>
+<p><code>~~</code> mscan :: (a-&gt;b-&gt;c-&gt;(b,a,d)) -&gt; a -&gt; b -&gt; [c] -&gt; (b,a,[d]) mscan f a b [] = (b,a,[]) mscan f a b (x:xs) = (b'', a'', y:ys) where (b'',a',y) = f a b' x (b',a'',ys) = mscan f a' b xs <code>~~</code></p>
+<p><embed src="figures/xfig/mscan.eps" /></p>
+<p>(b', a', [y<sub>0</sub>, y<sub>1</sub>, y<sub>2</sub>, y<sub>3</sub>]) = mscanr f a b [x<sub>0</sub>, x<sub>1</sub>, x<sub>2</sub>, x<sub>3</sub>]</p>
+<p>(b', a', ys) = mscanr f a b <strong>xs</strong></p>
+<h1 id="circuit-semantics">Circuit semantics</h1>
+<p>A digital circuit takes some input signals, performs a computation, and produces some output signals. Since the outputs depend on the inputs, the circuit acts like a mathematical function. This connection between circuits and functions is discussed in more depth in the chapter on synchronous circuits.</p>
+<h2 id="boolean-signals">Boolean signals</h2>
+<h2 id="streams">Streams</h2>
+<h2 id="synchronous-circuits">Synchronous circuits</h2>
+<h2 id="multiple-semantics">Multiple semantics</h2>
+<h2 id="path-depth">Path depth</h2>
+<h2 id="netlists">Netlists</h2>
+<h1 id="equational-reasoning">Equational reasoning</h1>
+<h2 id="substituting-equals-for-equals">Substituting equals for equals</h2>
+<p>An equation in Hydra is a true mathematical equation, not an assignment statement. This has several consequences. One is that the order of the equations does not matter, and it is not necessary to define a signal before it is used. The set of equations above illustrates this: <strong>x</strong> is defined using <strong>p</strong> and <strong>q</strong>, whose definitions appear later. These equations could equally well be written in reverse order:</p>
+<p><code>~~~</code> r = nor2 c d q = inv r p = xor2 a b x = nand2 p q <code>~~~</code></p>
+<p>The order of the equations makes no difference at all to the circuit; it's best to put them in whatever order seems to be easiest to understand. If a top-down view of the circuit seems natural, then the first set of equations is suitable, but if a bottom-up view is clearer, then the second set is better.</p>
+<p>There is another important consequence of the fact that we are working with mathematical equations. We can perform <strong>equational reasoning</strong> to transform a circuit specification into a different form, with a guarantee that the circuit itself has not been affected. Suppose that we have an equation <strong>x = e</strong>. Equational reasoning means that if <strong>x</strong> appears in <strong>e'</strong>, we can replace it with <strong>e</strong>; conversely, if <strong>e</strong> appears in <strong>e'</strong> we can replace it with <strong>x</strong>. This process is sometimes called ``substituting equals with equals'', and it is central in algebraic reasoning.</p>
+<p>Equational reasoning is one of the central advantages to a functional hardware description language. It has many applications: it can be used to rewrite a circuit to make it more readable; it can be used to transform a circuit to calculate the same result but do it faster; it can be used to prove that a circuit is correct according to an abstract specification. Equational reasoning can even be used to derive an implementation from a specification.</p>
+<p>Here is a simple example of equational reasoning. Start with the set of equations discussed above:</p>
+<p><code>~~~</code> x = nand2 p q p = xor2 a b q = inv r r = nor2 c d <code>~~~</code></p>
+<p>We can calculate the value of <strong>x</strong> using equational reasoning, in a sequence of steps:</p>
+<p><code>~~~</code> x = {definition of x} nand2 p q = {substitute value of p} nand2 (xor2 a b) q = {substitute value of q} nand2 (xor2 a b) (inv r) = {substitute value of r} nand2 (xor2 a b) (inv (nor2 c d)) <code>~~~</code></p>
+<p>This calculation may not look very impressive, but later we will see how equational reasoning can solve some quite challenging problems.</p>
+<h2 id="equivalent-ways-to-describe-a-circuit">Equivalent ways to describe a circuit</h2>
+<h1 id="summary-of-syntax">Summary of syntax</h1>
+<p>This section summarises the language syntax. Hydra is actually Haskell with some additional libraries, and it adopts all the syntax rules of Haskell.</p>
+<p>Comments. There are two ways to indicate a comment (1) enclose the comment in brackets {- so this is a comment -} (2) A double dash – indicates that everything else – on the line is a comment</p>
+<h2 id="indentation">Indentation</h2>
+<p>Haskell normally uses indentation, rather than punctuation, to determine the structure of a definition. There are good reasons behind this approach to syntax.</p>
+<p>It is also possible to use braces and semicolons to determine the structure, instead of indentation. This is particularly useful for generators, where the specification is not written by hand and also not intended to be human readable. There are also some situations where a large number of very short equations can be more readable with many placed on each line, separated by punctuation. However, these situations are relatively uncommon. Normally it's best to use indentation and to make the layout of the code as readable as possible.</p>
+<p>Indentation The equations in a definition need to be lined up vertically</p>
+<p>circ x y = a – a good definition where p = bla bla… q = bla… r = bla…</p>
+<p>circ x y = a – a bad definition where p = bla bla… q = bla… r = bla… -}</p>
+<h2 id="names">Names</h2>
+<p>Names (also called identifiers) are used for circuits (e.g. logic gates) and signals. A name must begin with a lower case letter, and may contain letters, digits, underscores, and primes (single quote). The following are valid names:</p>
+<p><code>~~~</code> x select adder y' bypass<sub>ctl</sub> <code>~~~</code></p>
+<p>The following identifiers cannot be used to name a circuit or signal:</p>
+<p><code>~~~</code> Product – begins with upper case letter x?3 – contains invalid character ? 0 – use zero to get the constant 0 signal <code>~~~</code></p>
+<h2 id="signal-expressions">Signal expressions</h2>
+<p>A signal is specified in Hydra by an expression. The simplest form of expression is simply the name of a signal. For example, suppose we have signals named <strong>x</strong> and <strong>y</strong>. Then the following expressions denote the corresponding signals. Note that <strong>zero</strong> and <strong>one</strong> are simply the names of the constant signals.</p>
+<p><code>~~~</code> zero one x y <code>~~~</code></p>
+<p>A signal is denoted by an expression, which can have any of the following forms:</p>
+<ul>
+<li><p>The constants <strong>zero</strong> and <strong>one</strong> are names that are pre-defined. These should not be redefined: don't write zero or one on the left hand side of an equation.</p></li>
+<li><p>The name of a signal which is in scope: <strong>x</strong>, <strong>carry</strong>, <strong>ctl<sub>ld</sub></strong>. Later we will see how to define these, using equations or circuit inputs.</p></li>
+<li><p>An application of a circuit to inputs denotes a signal: <strong>or2 x y</strong> specifies a signal which is the output of an <strong>or2</strong> gate connected to inputs <strong>x</strong> and <strong>y</strong>.</p></li>
+</ul>
+<p>Any of these notations can be used as input to a component.</p>
+<p>The component and the inputs are separated by a space; don't use punctuation.</p>
+<p><code>~~~</code> c = and2 a b – correct d = and2 (a,b); – wrong! don't use ( , ) ; <code>~~~</code></p>
+<hr />
 <p>To design a circuit, and to do anything useful with it, we need a way to describe it. The description must be understandable, and it also needs to be clear, complete, and precise. Such a description is called a <em>circuit specification</em>.</p>
 <p>This chapter introduces circuit specification using Hydra, a <em>functional hardware description language</em> which is used throughout this book. The focus is on the basic concepts and notations. Later chapters describe features relating to circuit models and simulation, sequential circuits, design patterns, and more.</p>
 <p>Hydra is implemented using Haskell, a general purpose functional programming language. Hydra is a subset of Haskell, augmented with libraries. A circuit specification is compiled using the Haskell compiler, and there is no separate Hydra compiler. However, it's better to think of Hydra as a distinct language, and some of the software tools will give an error message if you try to step outside of Hydra and write general Haskell code in a circuit specification. You don't need to know how Hydra is implemented in order to use it, but Chapter ?? explains how the implementation works.</p>
@@ -114,8 +1068,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>A circuit specification may be abstract, giving just a description of the intended behavior of the circuit. Alternatively, it may be written in a way that describes the structure as well as the function of the hardware. In this chapter, we will focus on this lower level form of specification.</p>
 <p>A specification may take the form of a diagram or a piece of text. For digital circuits, a pictorial specification is called a <em>schematic diagram</em> while a textual specification uses a <em>hardware description language</em>. Both forms can also be used for software: a textual specification of an algorithm uses a programming language, but there are also visual programming languages that used diagrams to describe algorithms.</p>
 <p>A schematic diagram is an abstract picture of a circuit. It shows the components and how they are connected with wires, but it does not directly describe the circuit's function. A schematic diagram implies some geometric information, such as the relative placement of components, and this geometry may be used in fabricating the circuit.</p>
-<h2 id="hardware-description-languages">Hardware description languages</h2>
-<p>An alternative approach is to use a computer hardware description language (`CHDL' or just `HDL', for hardware description language). A circuit specification using an HDL is a text document, so it looks superficially like a computer program, but it describes hardware rather than software.</p>
+<h2 id="hardware-description-languages-1">Hardware description languages</h2>
+<p>An alternative approach is to use a computer hardware description language (``CHDL'' or just ``HDL'', for hardware description language). A circuit specification using an HDL is a text document, so it looks superficially like a computer program, but it describes hardware rather than software.</p>
 <p>Schematic diagrams and hardware description languages each have their merits. A diagram may be easier for a beginner to understand, and it is more obvious that a schematic describes hardware, and isn't just a computer program. However, hardware description languages scale up better to large and complex circuits, and fit better with software tools that perform actions using a specification (simulation, analysis, etc.).</p>
 <p>Hardware description languages use many of the same concepts that appear in programming languages. This is natural, because the purpose of both hardware and software is to express algorithms, and both benefit from abstraction, repetition, and similar concepts. Some hardware description languages are based on imperative languages. We will be using Hydra, which is based on Haskell, a pure functional language.</p>
 <h2 id="functional-hardware-description">Functional hardware description</h2>
@@ -131,29 +1085,26 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>A circuit is a machine that takes some input signals, performs a computation, and produces some output signals. Since the outputs depend on the inputs, the circuit acts like a mathematical function. This connection between circuits and functions is discussed in more depth in the chapter on synchronous circuits.</p>
 <p>To design a new circuit, you need to take a set of existing circuits and connect them with wires. There are several libraries of existing circuits that you can start with, and you can also define libraries of your own circuits for further use. The standard logic gates are defined as primitives in a library.</p>
 <p>A signal is specified in Hydra by an expression. The simplest form of expression is simply the name of a signal. For example, suppose we have signals named |x| and |y|. Then the following expressions denote the corresponding signals. Note that |zero| and |one| are simply the names of the constant signals.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode Haskell"><code class="sourceCode haskell"><a class="sourceLine" id="cb1-1" title="1">zero</a>
-<a class="sourceLine" id="cb1-2" title="2">one</a>
-<a class="sourceLine" id="cb1-3" title="3">x</a>
-<a class="sourceLine" id="cb1-4" title="4">y</a></code></pre></div>
+<p>*+BEGIN<sub>SRC</sub> Haskell zero one x y *+END<sub>SRC</sub></p>
 <p>Another way to define a signal is to write an expression that introduces a component or circuit. The value of the expression is the signal that is the output of the component. The inputs to the component, which are also signals, must be written after the name of the component. Here is an example:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode Haskell"><code class="sourceCode haskell"><a class="sourceLine" id="cb2-1" title="1">or2 x y</a></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode Haskell"><code class="sourceCode haskell"><a class="sourceLine" id="cb1-1" title="1">or2 x y</a></code></pre></div>
 <p>This is an expression consisting of the name of a component (|and2|) followed by the names of the inputs to the component (|x| and |y|). The entire expression describes the output produced by the |or2| gate. Such an expression is called an <em>application</em> because the component is applied to its input signals.</p>
 <p>Each circuit takes a specific number of inputs, and an application using that circuit must supply the corresponding number of input signals. Here are several applications of logic gates, each with the right number of inputs.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode Haskell"><code class="sourceCode haskell"><a class="sourceLine" id="cb3-1" title="1">inv x</a>
-<a class="sourceLine" id="cb3-2" title="2">and2 a b</a>
-<a class="sourceLine" id="cb3-3" title="3">xor3 p q r</a>
-<a class="sourceLine" id="cb3-4" title="4">nor4 a b c d</a></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode Haskell"><code class="sourceCode haskell"><a class="sourceLine" id="cb2-1" title="1">inv x</a>
+<a class="sourceLine" id="cb2-2" title="2">and2 a b</a>
+<a class="sourceLine" id="cb2-3" title="3">xor3 p q r</a>
+<a class="sourceLine" id="cb2-4" title="4">nor4 a b c d</a></code></pre></div>
 <p>The expressions we have seen so far assume that we know the names of all the input signals. Since an application denotes a signal, we can that directly as an input. Here is an |and2| gate with two inputs: the first input is connected to the output of an inverter (whose input is |x|), and the second input is |y|.</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode Haskell"><code class="sourceCode haskell"><a class="sourceLine" id="cb4-1" title="1">and2 (inv x) y</a></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode Haskell"><code class="sourceCode haskell"><a class="sourceLine" id="cb3-1" title="1">and2 (inv x) y</a></code></pre></div>
 <p>The expression that describes the output of the inverter requires several symbols, the component |inv| and its input |x|. Such an expression needs to be enclosed in parentheses; thus |(inv x)| is a single value. The following notation would be wrong:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode Haskell"><code class="sourceCode haskell"><a class="sourceLine" id="cb5-1" title="1">and2 inv x y   <span class="co">-- Wrong!</span></a></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode Haskell"><code class="sourceCode haskell"><a class="sourceLine" id="cb4-1" title="1">and2 inv x y   <span class="co">-- Wrong!</span></a></code></pre></div>
 <p> The problem is that it looks like the |and2| gate is being given three inputs, not two, and the first one isn't even a signal.</p>
 <p>Parentheses are used in Hydra for grouping, just as in mathematics. You don't need to use parentheses just to specify the arguments to a function (that is, the inputs to a circuit). Some programming languages requires lots of punctuation to indicate function application:</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode Haskell"><code class="sourceCode haskell"><a class="sourceLine" id="cb6-1" title="1">nand3 (x, and2 (p,q), z)</a></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode Haskell"><code class="sourceCode haskell"><a class="sourceLine" id="cb5-1" title="1">nand3 (x, and2 (p,q), z)</a></code></pre></div>
 <p>In Hydra (as in Haskell) you don't need the extra parentheses and commas; just use parentheses when they are necessary to get the right grouping:</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode Haskell"><code class="sourceCode haskell"><a class="sourceLine" id="cb7-1" title="1">nand3 x (and2 p q) z</a></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode Haskell"><code class="sourceCode haskell"><a class="sourceLine" id="cb6-1" title="1">nand3 x (and2 p q) z</a></code></pre></div>
 
-<div class="sourceCode" id="cb8"><pre class="sourceCode Haskell"><code class="sourceCode haskell"><a class="sourceLine" id="cb8-1" title="1">x <span class="fu">=</span> or2 (and2 a b) c</a></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode Haskell"><code class="sourceCode haskell"><a class="sourceLine" id="cb7-1" title="1">x <span class="fu">=</span> or2 (and2 a b) c</a></code></pre></div>
 <p>Here we need the parentheses to indicate that <em>and2 a b</em> denotes a single value (a signal).</p>
 <p>It can be helpful to give both a schematic diagram and a textual specification for a circuit. Each form of description provides insight, and having both together is often worthwhile. But it is important to check that the two descriptions of the circuit are consistent with each other. To do this, check that every box in the diagram corresponds to a circuit (function) in the text, and check that the wires in the diagram correspond to the signals in the text.</p>
 <p>A useful skill is the ability to convert from a schematic to Hydra, or vice versa. The following problems give some practice with this.</p>
@@ -161,41 +1112,41 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 <h2 id="equations">Equations</h2>
 <p>So far, we have seen expressions that define a new signal as the output of a component. But the output signal has no name: it is anonymous. An equation can be used to give it a name. The left hand side of an equation is the name to be attached to the signal, and the right hand side is an expression that defines the value of the signal. The following equation says that the output of the |and3| gate has the name |x|.</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode Haskell"><code class="sourceCode haskell"><a class="sourceLine" id="cb9-1" title="1">x <span class="fu">=</span> and3 a (inv b) c</a></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode Haskell"><code class="sourceCode haskell"><a class="sourceLine" id="cb8-1" title="1">x <span class="fu">=</span> and3 a (inv b) c</a></code></pre></div>
 <p>The corresponding schematic diagram is:</p>
 
 <p>Signals may be named by an equation, or they may be anonymous. It is always possible to name all the signals, if you want to. This circuit contains several anonymous signals:</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode Haskell"><code class="sourceCode haskell"><a class="sourceLine" id="cb10-1" title="1">x <span class="fu">=</span> nand2 (xor2 a b) (inv (nor2 c d))</a></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode Haskell"><code class="sourceCode haskell"><a class="sourceLine" id="cb9-1" title="1">x <span class="fu">=</span> nand2 (xor2 a b) (inv (nor2 c d))</a></code></pre></div>
 <p>This can be rewritten so as to give every signal an explicit name, by introducing additional equations:</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode Haskell"><code class="sourceCode haskell"><a class="sourceLine" id="cb11-1" title="1">x <span class="fu">=</span> nand2 p q</a>
-<a class="sourceLine" id="cb11-2" title="2">p <span class="fu">=</span> xor2 a b</a>
-<a class="sourceLine" id="cb11-3" title="3">q <span class="fu">=</span> inv r</a>
-<a class="sourceLine" id="cb11-4" title="4">r <span class="fu">=</span> nor2 c d</a></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode Haskell"><code class="sourceCode haskell"><a class="sourceLine" id="cb10-1" title="1">x <span class="fu">=</span> nand2 p q</a>
+<a class="sourceLine" id="cb10-2" title="2">p <span class="fu">=</span> xor2 a b</a>
+<a class="sourceLine" id="cb10-3" title="3">q <span class="fu">=</span> inv r</a>
+<a class="sourceLine" id="cb10-4" title="4">r <span class="fu">=</span> nor2 c d</a></code></pre></div>
 <p>Sometimes an equation like this is called a <em>defining equation</em>, because the left hand side has to be a signal name whose value is defined to be the right hand side. It would be wrong, for example, to write</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode Haskell"><code class="sourceCode haskell"><a class="sourceLine" id="cb12-1" title="1">nand2 p q <span class="fu">=</span> x   <span class="co">-- Wrong!</span></a></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode Haskell"><code class="sourceCode haskell"><a class="sourceLine" id="cb11-1" title="1">nand2 p q <span class="fu">=</span> x   <span class="co">-- Wrong!</span></a></code></pre></div>
 <p>\subsection{Equational reasoning}</p>
 <p>An equation in Hydra is a true mathematical equation, not an assignment statement. This has several consequences. One is that the order of the equations does not matter, and it is not necessary to define a signal before it is used. The set of equations above illustrates this: |x| is defined using |p| and |q|, whose definitions appear later. These equations could equally well be written in reverse order:</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode Haskell"><code class="sourceCode haskell"><a class="sourceLine" id="cb13-1" title="1">r <span class="fu">=</span> nor2 c d</a>
-<a class="sourceLine" id="cb13-2" title="2">q <span class="fu">=</span> inv r</a>
-<a class="sourceLine" id="cb13-3" title="3">p <span class="fu">=</span> xor2 a b</a>
-<a class="sourceLine" id="cb13-4" title="4">x <span class="fu">=</span> nand2 p q</a></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode Haskell"><code class="sourceCode haskell"><a class="sourceLine" id="cb12-1" title="1">r <span class="fu">=</span> nor2 c d</a>
+<a class="sourceLine" id="cb12-2" title="2">q <span class="fu">=</span> inv r</a>
+<a class="sourceLine" id="cb12-3" title="3">p <span class="fu">=</span> xor2 a b</a>
+<a class="sourceLine" id="cb12-4" title="4">x <span class="fu">=</span> nand2 p q</a></code></pre></div>
 <p>The order of the equations makes no difference at all to the circuit; it's best to put them in whatever order seems to be easiest to understand. If a top-down view of the circuit seems natural, then the first set of equations is suitable, but if a bottom-up view is clearer, then the second set is better.</p>
-<p>There is another important consequence of the fact that we are working with mathematical equations. We can perform <em>equational reasoning</em> to transform a circuit specification into a different form, with a guarantee that the circuit itself has not been affected. Suppose that we have an equation |x = e|. Equational reasoning means that if |x| appears in |e'|, we can replace it with |e|; conversely, if |e| appears in |e'| we can replace it with |x|. This process is sometimes called `substituting equals with equals', and it is central in algebraic reasoning.</p>
+<p>There is another important consequence of the fact that we are working with mathematical equations. We can perform <em>equational reasoning</em> to transform a circuit specification into a different form, with a guarantee that the circuit itself has not been affected. Suppose that we have an equation |x = e|. Equational reasoning means that if |x| appears in |e'|, we can replace it with |e|; conversely, if |e| appears in |e'| we can replace it with |x|. This process is sometimes called ``substituting equals with equals'', and it is central in algebraic reasoning.</p>
 <p>Equational reasoning is one of the central advantages to a functional hardware description language. It has many applications: it can be used to rewrite a circuit to make it more readable; it can be used to transform a circuit to calculate the same result but do it faster; it can be used to prove that a circuit is correct according to an abstract specification. Equational reasoning can even be used to derive an implementation from a specification.</p>
 <p>Here is a simple example of equational reasoning. Start with the set of equations discussed above:</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode Haskell"><code class="sourceCode haskell"><a class="sourceLine" id="cb14-1" title="1">x <span class="fu">=</span> nand2 p q</a>
-<a class="sourceLine" id="cb14-2" title="2">p <span class="fu">=</span> xor2 a b</a>
-<a class="sourceLine" id="cb14-3" title="3">q <span class="fu">=</span> inv r</a>
-<a class="sourceLine" id="cb14-4" title="4">r <span class="fu">=</span> nor2 c d</a></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode Haskell"><code class="sourceCode haskell"><a class="sourceLine" id="cb13-1" title="1">x <span class="fu">=</span> nand2 p q</a>
+<a class="sourceLine" id="cb13-2" title="2">p <span class="fu">=</span> xor2 a b</a>
+<a class="sourceLine" id="cb13-3" title="3">q <span class="fu">=</span> inv r</a>
+<a class="sourceLine" id="cb13-4" title="4">r <span class="fu">=</span> nor2 c d</a></code></pre></div>
 <p> We can calculate the value of |x| using equational reasoning, in a sequence of steps:</p>
-<div class="sourceCode" id="cb15"><pre class="sourceCode Haskell"><code class="sourceCode haskell"><a class="sourceLine" id="cb15-1" title="1">x <span class="fu">=</span> {definition <span class="kw">of</span> x}</a>
-<a class="sourceLine" id="cb15-2" title="2">nand2 p q</a>
-<a class="sourceLine" id="cb15-3" title="3">  <span class="fu">=</span> {substitute value <span class="kw">of</span> p}</a>
-<a class="sourceLine" id="cb15-4" title="4">nand2 (xor2 a b) q</a>
-<a class="sourceLine" id="cb15-5" title="5">  <span class="fu">=</span> {substitute value <span class="kw">of</span> q}</a>
-<a class="sourceLine" id="cb15-6" title="6">nand2 (xor2 a b) (inv r)</a>
-<a class="sourceLine" id="cb15-7" title="7">  <span class="fu">=</span> {substitute value <span class="kw">of</span> r}</a>
-<a class="sourceLine" id="cb15-8" title="8">nand2 (xor2 a b) (inv (nor2 c d))</a></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode Haskell"><code class="sourceCode haskell"><a class="sourceLine" id="cb14-1" title="1">x <span class="fu">=</span> {definition <span class="kw">of</span> x}</a>
+<a class="sourceLine" id="cb14-2" title="2">nand2 p q</a>
+<a class="sourceLine" id="cb14-3" title="3">  <span class="fu">=</span> {substitute value <span class="kw">of</span> p}</a>
+<a class="sourceLine" id="cb14-4" title="4">nand2 (xor2 a b) q</a>
+<a class="sourceLine" id="cb14-5" title="5">  <span class="fu">=</span> {substitute value <span class="kw">of</span> q}</a>
+<a class="sourceLine" id="cb14-6" title="6">nand2 (xor2 a b) (inv r)</a>
+<a class="sourceLine" id="cb14-7" title="7">  <span class="fu">=</span> {substitute value <span class="kw">of</span> r}</a>
+<a class="sourceLine" id="cb14-8" title="8">nand2 (xor2 a b) (inv (nor2 c d))</a></code></pre></div>
 <p> This calculation may not look very impressive, but later we will see how equational reasoning can solve some quite challenging problems.</p>
 <p>\section{General Boolean functions}</p>
 <p>Suppose a Boolean function has <span class="math inline"><em>k</em></span> inputs, and one output.</p>
@@ -230,13 +1181,5 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p></p>
 <p>Don't take these names too seriously—they aren't standard. The point is that all of these functions do exist. What is important is the existence and the value of a function, not its name.</p>
 <p>(In this naming scheme, con means <em>constant</em>; j means <em>just</em>, nj means <em>not just</em>.)</p>
-<h2 id="typesetting-notes">Typesetting notes</h2>
-<ul>
-<li>C-c C-e h h org-html-export-to-html</li>
-</ul>
-<p>&lt;p&gt; &lt;a name="solution:or2-and2"&gt;**Solution**&lt;/a&gt; &lt;a href="#exercise:or2-and2"&gt;*(Go to exercise)*&lt;/a&gt; <strong>x = or2 (and2 a b) c</strong></p>
-<p>&lt;/p&gt;&lt;p&gt; &lt;a name="solution:inv-and2"&gt;**Solution**&lt;/a&gt; &lt;a href="#exercise:inv-and2"&gt;*(Go to exercise)*&lt;/a&gt; The diagram for inv and2 a b goes here.</p>
-<p>&lt;/p&gt;&lt;p&gt; &lt;a name="solution:xor2-nand3"&gt;**Solution**&lt;/a&gt; &lt;a href="#exercise:xor2-nand3"&gt;*(Go to exercise)*&lt;/a&gt; The diagram for xor2-nand3 goes here.</p>
-<p>&lt;/p&gt;</p>
 </body>
 </html>

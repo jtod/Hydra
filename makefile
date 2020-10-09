@@ -1,89 +1,56 @@
 #----------------------------------------------------------------------
-# makefile for Hydra, (c) 2020 John T. O'Donnell
-# See README.md, LICENSE.txt, doc/HydraUserGuide.org
-# In browser, visit docs/userguide/HydraUserGuide.html
+# makefile for Hydra
 #----------------------------------------------------------------------
 
-# Requires ghc, pandoc
-
-# Usage:
-
-#  make show-parameters for debugging, show makefile variables
-#  make install         compile and install
-#  make doc             haddock and user guide
-#  make userguide       create doc/html files from markdown source
+#  make userinstall     user requires ghc and cabal
+#  make devinstall      developer requires ghc, cabal, pandoc
 #  make clean           delete temp files but keep documentation
 
 #----------------------------------------------------------------------
-# Calculate locations and times, don't need to edit these
+# Calculate parameters: don't need to edit these
 
-# Provide version number in generated html documentation
-HydraVersion != grep < Hydra.cabal ^version
-VersionDate = $(HydraVersion)
+# Obtain version number from cabal file to use in generated html documentation
+VERSION != grep < Hydra.cabal ^version
 
-# make show-parameters -- print calculated parameters
-.PHONY : show-parameters
-show-parameters :
-	echo PackagePath = $(PackagePath)
-	echo PackageName = $(PackageName)
-	echo DateTimeStamp = $(DateTimeStamp)
-	echo BuildDate = $(BuildDate)
-	echo TarballName = $(TarballName)
-	echo FullCopyName = $(FullCopyName)
-	echo ArchiveLocation = $(ArchiveLocation)
-	echo HydraVersion = $(HydraVersion)
-	echo VersionDate = $(VersionDate)
+# Define dates in several formats, for inclusion in the app and user guide
+YEAR=$(shell date +"%Y")
+MONTHYEAR=$(shell date +"%B %Y")
+MONTHYEARDAY=$(shell date +"%F")
+
+# Define metadata line to put at top of html
+MDVERSION="$(VERSION), $(MONTHYEAR)"
+MDCOPYRIGHT="Copyright $(YEAR) John T. O&apos;Donnell"
+MDLATEST="For latest version, see <a href='https://github.com/jtod/Hydra' target='_blank'>https://github.com/jtod/Hydra</a>"
+MDHEADER=$(MDVERSION).\ $(MDCOPYRIGHT).\ $(MDLATEST).
 
 #----------------------------------------------------------------------
-# Compilation
+# Installation
 
-# Compile and install but don't try to build the user guide, which
-# requires software that some users may not have installed (m4,
-# pandoc).
+# User: install Haskell libraries needed to run circuits
+.PHONY : userinstall
+userinstall :
+	cabal install --lib
+	# Warning: Cabal install does not actually install the code
+	# See README.md, which explains how to run Hydra
 
-.PHONY : install
-install :
-	cabal configure
-	cabal install
+# Developer: build files to be disseminated
+.PHONY : build
+build :
+	make docs/userguide/HydraUserGuide.html
 	cabal haddock
 
-# Compile, install, and build the user guide
-.PHONY : all
-all :
-	make install
-	make userguide
-
 #----------------------------------------------------------------------
-# User guide
+# User guide: generate html from the source .org file
 
-# The source for the user guide (in src/docsrc) is written in org.
-# The m4 and pandoc programs are needed to build the html.
-
-.PHONY : olduserguide
-olduserguide :
-	mkdir -p doc/userguide/html
-	cp -r -u src/docsrc/figures doc/userguide
-	cp src/docsrc/style.css doc/userguide/html
-	m4 -P src/docsrc/indexsrc.m4 \
-	  >doc/userguide/html/indextemp.txt
-	pandoc --standalone \
-          --read markdown --write html \
-          --table-of-contents --toc-depth=4 \
-          --variable=date:'$(VersionDate)' \
-          --variable=css:style.css \
-          -o doc/userguide/html/index.html \
-	    doc/userguide/html/indextemp.txt
-
-docs/userguide/HydraUserGuide.html : docs/userguide/HydraUserGuide.org
-	m4 -P docs/userguide/HydraUserGuide.org \
-	  >docs/userguide/ugTEMP.org
+docs/userguide/HydraUserGuide.html : docs/userguide/HydraUserGuide.org \
+	  docs/userguide/userguide-template.html
 	pandoc --standalone \
           --from=org \
           --to=html \
+          --metadata title="Hydra User Guide" \
           --template=docs/userguide/userguide-template.html \
           --table-of-contents --toc-depth=4 \
-          --metadata title="Hydra User Guide" \
-          --variable=date:'$(VersionDate)' \
-          --variable=css:HydraUserGuide.css \
-          -o docs/userguide/HydraUserGuide.html \
-	  docs/userguide/ugTEMP.org
+	  --variable=mdheader:${MDHEADER} \
+          --variable=css:./HydraUserGuide.css \
+          --output=docs/userguide/HydraUserGuide.html \
+	  docs/userguide/HydraUserGuide.org
