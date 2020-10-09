@@ -91,9 +91,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li><a href="#modeling-circuits-as-functions">Modeling circuits as functions</a></li>
 </ul></li>
 <li><a href="#installation">Installation</a></li>
-<li><a href="#hello-world-running-a-simulation">Hello world! Running a simulation</a></li>
 <li><a href="#a-quick-overview-with-examples">A quick overview with examples</a><ul>
-<li><a href="#a-minimal-circuit-helloworld">A minimal circuit: helloWorld</a></li>
+<li><a href="#a-minimal-circuit-helloworld">A minimal circuit: HelloWorld</a><ul>
+<li><a href="#the-circuit-specification">The circuit specification</a></li>
+<li><a href="#the-simulation-driver">The simulation driver</a></li>
+</ul></li>
 <li><a href="#connecting-several-logic-gates-mux1">Connecting several logic gates: mux1</a></li>
 <li><a href="#producing-several-outputs-halfadd">Producing several outputs: halfAdd</a></li>
 <li><a href="#black-box-with-internal-signals-add4">Black box with internal signals: add4</a></li>
@@ -214,52 +216,78 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </nav>
 <h1 id="introduction">Introduction</h1>
 <p>Hydra is a computer hardware description language (CHDL or HDL) that enables you to design, analyse, and simulate digital circuits. It focuses on logic design, not on the physics of electronic components. It is concerned with how to connect logic gates into a system, but not with the electronic characteristics of an individual transistor. Hydra supports <strong>synchronous circuits</strong>, where a clock keeps all the flip flops synchronised with each other.</p>
-<p>This is free and open source software; see LICENSE.txt for details. To use the system you need the ghc compiler suite for Haskell (this is needed to use Hydra, not just to install it). See the sections Getting started and Installation.</p>
+<p>This is free and open source software; see LICENSE.txt for details. To use the system you need the ghc compiler suite for Haskell, which is needed to use Hydra, not just to install it.</p>
 <p>The language provides facilities that help to design complex circuits as well as small ones. The notation is concise and readable. Large circuits can be described using <strong>circuit generators</strong>, which remove most of the repetition in a circuit description without losing any of the detail. New circuit generators can be defined: you aren't limited to the ones that are built in.</p>
-<p>Hydra has a semantic foundation for circuits that supports the use of <strong>equational reasoning</strong>. This is a formal method that can be used to transform a circuit to make it more efficient according to a cost model, as well as to prove that an implementation satisfies a specification. In some cases, it is possible to start with an abstract specification of the desired behavior, and to derive mathematically a circuit that implements it.</p>
-<p>Hydra is not suitable for all design problems. It assumes that all the values on wires are digital, rather than continuously varying analogue voltages. There are other hardware description languages that can handle analogue circuits.</p>
+<p>Hydra has a semantic foundation for circuits that supports the use of <strong>equational reasoning</strong>. This is a formal method that can be used to transform a circuit to make it more efficient according to a cost model, as well as to prove that an implementation satisfies a specification. In some cases, it is possible to start with an abstract specification of the desired behavior and to derive mathematically a circuit that implements it.</p>
+<p>Hydra is not suitable for all circuit design problems. It assumes that all the values on wires are digital, rather than continuously varying analogue voltages. It requires sequential circuits to be synchronous, using one global clock.</p>
 <h2 id="hardware-description-languages">Hardware description languages</h2>
-<p>To design a circuit, and to do anything useful with it, we need a way to describe it. The description can take two forms. A <strong>specification</strong> is a clear statement of what the system is intended to do, while an <strong>implementation</strong> shows how the primitive operations that are available can achieve that result. Both the specification and implementation need to be clear, complete, and precise.</p>
-<p>An implementation may take the form of a diagram or a piece of text. For digital circuits, a pictorial specification is called a <strong>schematic diagram</strong> while a textual specification uses a <strong>hardware description language</strong>. Both forms can also be used for software: a textual specification of an algorithm uses a programming language, but there are also visual programming languages that used diagrams to describe algorithms.</p>
+<p>To design a circuit, and to do anything useful with it, we need a way to describe it. The description can take two forms. A <strong>specification</strong> is a clear statement of what the system is intended to do, while an <strong>implementation</strong> shows how the primitive components can be connected together into a circuit satisfies the specification. Both the specification and implementation need to be clear, complete, and precise.</p>
+<p>An implementation may take the form of a diagram or a piece of text. For digital circuits, a pictorial specification is called a <strong>schematic diagram</strong>, while a textual specification uses a <strong>hardware description language</strong>. Both forms can also be used for software: a textual specification of an algorithm uses a programming language, but there are also visual programming languages that used diagrams to describe algorithms.</p>
 <p>A schematic diagram is an abstract picture of a circuit. It shows the components and how they are connected with wires, but it does not directly describe the circuit's function. A schematic diagram implies some geometric information, such as the relative placement of components, and this geometry may be used in fabricating the circuit.</p>
 <p>An alternative approach is to use a computer hardware description language (CHDL or HDL). A circuit specification using an HDL is a text document, so it looks superficially like a computer program, but it describes hardware rather than software. Most hardware description languages are based on existing programming languages intended for software, and they model circuits using the paradigms of programming.</p>
 <p>Schematic diagrams and hardware description languages each have their merits. A diagram may be easier for a beginner to understand, and it's more obvious that a schematic describes hardware and isn't just a computer program. However, hardware description languages scale up better to large and complex circuits, and fit better with software tools that can analyse a circuit and simulate it.</p>
 <h2 id="modeling-circuits-as-functions">Modeling circuits as functions</h2>
 <p>Some HDLs are based on imperative programming languages, using the assignment statement to model a state change in a circuit. In contrast, Hydra is based on pure functional programming, and it models a circuit as a function that takes inputs and produces outputs. This is natural, because a circuit and a function are both a black box that takes some inputs and produces some outputs. The underlying model – circuits as functions rather than state changes as assignments – is the fundamental difference between Hydra and imperative HDLs.</p>
 <p>Hydra is an example of an <strong>embedded domain-specific language</strong> (DSL or EDSL). A domain-specific language is a language intended for one specific application domain, not for general purpose programming. Hydra is suitable specifically for expressing algorithms as digital circuits, but it isn't a general purpose programming language. It is implemented by <strong>embedding</strong> in Haskell, a general purpose functional language. This means that Hydra doesn't have a separate compiler; instead, its implementation consists of a library of Haskell modules. A circuit specification written in Hydra is compiled by the Haskell compiler and linked with the Hydra library. However, it is best to think of Hydra as a distinct language: designing a circuit is not the same as writing a program in Haskell, and some Haskell programs don't correspond to circuits.</p>
-<p>Hydra is implemented using Haskell, a general purpose functional programming language. Hydra is a subset of Haskell, augmented with libraries. A circuit specification is compiled using the Haskell compiler, and there is no separate Hydra compiler. However, it's better to think of Hydra as a distinct language, and some of the software tools will give an error message if you try to step outside of Hydra and write general Haskell code in a circuit specification. You don't need to know how Hydra is implemented in order to use it, but Chapter ?? explains how the implementation works.</p>
 <h1 id="installation">Installation</h1>
-<p>See <strong>README.md</strong> for current notes on installation.</p>
 <p>You need two pieces of software: ghc, a Haskell compiler, and the Hydra source. Both are free software, and they run on Windows, Macintosh, and Gnu/Linux.</p>
-<ul>
-<li><p>The ghc compiler for Haskell. To find out whether you have it, enter ghc –version. If it isn't installed, go to www.haskell.org. It's easiest to get the Haskell Platform, not just the ghc compiler.</p></li>
-<li><p>Download Hydra from <a href="https://github.com/jtod/Hydra">https://github.com/jtod/Hydra</a>. The installation file is Hydra-i.j.k.zip (or .tgz). Put the file somewhere in your user workspace and uppack it: on Linux, tar -xzf Hydra-i.j.k.tgz and on Windows use 7zip or tar.</p></li>
-<li><p>The User Guide is in docs/userguide/HydraUserGuide.html. If that file is missing, the source is docs/userguide/HydraUserGuide.org</p></li>
-<li><p>There is also an API reference; see README.md for how to find it.</p></li>
-<li><p>To build Hydra and make it available so you can use it in your circuits, see README.md.</p></li>
-</ul>
-<h1 id="hello-world-running-a-simulation">Hello world! Running a simulation</h1>
-<p>Let's start by running a circuit simulation. For now, just run the examples, and refer back to them as the subsequent sections explain the language. The examples directory contains a variety of circuits, and the simplest is in examples/helloworld.</p>
-<p>To run a circuit, two definitions are needed: the <strong>circuit specification</strong>, and a <strong>simulation driver</strong>. The circuit specification states precisely the interface to the circuit, what components it contains, and how they are connected. The simulation driver says how to parse the inputs using a readable input format, and how to format the outputs to make them readable.</p>
-<p>It's good practice to place the circuit definition and its simulation driver in separate files. By convention, the filename of the driver ends in "Run". The files in examples/helloworld are:</p>
-<ul>
-<li><p>HelloWorld.hs defines a circuit named hello, which takes two input bits and outputs their logical and.</p></li>
-<li><p>HelloWorldRun.hs defines a simulation driver for the circuit. Usually, a simulation driver file provides a main program named <strong>main</strong> which runs the simulation on test data which is also defined in the file. In HelloWorldRun.hs, the test data runs the circuit on all possible inputs 00, 01, 10, 11. Since the hello circuit is really just an and2 gate, the results should be 0, 0, 0, 1.</p></li>
-</ul>
-<p>You can tell ghc, the Haskell compiler, to compile the circuit and simulation driver and to execute the <strong>main</strong> in the driver.</p>
-<p><code>~~</code> cd examples/helloworld hydra HelloWorldRun <code>~~</code></p>
-<p>An alternative is to use the interactive ghci interpreter, using the hydrai command. This is sometimes quicker than using the ghc compiler, but the primary advantage is that it allows interactive testing. You aren't limited to executing <strong>main</strong>; you can enter expressions interactively.</p>
-<p><code>~~</code> hydrai :load HelloWorldRun :main <code>~~</code></p>
+<p>*Note (2020-10-09): it is planned to release Hydra on github within a few days. See <strong><strong>Releases</strong></strong> section on the github Hydra page. It's better to wait for a release, as the HEAD version is unstable. Eventually, it is planned to release Hydra on the Hackage, the Haskell package server. That will simplify the installation. For now, use the following instructions.*</p>
+<ol>
+<li>Install Haskell Platform (www.haskell.org). This gives you the ghc compiler and the cabal package system. Check that these are installed with these commands:</li>
+</ol>
+<p><code>~~</code> $ ghc –version The Glorious Glasgow Haskell Compilation System, version 8.10.2 $ cabal –version cabal-install version 3.2.0.0 compiled using version 3.2.0.0 of the Cabal library <code>~~</code></p>
+<ol>
+<li><p>Download Hydra from <a href="https://github.com/jtod/Hydra">https://github.com/jtod/Hydra</a> – click Releases and download the most recent version. It isn't recommended to use the Code link; that will give you the development branch which is not a stable release. The installation file is Hydra-i.j.k.zip (or .tgz).</p></li>
+<li><p>Put the file somewhere in your user workspace and uppack it: on Linux, tar -xzf Hydra-i.j.k.tgz and on Windows use 7zip or tar.</p></li>
+<li><p>Enter <strong>make userinstall</strong>. Alternatively, enter the following commands, which update the Haskell package database from the Internet, compile the dependencies, and build a documentation web page.</p></li>
+</ol>
+<p><code>~~</code> cabal update cabal install –lib cabal haddock <code>~~</code></p>
+<ol>
+<li>Add the following to your .bashrc configuration file (but replace /path/to/Hydra to the path where you actually put it). *(Why do you have to do this? Unfortunately, the latest version of cabal just compiles the code but doesn't make it visible to ghc, so it's difficult to use the compiled code. But you can run circuits directly using the Hydra source files, as shown below.)*</li>
+</ol>
+<p><code>~~</code> export HYDRA=/path/to/Hydra alias hydra="ghc -i${HYDRA}/src -e main" alias hydrai="ghci -i${Hydra}/src" <code>~~</code></p>
+<ol>
+<li>Test that it's working. In your shell, go to Hydra/examples/HelloWorld and enter:</li>
+</ol>
+<p><code>~~</code> hydra HelloWorldRun <code>~~</code></p>
+<p>This should produce the following output:</p>
+<p><code>~~</code> $ hydra HelloWorldRun x=0 y=0 output z=0 x=0 y=1 output z=0 x=1 y=0 output z=0 x=1 y=1 output z=1 <code>~~</code></p>
 <h1 id="a-quick-overview-with-examples">A quick overview with examples</h1>
-<p>This section shows several examples of circuits of increasing complexity. You may be able to design and simulate some circuits on your own by following and modifying these examples. The various design techniques are described in more detail in later sections.</p>
-<h2 id="a-minimal-circuit-helloworld">A minimal circuit: helloWorld</h2>
-<p>Files: <strong>examples/helloworld/HelloWorld.hs</strong> and <strong>examples/helloworld/HelloWorldRun.hs</strong></p>
-<p>The HelloWorld circuit just contains one logic gate.</p>
-<p><code>~~~</code> m4<sub>include</sub>(`examples/helloworld/HelloWorld.hs') <code>~~~</code></p>
-<p>The circuit itself is defined in a module HelloWorld, which is in the file named HelloWorld.hs. A module may contain any number of definitions. The module imports the standard library with <strong>import HDL.Hydra.Core.Lib</strong>. All circuit modules need this import; some modules will need additional import statements.</p>
-<p>The circuit specification has two parts: a <strong>type declaration</strong> which contains the symbol :: and a <strong>defining equation</strong> which contains the symbol =.</p>
+<p>This section shows several examples of circuits of increasing complexity. You should be able to design and simulate some circuits on your own by following and modifying these examples. The various design techniques are described in more detail in later sections. For now, just run the examples, and refer back to them as the subsequent sections explain the language. See the examples directory for a collection of circuits.</p>
+<h2 id="a-minimal-circuit-helloworld">A minimal circuit: HelloWorld</h2>
+<p>To run a circuit, two definitions are needed: the <strong>circuit specification</strong>, and a <strong>simulation driver</strong>. The circuit specification states precisely the interface to the circuit, what components it contains, and how they are connected. The simulation driver says how to parse the inputs using a readable input format, and how to format the outputs to make them readable.</p>
+<p>It's good practice to place the circuit definition and its simulation driver in separate files. By convention, the filename of the driver ends in "Run". The HelloWorld example consists of two files:</p>
+<ul>
+<li><p>HelloWorld.hs defines a circuit named hello, which takes two input bits and outputs their logical and. In other words, the <strong>hello</strong> circuit is just an and2 logic gate.</p></li>
+<li><p>HelloWorldRun.hs defines a simulation driver for the circuit. The file provides a main program named <strong>main</strong> which runs the simulation on test data which is also defined in the file. In HelloWorldRun.hs, the test data runs the circuit on all possible inputs 00, 01, 10, 11. Since the hello circuit is really just an and2 gate, the results should be 0, 0, 0, 1.</p></li>
+</ul>
+<h3 id="the-circuit-specification">The circuit specification</h3>
+<p>The circuit itself is defined in a module HelloWorld, which is in the file named HelloWorld.hs.</p>
+<p><code>~~</code> – HelloWorld: simplest example of a circuit – This file (HelloWorld) defines the circuit – To run a simulation, enter hydra HelloWorldRun – This file is part of Hydra, see Hydra/README.md</p>
+<p>module HelloWorld where import HDL.Hydra.Core.Lib</p>
+<p>– Define a circuit "hello" which takes two input bits and outputs – their logical conjunction (using an and2 logic gate)</p>
+<p>hello :: Bit a =&gt; a -&gt; a -&gt; a – type of the circuit gives its interface hello x y = and2 x y – implementation uses the and2 logic gate <code>~~</code></p>
+<p>A module may contain any number of definitions. The module imports the standard library with <strong>import HDL.Hydra.Core.Lib</strong>. All circuit modules need this import; some modules will need additional import statements.</p>
+<p>The circuit <strong>hello</strong> contains two lines of code: a <strong>type declaration</strong> which contains the symbol :: and a <strong>defining equation</strong> which contains the symbol =.</p>
+<p>The type declaration specifies the name of the circuit's interface.</p>
+<ul>
+<li><strong>hello ::</strong> means "hello has type…".</li>
+<li>*Bit a =&gt; * means the circuit uses Bit signals, and we will use the name <strong>a</strong> for the type of a bit signal</li>
+<li><strong>a -&gt; a -&gt; a</strong> says the circuit takes in input of type <strong>a</strong>, a second input also of type <strong>a</strong>, and it outputs a signal of type <strong>a</strong></li>
+<li>There may be any number of inputs, and each is followed by <strong>-&gt;</strong>. This means that the number of inputs is the number of <strong>-&gt;</strong> in the type.</li>
+<li>There must be exactly one output</li>
+</ul>
+<p><code>~~</code> hello :: Bit a =&gt; a -&gt; a -&gt; a – type of the circuit gives its interface <code>~~</code></p>
+<p>Tye defining equation specifies local names for the circuit's inputs, and it gives a circuit that produces its output.</p>
+<p><code>~~</code> hello x y = and2 x y <code>~~</code></p>
+<p>This says that we will use the names <strong>x</strong> and <strong>y</strong> for the inputs to the circuit. There is an and2 logic gate with inputs <strong>x</strong> and <strong>y</strong>; the output of that logic gate is the output of <strong>hello</strong>.</p>
+<h3 id="the-simulation-driver">The simulation driver</h3>
 <p>To test the circuit, we can simulate it with some inputs. This requires a <strong>simulation driver</strong> which is defined in a separate module in the file HelloWorldRun.hs.</p>
-<p><code>~~~</code> m4<sub>include</sub>(`examples/helloworld/HelloWorldRun.hs') <code>~~~</code></p>
+<p><code>~~~</code> – HelloWorldRun: simplest example of a circuit – This file (HelloWorldRun) defines the simulation driver – To run a simulation, enter hydra HelloWorldRun – This file is part of Hydra, see Hydra/README.md</p>
+<p>module Main where import HDL.Hydra.Core.Lib import HelloWorld</p>
+<p>main :: IO () main = helloRun testdata</p>
+<p>testdata :: <em>Int</em> testdata = [ [0, 0] , [0, 1] , [1, 0] , [1, 1] ]</p>
+<p>helloRun input = runAllInput input output where – Extract input signals x = getbit input 0 y = getbit input 1 – The circuit to be simulated z = hello x y – Format the output output = [string " x=", bit x, string " y=", bit y, string " output z=", bit z ] <code>~~</code></p>
 <p>Simulation drivers can be standalone modules containing the test data, as in HelloWorldRun. In this case, the name of the module should be <strong>Main</strong>. As well as importing the standard library, the module also needs to import the circuit.</p>
 <p>A Main module should define a function <strong>main</strong> which will run the simulation. This defines one or more actions to perform; in this case there is only one action, which is to execute the simulation driver (helloRun) on the circuit's inputs (testdata).</p>
 <p>The test data itself is a list of lists. The outer list gives the inputs for each clock cycle:</p>
@@ -267,6 +295,12 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>For any clock cycle, there is a list of inputs. Since the circuit has two inputs, each clock cycle gets a list of two values.</p>
 <p><code>~~</code> testdata = [ [0, 0] – in cycle 0, x=0 y=0 , [0, 1] – in cycle 1, x=0 y=1 , [1, 0] – in cycle 2, x=1 y=0 , [1, 1] – in cycle 3, x=1 y=1 ] <code>~~</code></p>
 <p>The simulation driver itself begins with <strong>helloRun input = runAllInput input output</strong>. See the section on simulation drivers for more details. In brief, the purpose of the driver is to convert inputs and outputs between a readable textual form and the internal signal representations needed by the circuit. It contains three sections. The first section defines the input signals for the circuit (x, y). The second section defines the output from the circuit (z). The third section formats what will be printed, which may include any of the signals along with label strings.</p>
+<p>The following commands will run the simulation, using the test data provided:</p>
+<p><code>~~</code> cd examples/HelloWorld hydra HelloWorldRun <code>~~</code></p>
+<p>The simulation driver provides the test data to the inputs of the circuit, runs the simulation, gathers the output signals from the circuit, and formats the results:</p>
+<p><code>~~</code> $ hydra HelloWorldRun x=0 y=0 output z=0 x=0 y=1 output z=0 x=1 y=0 output z=0 x=1 y=1 output z=1 <code>~~</code></p>
+<p>An alternative is to use the interactive ghci interpreter, using the hydrai command. This is sometimes quicker than using the ghc compiler, but the primary advantage is that it allows interactive testing. You aren't limited to executing <strong>main</strong>; you can enter expressions interactively. Enter :q to quit.</p>
+<p><code>~~</code> hydrai :load HelloWorldRun :main <code>~~</code></p>
 <h2 id="connecting-several-logic-gates-mux1">Connecting several logic gates: mux1</h2>
 <p>Files: <strong>examples/mux/Mux1.hs</strong> and <strong>examples/mux/Mux1Run.hs</strong></p>
 <p>The <strong>multiplexer</strong> is an example of a circuit that can be defined by conecting several logic gates together. It's not just an arbitrary example: the multiplexer is one of the most important building blocks for larger systems. There are many varieties of multiplexer; here we look at the 1-bit multiplexer, called <strong>mux1</strong>.</p>

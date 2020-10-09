@@ -10,19 +10,20 @@ language implemented using Haskell.
 
 ## Installation
 
-This is free software released under the GPL-3 license.
+You need two pieces of software: ghc, a Haskell compiler, and the
+Hydra source.  Both are free software, and they run on Windows,
+Macintosh, and Gnu/Linux.
 
 *Note (2020-10-09): it is planned to release Hydra on github within a
 few days.  See **Releases** section on the github Hydra page.  It's
 better to wait for a release, as the HEAD version is unstable.
 Eventually, it is planned to release Hydra on the Hackage, the Haskell
-package server.  That will simplify the installation.  For now, follow
+package server.  That will simplify the installation.  For now, use
 the following instructions.*
 
 1. Install Haskell Platform (www.haskell.org).  This gives you the ghc
    compiler and the cabal package system.  Check that these are
-   installed.  This version of Hydra was tested using these versions
-   of ghc and cabal:
+   installed with these commands:
    
 ~~~~
 $ ghc --version
@@ -32,16 +33,19 @@ cabal-install version 3.2.0.0
 compiled using version 3.2.0.0 of the Cabal library 
 ~~~~
 
-2. Download Hydra from https://github.com/jtod/Hydra Click Releases
-   and download the most recent release.  (It isn't recommended to use
+2. Download Hydra from https://github.com/jtod/Hydra -- click Releases
+   and download the most recent version.  It isn't recommended to use
    the Code link; that will give you the development branch which is
-   not a stable release.)
+   not a stable release.  The installation file is Hydra-i.j.k.zip (or
+   .tgz).
    
-3. Unpack the file and enter the directory.
+3. Put the file somewhere in your user workspace and uppack it: on
+   Linux, tar -xzf Hydra-i.j.k.tgz and on Windows use 7zip or tar.
 
-4. Issue the following commands.  These update the Haskell package
-   database from the Internet, compile the dependencies, and build a
-   documentation web page.
+4. Enter *make userinstall*.  Alternatively, enter the following
+   commands, which update the Haskell package database from the
+   Internet, compile the dependencies, and build a documentation web
+   page.
 
 ~~~~
 cabal update
@@ -53,20 +57,13 @@ cabal haddock
    /path/to/Hydra to the path where you actually put it).  *(Why do
    you have to do this?  Unfortunately, the latest version of cabal
    just compiles the code but doesn't make it visible to ghc, so it's
-   very difficult to use the compiled code.  Cabal makes the compiled
-   code usable only if the source was downloaded from the Hackage web
-   site, but not from github.  But you still have to do the cabal
-   install, because this compiles several other packages imported by
-   Hydra.  It's silly that cabal compiles Hydra but doesn't make
-   Hydra's object code available to use, but that's what it does.
-   Fortunately, you can run circuits directly using the Hydra source
-   files, as shown below.  The following commands recompile Hydra
-   every time you use it, which is annoying but doesn't actually take
-   too much time.)*
+   difficult to use the compiled code.  But you can run circuits
+   directly using the Hydra source files, as shown below.)*
    
 ~~~~
 export HYDRA=/path/to/Hydra
 alias hydra="ghc -i${HYDRA}/src -e main"
+alias hydrai="ghci -i${Hydra}/src"
 ~~~~
 
 6. Test that it's working.  In your shell, go to Hydra/examples/adder
@@ -114,10 +111,11 @@ doc/html/Hydra/index.html
 
 ## About Hydra
 
-* Author: John T. O'Donnell
-* School of Computing Science, University of Glasgow
+* Author: John T. O'Donnell, School of Computing Science, University
+  of Glasgow
 * Copyright (c) 2020 John T. O'Donnell
 * License: This software is free and open source, using the GPL-3
   license.  See LICENSE.txt.
 * Hydra web page: https://github.com/jtod/Hydra
 * Author's web page: https://jtod.github.io/index.html
+* Version: see Hydra.cabal

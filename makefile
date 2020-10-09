@@ -29,7 +29,9 @@ MDHEADER=$(MDVERSION).\ $(MDCOPYRIGHT).\ $(MDLATEST).
 # User: install Haskell libraries needed to run circuits
 .PHONY : userinstall
 userinstall :
+	cabal update
 	cabal install --lib
+	cabal haddock
 	# Warning: Cabal install does not actually install the code
 	# See README.md, which explains how to run Hydra
 
@@ -37,7 +39,6 @@ userinstall :
 .PHONY : build
 build :
 	make docs/userguide/HydraUserGuide.html
-	cabal haddock
 
 #----------------------------------------------------------------------
 # User guide: generate html from the source .org file
