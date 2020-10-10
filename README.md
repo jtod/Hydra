@@ -10,16 +10,24 @@ language implemented using Haskell.
 
 ## Installation
 
-You need two pieces of software: ghc, a Haskell compiler, and the
-Hydra source.  Both are free software, and they run on Windows,
-Macintosh, and Gnu/Linux.
+You need two pieces of software: the ghc Haskell compiler suite and
+the Hydra source.  All of this is free software, and it runs on
+Windows, Macintosh, and Gnu/Linux.
 
-*Note (2020-10-09): it is planned to release Hydra on github within a
-few days.  See **Releases** section on the github Hydra page.  It's
-better to wait for a release, as the HEAD version is unstable.
-Eventually, it is planned to release Hydra on the Hackage, the Haskell
-package server.  That will simplify the installation.  For now, use
-the following instructions.*
+* *Note (2020-10-09).  It is planned to release Hydra on github within
+   a few days.  See **Releases** section on the github Hydra page.
+   It's better to wait for a release, as the HEAD version is
+   unstable.*
+
+* *Note (October 2020). The installation requires defining some
+   .bashrc aliases.  Why are these needed?  Unfortunately, the latest
+   version of cabal just compiles the Hydra code but doesn't make it
+   visible to ghc, so it's essentially unusable.  Fortunately, you can
+   run circuits directly using the Hydra source files, with the
+   aliases given below.  This means the entire Hydra system has to be
+   recompiled every time you run a simulation.  It is hoped that a
+   better solution will emerge, but for now, use the following
+   instructions.*
 
 1. Install Haskell Platform (www.haskell.org).  This gives you the ghc
    compiler and the cabal package system.  Check that these are
@@ -53,17 +61,14 @@ cabal install --lib
 cabal haddock
 ~~~~
 
-5. Add the following to your .bashrc configuration file (but replace
-   /path/to/Hydra to the path where you actually put it).  *(Why do
-   you have to do this?  Unfortunately, the latest version of cabal
-   just compiles the code but doesn't make it visible to ghc, so it's
-   difficult to use the compiled code.  But you can run circuits
-   directly using the Hydra source files, as shown below.)*
+5. Add the following to your .bashrc configuration file, but replace
+   /path/to/Hydra to the path where you actually put it.  These
+   definitions enable ghc to find the Hydra source.
    
 ~~~~
 export HYDRA=/path/to/Hydra
 alias hydra="ghc -i${HYDRA}/src -e main"
-alias hydrai="ghci -i${Hydra}/src"
+alias hydrai="ghci -i${HYDRA}/src"
 ~~~~
 
 6. Test that it's working.  In your shell, go to Hydra/examples/adder

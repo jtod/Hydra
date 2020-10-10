@@ -1,9 +1,13 @@
+-- HalfAddRun: simulation driver for half adder
+-- This file is part of Hydra, see Hydra/README.md for copyright and license
+
 module HalfAddRun where
 import HDL.Hydra.Core.Lib
 import HalfAdd
 
 main :: IO ()
-main = run_halfAdd testdata
+main = do
+  run_halfAdd testdata
 
 testdata :: [[Int]]
 testdata =

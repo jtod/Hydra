@@ -1,14 +1,17 @@
+-- Count4: a 4-bit binary counter circuit
+-- This file is part of Hydra; see Hydra/README.md for copyright and license
+
 module Count4 where
 import HDL.Hydra.Core.Lib
 import HDL.Hydra.Circuits.Combinational
 
-
 -- Two versions of a 4 bit counter are defined.  The first version
 -- (count4a) uses explicit dff and mux1 circuits for each bit
 -- position.  The second version (count4b) simplifies the full circuit
--- by using a buildinb block (cbit).
+-- by using a building block circuit (cbit).
 
--- Version (a): explicit dff, mux1, halfAdd in each bit position
+-- Version (a): explicit dff, mux1, halfAdd in each bit position.  This
+-- definition is straightforward but not concise.
 
 count4a :: CBit a => a -> [a]
 count4a reset = [x0,x1,x2,x3]
@@ -22,7 +25,11 @@ count4a reset = [x0,x1,x2,x3]
     (c2,y2) = halfAdd x2 c3
     (c3,y3) = halfAdd x3 one
 
--- Version (b): user building block cbit
+-- Version (b): user building block cbit.  Notice that for each bit
+-- position there is a similar circuit, containing a dff and a mux1.
+-- Let's define that as a circuit, and call it cbit (for counter bit).
+-- The definition of cbit is simple, and it simplifies count4b.  This
+-- definition is better style than count4a.
 
 count4b :: CBit a => a -> [a]
 count4b reset = [x0,x1,x2,x3]

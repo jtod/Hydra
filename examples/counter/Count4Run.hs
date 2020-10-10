@@ -1,12 +1,15 @@
+-- Count4Run: simulation driver for 4-bit binary counter
+-- This file is part of Hydra; see Hydra/README.md for copyright and license
+
 module Main where
 import HDL.Hydra.Core.Lib
 import Count4
 
 main :: IO ()
-main =
-  do putStrLn "Running version (a) on testdata_1"
+main = do
+     putStrLn "Running counter4a on testdata_1"
      runCount4 count4a testdata_1
-     putStrLn "Running version (b) on testdata_1"
+     putStrLn "\nRunning count4b on testdata_1"
      runCount4 count4b testdata_1
 
 testdata_1 =
