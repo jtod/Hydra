@@ -1,17 +1,40 @@
+-- Mux2wRun: test mux2w Circuits library
+-- This file is part of Hydra, see Hydra/README.md for copyright and license
+
 module Main where
 import HDL.Hydra.Core.Lib
 import HDL.Hydra.Circuits.Combinational
 
+-- The Hydra circuit library contains a circuit called mux2w, which is
+-- a multiplexer with 2 input control bits and 4 input data words.
+-- This file uses a simulation driver and test data to demonstrate the
+-- circuit.
+
+-- The mux2w multiplexer uses the control bits to select one of the
+-- data words and output it; the other data inputs are discarded.
+-- Suppose c is a pair of bits, so c :: Bit a => (a,a).  Also suppose
+-- p,q,r,s are words of type Bit a => [a]. Then mux2 c p q r s has the
+-- value:
+
+--    if c = (0,0) then p
+--    if c = (0,1) then q
+--    if c = (1,0) then r
+--    if c = (1,1) then s
+
 main :: IO ()
-main = runmux2w testdata
+main = do
+  runmux2w testdata
 
 testdata :: [[Int]]
 testdata =
-  [[1,  39,  21,  82,  43],
-   [0,  18,  74, 123, 280],
-   [3,   1, 200,  35, 199],
-   [1,   1,   3,   5,   7],
-   [2, 200, 201, 202, 203]]
+-------------------------------------------------
+--  c    p    q    r    s        exected output
+-------------------------------------------------
+  [[1,  39,  21,  82,  43],   -- expect q =  21
+   [0,  18,  74, 123, 280],   -- expect p =  18
+   [3,   1, 200,  35, 199],   -- expect s = 199
+   [1,   1,   3,   5,   7],   -- expect q =   3
+   [2, 200, 201, 202, 203]]   -- expect r = 202
    
 runmux2w input = runAllInput input output
   where

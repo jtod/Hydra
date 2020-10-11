@@ -1,13 +1,20 @@
+-- SimDriverRun: demonstrate a simulation driver
+-- This file is part of Hydra, see Hydra/README.md for copyright and license
+
 module Main where
 import HDL.Hydra.Core.Lib
 
-{- Demonstrate a basic simulation driver, with input data of type
-[[Int]] and with conversions for bits, binary, two's complement,
-etc. -}
+-- Demonstrate a basic simulation driver, with input data of type
+-- [[Int]] and with conversions for bits, binary, two's complement,
+-- etc.  The simulation driver merely collects input signals (showing
+-- how to define input signals from the test data) and outputs them
+-- (showing how to format and output signals).  There isn't a circuit
+-- here, but see other examples for simulation drivers that
+-- incorporate a circuit.
 
-main =
-  do putStrLn "runSimDriver"
-     runSimDriver inputdata
+main = do
+  putStrLn "runSimDriver"
+  runSimDriver inputdata
 
 inputdata =
 ---------------------

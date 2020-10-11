@@ -1,14 +1,19 @@
+-- BSR4Run: simulation driver for 4-bit bidirectional shift register
+-- This file is part of Hydra, see Hydra/README.md for copyright and license
+
 module BSR4Run where
 import HDL.Hydra.Core.Lib
 import BSR4
 
 main :: IO ()
-main =  runBSR4 testdata
+main = do
+  runBSR4 testdata
 
--- 0   no operation
--- 1   load input word x
--- 2   shift right
--- 3   shift left
+-- The circuit performs an operation determined by the operation code:
+--   0  no operation
+--   1  load input word x
+--   2  shift right
+--   3  shift left
 
 testdata :: [[Int]]
 testdata =
@@ -36,7 +41,7 @@ runBSR4 input = runAllInput input output
     r  = getbit   input 2
     x  = getbin 4 input 3
 -- Connect the inputs and output signals to the circuit
-    (lo,ro,y) = sr4 op l r x
+    (lo,ro,y) = bsr4 op l r x
 -- Format the output signals
     output =
       [string "op=", bit (fst op), bit (snd op),

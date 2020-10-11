@@ -28,7 +28,8 @@ source-repository head
   type:     git
   location: https://github.com/jtod/Hydra
 
-extra-doc-files: docs/userguide/HydraUserGuide.html docs/userguide/userguide-style.css
+extra-doc-files: docs/userguide/HydraUserGuide.html \
+                   docs/userguide/userguide-style.css
 
 library
   default-language: Haskell2010

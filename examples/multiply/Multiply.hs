@@ -1,3 +1,6 @@
+-- Multiply: circuit that multiplies two binary natural numbers
+-- This file is part of Hydra, see Hydra/README.md for copyright and license
+
 ----------------------------------------------------------------------
 -- Binary multiplier circuit
 ----------------------------------------------------------------------
@@ -7,21 +10,19 @@ import HDL.Hydra.Core.Lib
 import HDL.Hydra.Circuits.Combinational
 import HDL.Hydra.Circuits.Register
 
-{- Definition of a sequential functional unit that multiples two
-binary integers, along with test data and simulation driver.
+-- Definition of a circuit that multiples two binary integers.  The
+-- circuit is a functional unit, which uses a start control signal to
+-- initiate a multiplication and produces a ready output signal to
+-- indicate completion.
 
-The circuit is a functional unit, which uses a start control signal to
-initiate a multiplication and produces a ready output signal to
-indicate completion.
-
-The multiplier circuit uses the sequential shift-and-add algorithm to
-multiply two k-bit binary numbers, producing a 2k-bit product.  The
-specification is general, taking a size parameter k::Int.  The start
-control signal tells the multiplier to begin computing the product
-x*y, and any other multiplication in progress (if any) is aborted.  In
-order to make the simulation output more interesting, the multiplier
-outputs its internal register and sum values as well as the ready
-signal and the product. -}
+-- The multiplier circuit uses the sequential shift-and-add algorithm
+-- to multiply two k-bit binary numbers, producing a 2k-bit product.
+-- The specification is general, taking a size parameter k::Int.  The
+-- start control signal tells the multiplier to begin computing the
+-- product x*y, and any other multiplication in progress (if any) is
+-- aborted.  In order to make the simulation output more interesting,
+-- the multiplier outputs its internal register and sum values as well
+-- as the ready signal and the product.
 
 multiply
   :: CBit a               -- synchronous circuit

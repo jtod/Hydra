@@ -91,6 +91,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li><a href="#modeling-circuits-as-functions">Modeling circuits as functions</a></li>
 </ul></li>
 <li><a href="#installation">Installation</a></li>
+<li><a href="#note-october-2020.-the-installation-requires-defining-some">/Note (October 2020). The installation requires defining some</a></li>
 <li><a href="#a-quick-overview-with-examples">A quick overview with examples</a><ul>
 <li><a href="#a-minimal-circuit-helloworld">A minimal circuit: HelloWorld</a><ul>
 <li><a href="#the-circuit-specification">The circuit specification</a></li>
@@ -231,7 +232,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>Hydra is an example of an <strong>embedded domain-specific language</strong> (DSL or EDSL). A domain-specific language is a language intended for one specific application domain, not for general purpose programming. Hydra is suitable specifically for expressing algorithms as digital circuits, but it isn't a general purpose programming language. It is implemented by <strong>embedding</strong> in Haskell, a general purpose functional language. This means that Hydra doesn't have a separate compiler; instead, its implementation consists of a library of Haskell modules. A circuit specification written in Hydra is compiled by the Haskell compiler and linked with the Hydra library. However, it is best to think of Hydra as a distinct language: designing a circuit is not the same as writing a program in Haskell, and some Haskell programs don't correspond to circuits.</p>
 <h1 id="installation">Installation</h1>
 <p>You need two pieces of software: ghc, a Haskell compiler, and the Hydra source. Both are free software, and they run on Windows, Macintosh, and Gnu/Linux.</p>
-<p>*Note (2020-10-09): it is planned to release Hydra on github within a few days. See <strong><strong>Releases</strong></strong> section on the github Hydra page. It's better to wait for a release, as the HEAD version is unstable. Eventually, it is planned to release Hydra on the Hackage, the Haskell package server. That will simplify the installation. For now, use the following instructions.*</p>
+<h1 id="note-october-2020.-the-installation-requires-defining-some">/Note (October 2020). The installation requires defining some</h1>
+<p>.bashrc aliases. Why are these needed? Unfortunately, the latest version of cabal just compiles the Hydra code but doesn't make it visible to ghc, so it's essentially unusable. Fortunately, you can run circuits directly using the Hydra source files, with the aliases given below. This means the entire Hydra system has to be recompiled every time you run a simulation. It is hoped that a better solution will emerge, but for now, use the following instructions./</p>
 <ol>
 <li>Install Haskell Platform (www.haskell.org). This gives you the ghc compiler and the cabal package system. Check that these are installed with these commands:</li>
 </ol>
@@ -243,9 +245,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </ol>
 <p><code>~~</code> cabal update cabal install –lib cabal haddock <code>~~</code></p>
 <ol>
-<li>Add the following to your .bashrc configuration file (but replace /path/to/Hydra to the path where you actually put it). *(Why do you have to do this? Unfortunately, the latest version of cabal just compiles the code but doesn't make it visible to ghc, so it's difficult to use the compiled code. But you can run circuits directly using the Hydra source files, as shown below.)*</li>
+<li>Add the following to your .bashrc configuration file, but replace /path/to/Hydra to the path where you actually put it. These definitions enable ghc to find the Hydra source.</li>
 </ol>
-<p><code>~~</code> export HYDRA=/path/to/Hydra alias hydra="ghc -i${HYDRA}/src -e main" alias hydrai="ghci -i${Hydra}/src" <code>~~</code></p>
+<p><code>~~</code> export HYDRA=/path/to/Hydra alias hydra="ghc -i${HYDRA}/src -e main" alias hydrai="ghci -i${HYDRA}/src" <code>~~</code></p>
 <ol>
 <li>Test that it's working. In your shell, go to Hydra/examples/HelloWorld and enter:</li>
 </ol>
