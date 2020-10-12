@@ -14,8 +14,7 @@ latest release.
 
 ## Installation
 
-Before using Hydra, you need some standard software tools: a *text
-editor*, a *shell*, and the *ghc Haskell compiler suite*.  All of the
+Before using Hydra, you need some standard software tools.  All of the
 software described here is free and open source, and all of it runs on
 Windows, Macintosh, and Gnu/Linux.
 
@@ -42,8 +41,8 @@ commands.  There are many shells; they are largely similar but use
 different syntax.  Bash is available on every platform, and has become
 a defacto standard.  Windows has several shells of its own, including
 Command Prompt and PowerShell, but you can also use bash on Windows.
-You can use any shell you like, but the following instructions assume
-bash.
+You can use any shell you like.  The following instructions  assume
+either bash or Windows Command Prompt.
 
 Instead of a shell, it's also possible to use a GUI (graphical user
 interface), but setting that up is a little more complicated, and the
@@ -55,17 +54,11 @@ change the directory, list the files in the directory, etc.  Also, you
 need to set the environment variables so the operating system can find
 your software.
 
-Bash comes pre-installed on Macintosh and Gnu/Linux.  It is available
-for Windows but isn't there by default.  Here is a tutorial on [how to
-install bash on
+If you're using Windows, it's simplest to use Command Prompt.  If you
+wish to use bash, here is a tutorial on [how to install bash on
 Windows:](https://itsfoss.com/install-bash-on-windows/).  Another
 approach is to [install Cygwin](http://www.cygwin.com/), which
 provides an entire Linux suite of software on Windows.
-
-There are some system environment variables that tell the operating
-system how to find your installed software.  If you're using bash,
-this is done by editing a file named *.bashrc* which is normally in
-your home directory.
 
 ### ghc compiler
 
@@ -92,39 +85,31 @@ compiled using version 3.2.0.0 of the Cabal library
 2. Put the file somewhere in your user workspace and uppack it: on
    Linux, tar -xzf Hydra-i.j.k.tgz and on Windows use 7zip or tar.
 
-3. Enter *make userinstall*.  Alternatively, enter the following
-   commands, which update the Haskell package database from the
-   Internet, compile the dependencies, and build a documentation web
-   page.
+3. Using your shell (bash, or Windows Command Prompt), enter the Hydra
+   directory and issue the following commands.  These commands are the
+   same for both bash and Windows Command Prompt.  They update the
+   Haskell package database from the Internet, compile the
+   dependencies, and build a documentation web page.
 
 ~~~~
+cd /path/to/Hydra
 cabal update
-cabal install --lib
-cabal haddock
+cabal v1-install
+cabal v1-haddock
 ~~~~
 
-4. Add the following to your .bashrc configuration file, but replace
-   /path/to/Hydra to the path where you actually put it.  These
-   definitions enable ghc to find the Hydra source.
-   
-~~~~
-export HYDRA=/path/to/Hydra
-alias hydra="ghc -i${HYDRA}/src -e main"
-alias hydrai="ghci -i${HYDRA}/src"
-~~~~
-
-5. Test that it's working.  In your shell, go to Hydra/examples/adder
+4. Test that it's working.  In your shell, go to Hydra/examples/adder
    and enter:
 
 ~~~~
-hydra Add4Run
+ghc -e main Add4Run
 ~~~~
 
 This simulates the **Add4.hs** circuit using test data defined in
 **Add4Run.hs**, and it should produce the following output:
 
 ~~~~
-$ hydra Add4Run
+$ ghc -e main Add4Run
   x =  5  y =  8  cin = 0    ==>    cout = 0  s = 13
   x =  7  y =  3  cin = 0    ==>    cout = 0  s = 10
   x =  8  y = 12  cin = 0    ==>    cout = 1  s =  4
