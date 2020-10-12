@@ -38,13 +38,16 @@ userinstall :
 # Developer: build files to be disseminated
 .PHONY : build
 build :
+	echo ${MDHEADER}
 	make docs/userguide/HydraUserGuide.html
+	make index.html
 
 #----------------------------------------------------------------------
 # User guide: generate html from the source .org file
 
 docs/userguide/HydraUserGuide.html : docs/userguide/HydraUserGuide.org \
-	  docs/userguide/userguide-template.html
+	  docs/userguide/userguide-template.html \
+	  Hydra.cabal
 	pandoc --standalone \
           --from=org \
           --to=html \
@@ -55,3 +58,19 @@ docs/userguide/HydraUserGuide.html : docs/userguide/HydraUserGuide.org \
           --variable=css:./HydraUserGuide.css \
           --output=docs/userguide/HydraUserGuide.html \
 	  docs/userguide/HydraUserGuide.org
+
+#----------------------------------------------------------------------
+# generate index.html from README.md
+
+index.html : README.md \
+	  docs/userguide/userguide-template.html
+	pandoc --standalone \
+          --from=markdown \
+          --to=html \
+	  --metadata pagetitle="Hydra hardware description langauge" \
+          --template=docs/userguide/userguide-template.html \
+	  --variable=mdheader:${MDHEADER} \
+          --variable=css:index.css \
+          --output=index.html \
+	  README.md
+

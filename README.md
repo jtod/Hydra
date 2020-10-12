@@ -6,32 +6,72 @@ several levels of abstraction, including logic gates, register
 transfer level, datapath and control, and processors. There are tools
 for simulating circuits, generating netlists, and emulating
 instruction set architectures. It is an embedded domain specific
-language implemented using Haskell.
+language implemented using Haskell.  This is free and open source
+software released under the GPL-3 license.
+
+This is version 2.4.2.  See https://github.com/jtod/Hydra for the
+latest release.
 
 ## Installation
 
-You need two pieces of software: the ghc Haskell compiler suite and
-the Hydra source.  All of this is free software, and it runs on
+Before using Hydra, you need some standard software tools: a *text
+editor*, a *shell*, and the *ghc Haskell compiler suite*.  All of the
+software described here is free and open source, and all of it runs on
 Windows, Macintosh, and Gnu/Linux.
 
-* *Note (2020-10-09).  It is planned to release Hydra on github within
-   a few days.  See **Releases** section on the github Hydra page.
-   It's better to wait for a release, as the HEAD version is
-   unstable.*
+### Text editor
 
-* *Note (October 2020). The installation requires defining some
-   .bashrc aliases.  Why are these needed?  Unfortunately, the latest
-   version of cabal just compiles the Hydra code but doesn't make it
-   visible to ghc, so it's essentially unusable.  Fortunately, you can
-   run circuits directly using the Hydra source files, with the
-   aliases given below.  This means the entire Hydra system has to be
-   recompiled every time you run a simulation.  It is hoped that a
-   better solution will emerge, but for now, use the following
-   instructions.*
+You'll need to edit text files, both to configure the installation,
+and also to develop your circuit specification source code.  A text
+editor allows you to write and modify plain text characters.  It is
+quite different from a word processor, which inserts invisible
+formatting commands.
 
-1. Install Haskell Platform (www.haskell.org).  This gives you the ghc
-   compiler and the cabal package system.  Check that these are
-   installed with these commands:
+You can use any text editor you like; the choice is personal
+preference.  There are some text editors aimed at beginners, such as
+Notepad.  There are two standard text editors popular among serious
+software developers: emacs and vim.  It's also possible to get word
+processors, such as Word, to edit text, but you have to be careful
+about saving your document as plain text.  A final alternative is to
+use an integrated development environment.  The choice is yours.
+
+### Shell
+
+A shell is a window where you interact with software using text
+commands.  There are many shells; they are largely similar but use
+different syntax.  Bash is available on every platform, and has become
+a defacto standard.  Windows has several shells of its own, including
+Command Prompt and PowerShell, but you can also use bash on Windows.
+You can use any shell you like, but the following instructions assume
+bash.
+
+Instead of a shell, it's also possible to use a GUI (graphical user
+interface), but setting that up is a little more complicated, and the
+GUI is less powerful than a shell.  This section assumes you're using
+a shell.
+
+Whatever shell you use, you need to learn some basic commands: how to
+change the directory, list the files in the directory, etc.  Also, you
+need to set the environment variables so the operating system can find
+your software.
+
+Bash comes pre-installed on Macintosh and Gnu/Linux.  It is available
+for Windows but isn't there by default.  Here is a tutorial on [how to
+install bash on
+Windows:](https://itsfoss.com/install-bash-on-windows/).  Another
+approach is to [install Cygwin](http://www.cygwin.com/), which
+provides an entire Linux suite of software on Windows.
+
+There are some system environment variables that tell the operating
+system how to find your installed software.  If you're using bash,
+this is done by editing a file named *.bashrc* which is normally in
+your home directory.
+
+### ghc compiler
+
+Install Haskell Platform (www.haskell.org).  This gives you the ghc
+compiler, the cabal package system, some standard libraries, and some
+additional tools.   Check that these are installed with these commands:
    
 ~~~~
 $ ghc --version
@@ -41,16 +81,18 @@ cabal-install version 3.2.0.0
 compiled using version 3.2.0.0 of the Cabal library 
 ~~~~
 
-2. Download Hydra from https://github.com/jtod/Hydra -- click Releases
+### Hydra
+
+1. Download Hydra from https://github.com/jtod/Hydra -- click Releases
    and download the most recent version.  It isn't recommended to use
    the Code link; that will give you the development branch which is
    not a stable release.  The installation file is Hydra-i.j.k.zip (or
-   .tgz).
+   .tgz), where i.j.k is the version number.
    
-3. Put the file somewhere in your user workspace and uppack it: on
+2. Put the file somewhere in your user workspace and uppack it: on
    Linux, tar -xzf Hydra-i.j.k.tgz and on Windows use 7zip or tar.
 
-4. Enter *make userinstall*.  Alternatively, enter the following
+3. Enter *make userinstall*.  Alternatively, enter the following
    commands, which update the Haskell package database from the
    Internet, compile the dependencies, and build a documentation web
    page.
@@ -61,7 +103,7 @@ cabal install --lib
 cabal haddock
 ~~~~
 
-5. Add the following to your .bashrc configuration file, but replace
+4. Add the following to your .bashrc configuration file, but replace
    /path/to/Hydra to the path where you actually put it.  These
    definitions enable ghc to find the Hydra source.
    
@@ -71,7 +113,7 @@ alias hydra="ghc -i${HYDRA}/src -e main"
 alias hydrai="ghci -i${HYDRA}/src"
 ~~~~
 
-6. Test that it's working.  In your shell, go to Hydra/examples/adder
+5. Test that it's working.  In your shell, go to Hydra/examples/adder
    and enter:
 
 ~~~~
