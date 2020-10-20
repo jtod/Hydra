@@ -1,7 +1,6 @@
--- Mux1Run: test the mux1 circuit
--- This file is part of Hydra, see Hydra/README.md for copyright and license
-
 module Main where
+-- Mux1Run: test the mux1 circuit
+
 import HDL.Hydra.Core.Lib
 import Mux1
 

@@ -1,15 +1,11 @@
--- HelloWorld: simplest example of a circuit definition
--- This file is part of Hydra, see Hydra/README.md for copyright and license
+-- File: examples/HelloWorld/HelloWorld.hs   (see Hydra/README.md)
+-- Defines a simple circuit; see HelloWorldRun to simulate it
 
--- To run the simulation, enter either of these commands:
---   hydra HelloWorldRun           -- README.md gives bash alias for "hydra"
---   ghc -e main HelloWorldRun     -- execute "main" in file HelloWorldRun.hs
-
-module HelloWorld where     -- this module defines and exports the circuit
-import HDL.Hydra.Core.Lib   -- import the Hydra core library
+module HelloWorld where
+import HDL.Hydra.Core.Lib
 
 -- Define a circuit "hello" which takes two input bits and outputs
--- their logical conjunction (using an and2 logic gate)
+-- their logical conjunction, using an and2 logic gate
 
 hello :: Bit a => a -> a -> a   -- the type of the circuit gives its interface
-hello x y = and2 x y            -- the implementation uses the and2 logic gate
+hello x y = and2 x y            -- the implementation uses an and2 logic gate

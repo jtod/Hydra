@@ -9,9 +9,6 @@ instruction set architectures. It is an embedded domain specific
 language implemented using Haskell.  This is free and open source
 software released under the GPL-3 license.
 
-This is version 2.4.2.  See https://github.com/jtod/Hydra for the
-latest release.
-
 ## Installation
 
 Before using Hydra, you need some standard software tools.  All of the

@@ -1,6 +1,3 @@
--- Mux1: a multiplexer circuit
--- This file is part of Hydra, see Hydra/README.md for copyright and license
-
 module Mux1 where
 import HDL.Hydra.Core.Lib
 
