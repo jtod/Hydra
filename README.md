@@ -11,7 +11,9 @@ software released under the GPL-3 license.
 
 The system is documented in the User Guide, which is available in two
 formats: <a href="docs/UserGuide/HydraUserGuide.html">html</a> and <a
-href="docs/UserGuide/HydraUserGuide.org">org</a>.
+href="docs/UserGuide/HydraUserGuide.org">org</a>.  If you're reading
+this on the github page, the org link is better; if you've downloaded
+the files to your computer, the html link gives better formatting.
 
 ## Installation
 
