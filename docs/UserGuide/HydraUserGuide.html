@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2020-10-19 Mon 19:36 -->
+<!-- 2021-09-27 Mon 10:18 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>&lrm;</title>
@@ -39,7 +39,7 @@
   }
   pre.src {
     position: relative;
-    overflow: visible;
+    overflow: auto;
     padding-top: 1.2em;
   }
   pre.src:before {
@@ -51,7 +51,7 @@
     padding: 3px;
     border: 1px solid black;
   }
-  pre.src:hover:before { display: inline;}
+  pre.src:hover:before { display: inline; margin-top: 14px;}
   /* Languages per Org manual */
   pre.src-asymptote:before { content: 'Asymptote'; }
   pre.src-awk:before { content: 'Awk'; }
@@ -160,6 +160,19 @@
   .footdef  { margin-bottom: 1em; }
   .figure { padding: 1em; }
   .figure p { text-align: center; }
+  .equation-container {
+    display: table;
+    text-align: center;
+    width: 100%;
+  }
+  .equation {
+    vertical-align: middle;
+  }
+  .equation-label {
+    display: table-cell;
+    text-align: right;
+    vertical-align: middle;
+  }
   .inlinetask {
     padding: 10px;
     border: 2px solid gray;
@@ -181,50 +194,26 @@
 </style>
 <link rel="stylesheet" type="text/css" href="HydraUserGuide.css" />
 <script type="text/javascript">
-/*
-@licstart  The following is the entire license notice for the
-JavaScript code in this tag.
-
-Copyright (C) 2012-2019 Free Software Foundation, Inc.
-
-The JavaScript code in this tag is free software: you can
-redistribute it and/or modify it under the terms of the GNU
-General Public License (GNU GPL) as published by the Free Software
-Foundation, either version 3 of the License, or (at your option)
-any later version.  The code is distributed WITHOUT ANY WARRANTY;
-without even the implied warranty of MERCHANTABILITY or FITNESS
-FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
-
-As additional permission under GNU GPL version 3 section 7, you
-may distribute non-source (e.g., minimized or compacted) forms of
-that code without the copy of the GNU GPL normally required by
-section 4, provided you include this license notice and a URL
-through which recipients can access the Corresponding Source.
-
-
-@licend  The above is the entire license notice
-for the JavaScript code in this tag.
-*/
+// @license magnet:?xt=urn:btih:e95b018ef3580986a04669f1b5879592219e2a7a&dn=public-domain.txt Public Domain
 <!--/*--><![CDATA[/*><!--*/
- function CodeHighlightOn(elem, id)
- {
-   var target = document.getElementById(id);
-   if(null != target) {
-     elem.cacheClassElem = elem.className;
-     elem.cacheClassTarget = target.className;
-     target.className = "code-highlighted";
-     elem.className   = "code-highlighted";
-   }
- }
- function CodeHighlightOff(elem, id)
- {
-   var target = document.getElementById(id);
-   if(elem.cacheClassElem)
-     elem.className = elem.cacheClassElem;
-   if(elem.cacheClassTarget)
-     target.className = elem.cacheClassTarget;
- }
-/*]]>*///-->
+     function CodeHighlightOn(elem, id)
+     {
+       var target = document.getElementById(id);
+       if(null != target) {
+         elem.classList.add("code-highlighted");
+         target.classList.add("code-highlighted");
+       }
+     }
+     function CodeHighlightOff(elem, id)
+     {
+       var target = document.getElementById(id);
+       if(null != target) {
+         elem.classList.remove("code-highlighted");
+         target.classList.remove("code-highlighted");
+       }
+     }
+    /*]]>*///-->
+// @license-end
 </script>
 <script type="text/x-mathjax-config">
     MathJax.Hub.Config({
@@ -262,202 +251,212 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org95a2ed4">1. Introduction</a>
+<li><a href="#org29a7120">1. Introduction</a>
 <ul>
-<li><a href="#org0b8d8bf">1.1. Hardware description languages</a></li>
-<li><a href="#orgb1926a8">1.2. Modeling circuits as functions</a></li>
+<li><a href="#org494a2a8">1.1. Hardware description languages</a></li>
+<li><a href="#orge70ac2f">1.2. Modeling circuits as functions</a></li>
 </ul>
 </li>
-<li><a href="#orgde75713">2. Installation</a>
+<li><a href="#org108c23a">2. Installation</a>
 <ul>
-<li><a href="#org9b9e475">2.1. Text editor</a></li>
-<li><a href="#orgf3b5480">2.2. Shell</a></li>
-<li><a href="#org4e825e6">2.3. ghc compiler</a></li>
-<li><a href="#org278220b">2.4. Hydra</a></li>
-<li><a href="#org771b9c9">2.5. Running a circuit simulation</a></li>
+<li>
+<ul>
+<li><a href="#org39ad004">2.0.1. Install Hydra</a></li>
+<li><a href="#orga4d391d">2.0.2. Circuit simulation</a></li>
+<li><a href="#orgf746c54">2.0.3. Running without compilation</a></li>
+<li><a href="#orgc072483">2.0.4. Compiling and running the circuit</a></li>
 </ul>
 </li>
-<li><a href="#org5437d1a">3. Tutorial overview</a>
-<ul>
-<li><a href="#org9079d70">3.1. A minimal circuit: HelloWorld</a>
-<ul>
-<li><a href="#orgc9b951f">3.1.1. The circuit specification</a></li>
-<li><a href="#org9a9259f">3.1.2. The simulation driver</a></li>
+<li><a href="#orgf19a3af">2.1. Install ghc</a></li>
+<li><a href="#orgfe62232">2.2. Install Hydra</a></li>
+<li><a href="#org5a1ad77">2.3. Test the installation</a></li>
 </ul>
 </li>
-<li><a href="#org622ce5b">3.2. Connecting several logic gates: mux1</a></li>
-<li><a href="#org22468c6">3.3. Producing several outputs: halfAdd</a></li>
-<li><a href="#org495c8a6">3.4. Black box with internal signals: add4</a></li>
-<li><a href="#orgfb1c593">3.5. Feedback and changing state: BSR4</a></li>
+<li><a href="#org4ff475f">3. Tutorial overview</a>
+<ul>
+<li><a href="#org1a4a125">3.1. A minimal circuit: HelloWorld</a>
+<ul>
+<li><a href="#org6d9535f">3.1.1. The circuit specification</a></li>
+<li><a href="#org8f4647f">3.1.2. The simulation driver</a></li>
 </ul>
 </li>
-<li><a href="#org39bde7e">4. Modules and files</a></li>
-<li><a href="#orga8e2a3f">5. Connecting components with signals</a>
-<ul>
-<li><a href="#org1b5faa4">5.1. Logic gates</a></li>
-<li><a href="#org23a2a3d">5.2. Connecting a circuit to inputs</a></li>
-<li><a href="#org2327c52">5.3. Anonymous signals</a></li>
-<li><a href="#orga40ee60">5.4. Named signals and equations</a></li>
-<li><a href="#org1169b9f">5.5. Constant signals</a></li>
+<li><a href="#orgfc1f610">3.2. Connecting several logic gates: mux1</a></li>
+<li><a href="#org6dd668e">3.3. Producing several outputs: halfAdd</a></li>
+<li><a href="#org48acacb">3.4. Black box with internal signals: add4</a></li>
+<li><a href="#orgc81e6d5">3.5. Feedback and changing state: BSR4</a></li>
 </ul>
 </li>
-<li><a href="#org528e875">6. Defining new circuits</a>
+<li><a href="#org6ec47ad">4. Modules and files</a></li>
+<li><a href="#orga57392e">5. Connecting components with signals</a>
 <ul>
-<li><a href="#orgd75fcf0">6.1. Circuit type</a></li>
-<li><a href="#org6175a26">6.2. Interface</a></li>
-<li><a href="#org8498a6e">6.3. Internal signals</a></li>
-<li><a href="#org6a345d8">6.4. Multiple outputs</a></li>
-<li><a href="#org6fb44f4">6.5. Feedback</a></li>
+<li><a href="#org55d586c">5.1. Logic gates</a></li>
+<li><a href="#orge100e82">5.2. Connecting a circuit to inputs</a></li>
+<li><a href="#org53892f0">5.3. Anonymous signals</a></li>
+<li><a href="#org6f31aa4">5.4. Named signals and equations</a></li>
+<li><a href="#orgd6ec5d3">5.5. Constant signals</a></li>
 </ul>
 </li>
-<li><a href="#org1b21883">7. Signal and circuit types</a>
+<li><a href="#org9b51f3a">6. Defining new circuits</a>
 <ul>
-<li><a href="#org4220e24">7.1. Signal types and classes</a></li>
-<li><a href="#org3b1171d">7.2. Combinational signals: Bit a</a></li>
-<li><a href="#org9d01ff1">7.3. Clocked signals: CBit a</a></li>
-<li><a href="#org78e7da3">7.4. Inputs and outputs</a></li>
+<li><a href="#org989c762">6.1. Circuit type</a></li>
+<li><a href="#org7d2be1a">6.2. Interface</a></li>
+<li><a href="#orga0ca0d6">6.3. Internal signals</a></li>
+<li><a href="#org6fb97ea">6.4. Multiple outputs</a></li>
+<li><a href="#org7035cca">6.5. Feedback</a></li>
 </ul>
 </li>
-<li><a href="#org4a4c76a">8. Containers</a>
+<li><a href="#org32c4eb8">7. Signal and circuit types</a>
 <ul>
-<li><a href="#orgb659379">8.1. Tuples</a></li>
-<li><a href="#org43cb2ed">8.2. Words</a></li>
-<li><a href="#org5f63ec2">8.3. A circuit with words and internal signals</a>
-<ul>
-<li><a href="#orgedeb3fe">8.3.1. Building words</a></li>
-<li><a href="#orgf8ecb5d">8.3.2. Accessing parts of a word</a></li>
+<li><a href="#org5102ceb">7.1. Signal types and classes</a></li>
+<li><a href="#org418048c">7.2. Combinational signals: Bit a</a></li>
+<li><a href="#orgb408f9b">7.3. Clocked signals: CBit a</a></li>
+<li><a href="#org276a89a">7.4. Inputs and outputs</a></li>
 </ul>
 </li>
-<li><a href="#org824862d">8.4. Nested clusters</a></li>
+<li><a href="#org84fef09">8. Containers</a>
+<ul>
+<li><a href="#orgf0af86b">8.1. Tuples</a></li>
+<li><a href="#orga35cd9a">8.2. Words</a></li>
+<li><a href="#orgc803821">8.3. A circuit with words and internal signals</a>
+<ul>
+<li><a href="#org490c32f">8.3.1. Building words</a></li>
+<li><a href="#org48a7010">8.3.2. Accessing parts of a word</a></li>
 </ul>
 </li>
-<li><a href="#org62bed7f">9. Combinational simulation</a></li>
-<li><a href="#org79cf54f">10. Synchronous sequential simulation</a>
-<ul>
-<li><a href="#org7df19dc">10.1. General form</a></li>
-<li><a href="#org2566e12">10.2. Parsing the inputs</a></li>
-<li><a href="#orgd230559">10.3. Formatting the outputs</a></li>
-<li><a href="#org9bba282">10.4. Defining a main program</a></li>
-<li><a href="#orgbe8c0d7">10.5. Modules and libraries</a></li>
-<li><a href="#orgfb501bf">10.6. Compilation and interpretation</a></li>
+<li><a href="#org7c45dfb">8.4. Nested clusters</a></li>
 </ul>
 </li>
-<li><a href="#org2a04213">11. Standard library for bits</a>
+<li><a href="#orgfd5fb29">9. Combinational simulation</a></li>
+<li><a href="#orgf5ef9d0">10. Synchronous sequential simulation</a>
 <ul>
-<li><a href="#org1d97749">11.1. Constant signals</a></li>
-<li><a href="#org53d2240">11.2. Logic gates</a></li>
-<li><a href="#org20af8b8">11.3. Replicating a signal</a></li>
-<li><a href="#org5b5c9dc">11.4. Multiplexers and demultiplexers</a></li>
-<li><a href="#orgffca555">11.5. Bit addition</a></li>
-<li><a href="#org9de4436">11.6. Flip flops and registers</a></li>
+<li><a href="#org589f322">10.1. General form</a></li>
+<li><a href="#org38ff0c7">10.2. Parsing the inputs</a></li>
+<li><a href="#orgcd5c019">10.3. Formatting the outputs</a></li>
+<li><a href="#orgb185aec">10.4. Defining a main program</a></li>
+<li><a href="#orga9cfd58">10.5. Modules and libraries</a></li>
+<li><a href="#orgd129e6d">10.6. Compilation and interpretation</a></li>
 </ul>
 </li>
-<li><a href="#org1c27e73">12. Standard library for words</a>
+<li><a href="#org1d79cfc">11. Standard library for bits</a>
 <ul>
-<li><a href="#orgc9f13da">12.1. Replication and constant words</a></li>
-<li><a href="#org5d1bbfc">12.2. Replicating a word</a></li>
-<li><a href="#orgb1588f3">12.3. Rearranging bits in a word</a>
-<ul>
-<li><a href="#org8a71152">12.3.1. Combinational shifting</a></li>
-<li><a href="#org4851b61">12.3.2. Bit slice representation</a></li>
+<li><a href="#org3ef8a8d">11.1. Constant signals</a></li>
+<li><a href="#org708ec33">11.2. Logic gates</a></li>
+<li><a href="#orgeaba281">11.3. Replicating a signal</a></li>
+<li><a href="#org8bcf335">11.4. Multiplexers and demultiplexers</a></li>
+<li><a href="#orge269af8">11.5. Bit addition</a></li>
+<li><a href="#orgc9e973d">11.6. Flip flops and registers</a></li>
 </ul>
 </li>
-<li><a href="#orga4e17cf">12.4. Logic on words</a></li>
-<li><a href="#org1577344">12.5. Conditionals and addresses</a>
+<li><a href="#orgd450033">12. Standard library for words</a>
 <ul>
-<li><a href="#orgcf9972e">12.5.1. Multiplexers</a></li>
-<li><a href="#orgca5eb1a">12.5.2. Demultiplexers</a></li>
+<li><a href="#org46e28c6">12.1. Replication and constant words</a></li>
+<li><a href="#orgd7c7818">12.2. Replicating a word</a></li>
+<li><a href="#org7a4eb90">12.3. Rearranging bits in a word</a>
+<ul>
+<li><a href="#org839f282">12.3.1. Combinational shifting</a></li>
+<li><a href="#org3c0e341">12.3.2. Bit slice representation</a></li>
 </ul>
 </li>
-<li><a href="#orga4a473c">12.6. Arithmetic</a>
+<li><a href="#orge6ea057">12.4. Logic on words</a></li>
+<li><a href="#orgc772e15">12.5. Conditionals and addresses</a>
 <ul>
-<li><a href="#org969bfcc">12.6.1. Binary addition</a></li>
+<li><a href="#org18ea8fe">12.5.1. Multiplexers</a></li>
+<li><a href="#orgbec8323">12.5.2. Demultiplexers</a></li>
 </ul>
 </li>
-<li><a href="#org089b474">12.7. Registers</a></li>
-<li><a href="#orgca3af77">12.8. Registers</a></li>
+<li><a href="#orgd796357">12.6. Arithmetic</a>
+<ul>
+<li><a href="#orga430183">12.6.1. Binary addition</a></li>
 </ul>
 </li>
-<li><a href="#org02f458f">13. Circuit generators</a>
-<ul>
-<li><a href="#org65498ec">13.1. Operating on words</a></li>
-<li><a href="#org35ed1b6">13.2. Recursive circuit definitions</a></li>
-<li><a href="#orgc66626c">13.3. Tree structured circuits</a></li>
-<li><a href="#orge1fdecb">13.4. Memory</a></li>
+<li><a href="#org45f5361">12.7. Registers</a></li>
+<li><a href="#orgb2bc9ec">12.8. Registers</a></li>
 </ul>
 </li>
-<li><a href="#org0393e71">14. Combinators</a>
+<li><a href="#org40fa125">13. Circuit generators</a>
 <ul>
-<li><a href="#org73e0d6d">14.1. Map</a>
-<ul>
-<li><a href="#org7497594">14.1.1. Sized map</a></li>
+<li><a href="#org064098b">13.1. Operating on words</a></li>
+<li><a href="#org4f35e82">13.2. Recursive circuit definitions</a></li>
+<li><a href="#org3947ba0">13.3. Tree structured circuits</a></li>
+<li><a href="#org9efc779">13.4. Memory</a></li>
 </ul>
 </li>
-<li><a href="#org6567c68">14.2. Fold</a>
+<li><a href="#org062c459">14. Combinators</a>
 <ul>
-<li><a href="#org47c3309">14.2.1. Fold from the left</a></li>
-<li><a href="#org9cb326a">14.2.2. Binary comparison using foldl</a></li>
-<li><a href="#org3b4dcc2">14.2.3. Fold from the right: foldr</a></li>
+<li><a href="#org18d6c6f">14.1. Map</a>
+<ul>
+<li><a href="#org1682134">14.1.1. Sized map</a></li>
 </ul>
 </li>
-<li><a href="#org41136f7">14.3. Scan</a>
+<li><a href="#org582d53d">14.2. Fold</a>
 <ul>
-<li><a href="#org3c14060">14.3.1. Scan from the left: scanl</a></li>
-<li><a href="#orgf3e49ef">14.3.2. Scan from the right: scanr</a></li>
-<li><a href="#orga60bec5">14.3.3. Combining a map with a scan</a></li>
-<li><a href="#org6f7bcd9">14.3.4. Ripple carry addition</a></li>
-<li><a href="#org38d2d1f">14.3.5. Bidirectional scan</a></li>
+<li><a href="#orge5469bf">14.2.1. Fold from the left</a></li>
+<li><a href="#org779a304">14.2.2. Binary comparison using foldl</a></li>
+<li><a href="#org835955a">14.2.3. Fold from the right: foldr</a></li>
+</ul>
+</li>
+<li><a href="#orgabcae84">14.3. Scan</a>
+<ul>
+<li><a href="#org8d0dc73">14.3.1. Scan from the left: scanl</a></li>
+<li><a href="#org9848c47">14.3.2. Scan from the right: scanr</a></li>
+<li><a href="#orgce3c56f">14.3.3. Combining a map with a scan</a></li>
+<li><a href="#orgbd406e1">14.3.4. Ripple carry addition</a></li>
+<li><a href="#orgbaaac3a">14.3.5. Bidirectional scan</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#org342beb5">15. Circuit semantics</a>
+<li><a href="#orgdd4aca8">15. Circuit semantics</a>
 <ul>
-<li><a href="#org957850d">15.1. Boolean signals</a></li>
-<li><a href="#org818f24d">15.2. Streams</a></li>
-<li><a href="#orgbd34366">15.3. Synchronous circuits</a></li>
-<li><a href="#org10a1a46">15.4. Multiple semantics</a></li>
-<li><a href="#org8a07686">15.5. Path depth</a></li>
-<li><a href="#orgdd24a14">15.6. Netlists</a></li>
+<li><a href="#orgd7ddda1">15.1. Boolean signals</a></li>
+<li><a href="#orge15b28b">15.2. Streams</a></li>
+<li><a href="#org7c3b3cd">15.3. Synchronous circuits</a></li>
+<li><a href="#org72f1194">15.4. Multiple semantics</a></li>
+<li><a href="#orgb5ed1da">15.5. Path depth</a></li>
+<li><a href="#org6dc14da">15.6. Netlists</a></li>
 </ul>
 </li>
-<li><a href="#org67c77fc">16. Equational reasoning</a>
+<li><a href="#orgf92375e">16. Equational reasoning</a>
 <ul>
-<li><a href="#orgaf7eead">16.1. Substituting equals for equals</a></li>
-<li><a href="#org2274a1f">16.2. Equivalent ways to describe a circuit</a></li>
+<li><a href="#orgbdec369">16.1. Substituting equals for equals</a></li>
+<li><a href="#orgc0c0efa">16.2. Equivalent ways to describe a circuit</a></li>
 </ul>
 </li>
-<li><a href="#orgd61f0f6">17. Common errors and error messages</a>
+<li><a href="#org147ffbb">17. Common errors and error messages</a>
 <ul>
-<li><a href="#org047f6a4">17.1. zero, one, 0, 1</a></li>
+<li><a href="#orge4f0e63">17.1. zero, one, 0, 1</a></li>
 </ul>
 </li>
-<li><a href="#org34c3df6">18. Summary of syntax</a>
+<li><a href="#orgfe0e4d4">18. Summary of syntax</a>
 <ul>
-<li><a href="#org8b1d549">18.1. Indentation</a></li>
-<li><a href="#org20db39b">18.2. Names</a></li>
-<li><a href="#org4990c05">18.3. Signal expressions</a></li>
-<li><a href="#orgdbf50db">18.4. Specifications</a></li>
-<li><a href="#orgad5af6c">18.5. Hardware description languages</a></li>
-<li><a href="#org82de330">18.6. Functional hardware description</a></li>
-<li><a href="#orgce63d43">18.7. Signals</a></li>
-<li><a href="#orge3132c4">18.8. Circuits</a></li>
-<li><a href="#org5def883">18.9. Equations</a></li>
+<li><a href="#org5f07560">18.1. Indentation</a></li>
+<li><a href="#org3f62abc">18.2. Names</a></li>
+<li><a href="#orgeaca4db">18.3. Signal expressions</a></li>
+<li><a href="#org408fe11">18.4. Specifications</a></li>
+<li><a href="#org88537e7">18.5. Hardware description languages</a></li>
+<li><a href="#orge28be2e">18.6. Functional hardware description</a></li>
+<li><a href="#org0ae50f6">18.7. Signals</a></li>
+<li><a href="#org1f88013">18.8. Circuits</a></li>
+<li><a href="#org2b0d937">18.9. Equations</a></li>
 </ul>
 </li>
-<li><a href="#org8f7a615">19. Notes</a>
+<li><a href="#orgb239af4">19. Development notes</a>
 <ul>
-<li><a href="#org932aed5">19.1. export to html</a></li>
-<li><a href="#org4619aec">19.2. tangle</a></li>
-<li><a href="#org51e2957">19.3. </a></li>
+<li><a href="#org850d0d2">19.1. Emacs</a>
+<ul>
+<li><a href="#orgf09f654">19.1.1. Export to html</a></li>
+<li><a href="#orgfb3137c">19.1.2. Tangle</a></li>
+<li><a href="#orgd939538">19.1.3. Set emacs variables</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-org95a2ed4" class="outline-2">
-<h2 id="org95a2ed4"><span class="section-number-2">1</span> Introduction</h2>
+<div id="outline-container-org29a7120" class="outline-2">
+<h2 id="org29a7120"><span class="section-number-2">1</span> Introduction</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 Hydra is a computer hardware description language (CHDL or HDL) that
@@ -503,8 +502,8 @@ synchronous, using one global clock.
 </p>
 </div>
 
-<div id="outline-container-org0b8d8bf" class="outline-3">
-<h3 id="org0b8d8bf"><span class="section-number-3">1.1</span> Hardware description languages</h3>
+<div id="outline-container-org494a2a8" class="outline-3">
+<h3 id="org494a2a8"><span class="section-number-3">1.1</span> Hardware description languages</h3>
 <div class="outline-text-3" id="text-1-1">
 <p>
 To design a circuit, and to do anything useful with it, we need a way
@@ -569,8 +568,8 @@ like Hydra use text to describe hardware.
 </div>
 </div>
 
-<div id="outline-container-orgb1926a8" class="outline-3">
-<h3 id="orgb1926a8"><span class="section-number-3">1.2</span> Modeling circuits as functions</h3>
+<div id="outline-container-orge70ac2f" class="outline-3">
+<h3 id="orge70ac2f"><span class="section-number-3">1.2</span> Modeling circuits as functions</h3>
 <div class="outline-text-3" id="text-1-2">
 <p>
 Some HDLs are based on imperative programming languages, using the
@@ -603,136 +602,271 @@ programs don't correspond to circuits.
 </div>
 </div>
 
-<div id="outline-container-orgde75713" class="outline-2">
-<h2 id="orgde75713"><span class="section-number-2">2</span> Installation</h2>
+<div id="outline-container-org108c23a" class="outline-2">
+<h2 id="org108c23a"><span class="section-number-2">2</span> Installation</h2>
 <div class="outline-text-2" id="text-2">
-<p>
-Before using Hydra, you need some standard software tools.  All of the
-software described here is free and open source, and all of it runs on
-Windows, Macintosh, and Gnu/Linux.
-</p>
 </div>
-
-<div id="outline-container-org9b9e475" class="outline-3">
-<h3 id="org9b9e475"><span class="section-number-3">2.1</span> Text editor</h3>
-<div class="outline-text-3" id="text-2-1">
+<div id="outline-container-org39ad004" class="outline-4">
+<h4 id="org39ad004"><span class="section-number-4">2.0.1</span> Install Hydra</h4>
+<div class="outline-text-4" id="text-2-0-1">
 <p>
-You'll need to edit text files to develop your circuit specification
-source code.  A text editor allows you to write and modify plain text
-characters.  It is quite different from a word processor, which
-inserts invisible formatting commands.
+Download Hydra from <a href="https://github.com/jtod/Hydra">https://github.com/jtod/Hydra</a>.  Click Releases
+and download the most recent version.  The installation file is
+Hydra-i.j.k.zip (or .tgz), where i.j.k is the version number.  Put the
+file somewhere in your user workspace and uppack it.  On Linux, enter
+<code>tar -xzf Hydra-i.j.k.tgz</code> and on Windows use 7zip or similar.
 </p>
 
 <p>
-You can use any text editor you like; the choice is personal
-preference.  Some text editors, such as Notepad, are aimed at
-beginners.  Two standard text editors are popular among software
-developers: emacs and vim.  It's also possible to get word processors,
-such as Word, to edit text, but you have to be careful about saving
-your document as plain text.  Another alternative is to use an
-integrated development environment.  The choice is yours.
+Enter the Hydra directory and compile it with the following commands:
 </p>
-</div>
-</div>
-
-<div id="outline-container-orgf3b5480" class="outline-3">
-<h3 id="orgf3b5480"><span class="section-number-3">2.2</span> Shell</h3>
-<div class="outline-text-3" id="text-2-2">
-<p>
-A shell is an environment where you interact with software using text
-commands.  There are many shells; they are largely similar but use
-different syntax.  Bash is available on every platform, and has become
-a defacto standard.  Windows has several shells of its own, including
-Command Prompt and PowerShell, but you can also use bash on Windows.
-You can use any shell you like.
-</p>
-
-<p>
-Instead of a shell, it's also possible to use a GUI (graphical user
-interface).
-</p>
-
-<p>
-Whatever shell you use, you need to learn some basic commands: how to
-change the directory, list the files in the directory, etc.
-</p>
-
-<p>
-If you're using Windows, it's simplest to use either Command Prompt or
-PowerShell as these comes pre-installed with Windows.  If you wish to
-use bash, here is a tutorial on [how to install bash on
-Windows:](<a href="https://itsfoss.com/install-bash-on-windows/">https://itsfoss.com/install-bash-on-windows/</a>).  Another
-approach is to [install Cygwin](<a href="http://www.cygwin.com/">http://www.cygwin.com/</a>), which
-provides an entire Gnu/Linux suite of software on Windows.
-</p>
-
-<p>
-The commands and examples given in this Guide work with all three:
-bash, Windows Command Prompt, and Windows PowerShell.
-</p>
-</div>
-</div>
-
-<div id="outline-container-org4e825e6" class="outline-3">
-<h3 id="org4e825e6"><span class="section-number-3">2.3</span> ghc compiler</h3>
-<div class="outline-text-3" id="text-2-3">
-<p>
-Hydra requires the ghc compiler suite for Haskell.  It's best to
-install the Haskell Platform (www.haskell.org), which gives you the
-ghc compiler as well as some essential additional tools, including the
-cabal package system and standard libraries.  Check that the
-installation is working with these commands:
-</p>
-
-<div class="org-src-container">
-<pre class="src src-shell">$ ghc --version
-The Glorious Glasgow Haskell Compilation System, version 8.10.2
-$ cabal --version
-cabal-install version 3.2.0.0
-compiled using version 3.2.0.0 of the Cabal library 
-</pre>
-</div>
-</div>
-</div>
-
-<div id="outline-container-org278220b" class="outline-3">
-<h3 id="org278220b"><span class="section-number-3">2.4</span> Hydra</h3>
-<div class="outline-text-3" id="text-2-4">
-<ol class="org-ol">
-<li>Download Hydra from <a href="https://github.com/jtod/Hydra">https://github.com/jtod/Hydra</a> Click Releases
-and download the most recent version.  It isn't recommended to use
-the Code link; that gives you the development branch which is not a
-stable release.  The installation file is Hydra-i.j.k.zip (or
-.tgz), where i.j.k is the version number.  Alternatively, you can
-use git clone.</li>
-
-<li>Put the file somewhere in your user workspace and uppack it: on
-Linux, tar -xzf Hydra-i.j.k.tgz and on Windows use 7zip or similar.</li>
-
-<li>Using your shell (bash, Windows Command Prompt, or Windows
-PowerShell), enter the Hydra directory and issue the following
-commands (which are the same for all three of those shells).  These
-commands update the Haskell package database from the Internet,
-download and compile the dependencies, compile Hydra, and build a
-documentation web page.</li>
-</ol>
 
 <div class="org-src-container">
 <pre class="src src-shell"><span style="color: #483d8b;">cd</span> /path/to/Hydra
 cabal update
 cabal v1-install
-cabal v1-haddock
 </pre>
 </div>
+
+<p>
+The installation command will compile Hydra and generate a
+documentation file:
+</p>
+
+<pre class="example" id="orgee7de1a">
+$ cabal v1-install
+Warning: Hydra.cabal:31:1: Ignoring trailing fields after sections:
+"extra-doc-files"
+Resolving dependencies...
+Starting     Hydra-2.5.0
+Building     Hydra-2.5.0
+Completed    Hydra-2.5.0
+Updating documentation index
+C:\Users\USERNAME\AppData\Roaming\cabal\doc\x86_64-windows-ghc-9.0.1\index.html
+$
+</pre>
+
+<p>
+This User Guide is the primary documentation for Hydra, but the
+command <code>cabal haddock</code> also generates some html documentation.  The
+location of this file is given when you enter the <code>cabal v1-install</code>
+command.
+</p>
+
+<pre class="example" id="org932cc61">
+file:///C:/Users/MYUSERNAME/AppData/Roaming/...
+cabal/doc/x86_64-windows-ghc-9.0.1/...
+Hydra-2.5.0/html/index.html
+</pre>
+
+<p>
+Test the installation.  Enter the directory <code>examples/HelloWorld</code>, which
+contains a minimal example.  There are two files:
+</p>
+<ul class="org-ul">
+<li><code>HelloWorld.hs</code> defines a simple circuit <code>hello</code> which is actually
+just an <code>and2</code> logic gate</li>
+<li><code>HelloWorldRun.hs</code> is an executable program that runs the <code>hello</code>
+circuit with some test data</li>
+</ul>
+
+<p>
+Run the simulation with the command <code>ghc -e main HelloWorldRun</code> which
+should produce this output:
+</p>
+
+<pre class="example" id="org97cfb5d">
+$ ghc -e main HelloWorldRun
+  x=0  y=0  output z=0
+  x=0  y=1  output z=0
+  x=1  y=0  output z=0
+  x=1  y=1  output z=1
+$
+</pre>
+
+<p>
+Install Hydra: download Hydra, enter the directory, and
+</p>
+
+<p>
+Enter the directory Sigma16/circuits.  Run all the commands in that
+directory, don't cd to any of the subdirectories.
+</p>
+
+<p>
+The M1 directory contains the Machine 1 circuit which implements the
+core Sigma16 architecture, as well as simulation tools and example
+programs.
+</p>
 </div>
 </div>
 
-<div id="outline-container-org771b9c9" class="outline-3">
-<h3 id="org771b9c9"><span class="section-number-3">2.5</span> Running a circuit simulation</h3>
-<div class="outline-text-3" id="text-2-5">
+<div id="outline-container-orga4d391d" class="outline-4">
+<h4 id="orga4d391d"><span class="section-number-4">2.0.2</span> Circuit simulation</h4>
+</div>
+<div id="outline-container-orgf746c54" class="outline-4">
+<h4 id="orgf746c54"><span class="section-number-4">2.0.3</span> Running without compilation</h4>
+<div class="outline-text-4" id="text-2-0-3">
 <p>
-Test that your installation is working by running a circuit
-simulation.  In your shell, enter:
+You can run circuit simulations without first compiling the circuit
+files.  For example, to run the M1 processor on the Add example
+program use this command:
+</p>
+
+<pre class="example" id="orgf952b5f">
+runghc M1/Tools/Run M1/Programs/Add.obj.txt
+</pre>
+</div>
+</div>
+
+<div id="outline-container-orgc072483" class="outline-4">
+<h4 id="orgc072483"><span class="section-number-4">2.0.4</span> Compiling and running the circuit</h4>
+<div class="outline-text-4" id="text-2-0-4">
+<p>
+Compile the tools:
+</p>
+
+<pre class="example" id="org5006ae0">
+ghc --make M1/Tools/Run
+</pre>
+
+<p>
+Now run a machine language program on the circuit.  The executable
+program you need is M1/Tools/Run and you need to give it the name of
+an object code file, e.g. M1/Programs/Add.obj.txt:
+</p>
+
+<p>
+$ M1/Tools/Run M1/Programs/Add.obj.txt
+M1 Run starting
+&#x2026; simulation output follows&#x2026;
+</p>
+
+
+<p>
+All of the software required for Hydra is free and open source, and
+all of it runs on Windows, Macintosh, and Gnu/Linux.
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgf19a3af" class="outline-3">
+<h3 id="orgf19a3af"><span class="section-number-3">2.1</span> Install ghc</h3>
+<div class="outline-text-3" id="text-2-1">
+<p>
+Install the ghc Haskell compiler, which you can download from the
+Haskell web page <a href="https://www.haskell.org/">https://www.haskell.org/</a>.  A standard
+installation will also install the packaging tool <code>cabal</code>.  Check that
+the installation succeeded with <code>ghc --version</code> and <code>cabal --version</code>.
+</p>
+
+<pre class="example" id="org12faeb0">
+$ ghc --version
+The Glorious Glasgow Haskell Compilation System, version 9.0.1
+$ cabal --version
+cabal-install version 3.4.0.0
+compiled using version 3.4.0.0 of the Cabal library
+</pre>
+</div>
+</div>
+
+<div id="outline-container-orgfe62232" class="outline-3">
+<h3 id="orgfe62232"><span class="section-number-3">2.2</span> Install Hydra</h3>
+<div class="outline-text-3" id="text-2-2">
+<p>
+Download Hydra from <a href="https://github.com/jtod/Hydra">https://github.com/jtod/Hydra</a>.  Click Releases
+and download the most recent version.  The installation file is
+Hydra-i.j.k.zip (or .tgz), where i.j.k is the version number.  Put the
+file somewhere in your user workspace and uppack it.  On Linux, enter
+<code>tar -xzf Hydra-i.j.k.tgz</code> and on Windows use 7zip or similar.
+</p>
+
+<p>
+Enter the Hydra directory and compile it with the following commands:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-shell"><span style="color: #483d8b;">cd</span> /path/to/Hydra
+cabal v2-update
+cabal v2-haddock
+cabal v2-install --lib
+</pre>
+</div>
+
+<p>
+The <code>cabal v2-haddock</code> command will generates a documentation file and
+gives the location where the file is stored.  On Windows, this path
+may be similar to the following (it's one long line, broken up here
+for readability):
+</p>
+
+<pre class="example" id="orga39249f">
+C:\Users\USERNAME\...
+path\to\SigmaSystem\...
+Hydra\dist-newstyle\build\x86_64-windows\ghc-9.0.1\...
+Hydra-2.5.0\doc\html\Hydra\index.html
+</pre>
+
+<pre class="example" id="orgc936e95">
+$ cabal v2-install --lib Hydra
+Wrote tarball sdist to C:\Users\johnt\Google
+Drive\home\docs\research\SigmaSystem\Hydra\dist-newstyle\sdist\Hydra-2.5.0.tar.gz
+Resolving dependencies...
+Build profile: -w ghc-9.0.1 -O1
+In order, the following will be built (use -v for more details):
+ - Hydra-2.5.0 (lib) (requires build)
+Starting     Hydra-2.5.0 (lib)
+Building     Hydra-2.5.0 (lib)
+Installing   Hydra-2.5.0 (lib)
+Completed    Hydra-2.5.0 (lib)
+$
+</pre>
+
+<p>
+This User Guide is the primary documentation for Hydra, but the
+command <code>cabal haddock</code> also generates some html documentation.  The
+location of this file is given when you enter the <code>cabal v1-install</code>
+command.
+</p>
+
+<pre class="example" id="org3b7a0da">
+file:///C:/Users/MYUSERNAME/AppData/Roaming/...
+cabal/doc/x86_64-windows-ghc-9.0.1/...
+Hydra-2.5.0/html/index.html
+</pre>
+</div>
+</div>
+
+<div id="outline-container-org5a1ad77" class="outline-3">
+<h3 id="org5a1ad77"><span class="section-number-3">2.3</span> Test the installation</h3>
+<div class="outline-text-3" id="text-2-3">
+<p>
+Enter the directory <code>examples/HelloWorld</code>, which contains a minimal
+example.  There are two files:
+</p>
+<ul class="org-ul">
+<li><code>HelloWorld.hs</code> defines a simple circuit <code>hello</code> which is actually
+just an <code>and2</code> logic gate</li>
+<li><code>HelloWorldRun.hs</code> is an executable program that runs the <code>hello</code>
+circuit with some test data</li>
+</ul>
+
+<p>
+Run the simulation with the command <code>ghc -e main HelloWorldRun</code> which
+should produce this output:
+</p>
+
+<pre class="example" id="orgd0cb186">
+$ ghc -e main HelloWorldRun
+  x=0  y=0  output z=0
+  x=0  y=1  output z=0
+  x=1  y=0  output z=0
+  x=1  y=1  output z=1
+$
+</pre>
+
+<p>
+Here is another example:
 </p>
 
 <div class="org-src-container">
@@ -770,8 +904,8 @@ message "Could not find module&#x2026;".
 </div>
 </div>
 
-<div id="outline-container-org5437d1a" class="outline-2">
-<h2 id="org5437d1a"><span class="section-number-2">3</span> Tutorial overview</h2>
+<div id="outline-container-org4ff475f" class="outline-2">
+<h2 id="org4ff475f"><span class="section-number-2">3</span> Tutorial overview</h2>
 <div class="outline-text-2" id="text-3">
 <p>
 This section shows several examples of circuits of increasing
@@ -784,8 +918,8 @@ collection of circuits.
 </p>
 </div>
 
-<div id="outline-container-org9079d70" class="outline-3">
-<h3 id="org9079d70"><span class="section-number-3">3.1</span> A minimal circuit: HelloWorld</h3>
+<div id="outline-container-org1a4a125" class="outline-3">
+<h3 id="org1a4a125"><span class="section-number-3">3.1</span> A minimal circuit: HelloWorld</h3>
 <div class="outline-text-3" id="text-3-1">
 <p>
 To run a circuit, two definitions are needed: a circuit specification,
@@ -817,8 +951,8 @@ gate, the results should be 0, 0, 0, 1.</li>
 </ul>
 </div>
 
-<div id="outline-container-orgc9b951f" class="outline-4">
-<h4 id="orgc9b951f"><span class="section-number-4">3.1.1</span> The circuit specification</h4>
+<div id="outline-container-org6d9535f" class="outline-4">
+<h4 id="org6d9535f"><span class="section-number-4">3.1.1</span> The circuit specification</h4>
 <div class="outline-text-4" id="text-3-1-1">
 <p>
 The circuit itself is defined in a module <code>HelloWorld</code>, which is in the
@@ -826,7 +960,7 @@ file named <code>HelloWorld.hs</code>.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-hydra" id="orgb4d0fdd">-- File: examples/HelloWorld/HelloWorld.hs   (see Hydra/README.md)
+<pre class="src src-hydra" id="org3dcba39">-- File: examples/HelloWorld/HelloWorld.hs   (see Hydra/README.md)
 -- Defines a simple circuit; see HelloWorldRun to simulate it
 
 module HelloWorld where
@@ -887,8 +1021,8 @@ the circuit</li>
 </div>
 </div>
 
-<div id="outline-container-org9a9259f" class="outline-4">
-<h4 id="org9a9259f"><span class="section-number-4">3.1.2</span> The simulation driver</h4>
+<div id="outline-container-org8f4647f" class="outline-4">
+<h4 id="org8f4647f"><span class="section-number-4">3.1.2</span> The simulation driver</h4>
 <div class="outline-text-4" id="text-3-1-2">
 <p>
 To test the circuit, we can simulate it with some inputs.  This
@@ -901,7 +1035,7 @@ module.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-hydra" id="org16ea334"><span class="linenr">1: </span>-- File: examples/HelloWorld/HelloWorldRun.hs   (see Hydra/README.md)
+<pre class="src src-hydra" id="org0c86682"><span class="linenr">1: </span>-- File: examples/HelloWorld/HelloWorldRun.hs   (see Hydra/README.md)
 <span class="linenr">2: </span>-- Simulation driver for HelloWorld circuit
 <span class="linenr">3: </span>-- To run a simulation, enter:  ghc -e main HelloWorldRun
 <span class="linenr">4: </span>
@@ -974,7 +1108,7 @@ inputs for a particular clock cycle: the i'th element gives the
 circuit inputs during clock cycle i.  Its general form is:
 </p>
 
-<pre class="example">
+<pre class="example" id="org0d736b1">
 testdata =
   [ inputs for clock cycle 0
   , inputs for clock cycle 1
@@ -988,7 +1122,7 @@ For any clock cycle, there is a list of inputs.  Since the <code>hello</code>
 circuit has two inputs, each clock cycle gets a list of two values.
 </p>
 
-<pre class="example">
+<pre class="example" id="org619a4cb">
 testdata :: [[Int]]
 testdata =
 ------------------------------
@@ -1059,8 +1193,8 @@ hydrai
 </div>
 </div>
 
-<div id="outline-container-org622ce5b" class="outline-3">
-<h3 id="org622ce5b"><span class="section-number-3">3.2</span> Connecting several logic gates: mux1</h3>
+<div id="outline-container-orgfc1f610" class="outline-3">
+<h3 id="orgfc1f610"><span class="section-number-3">3.2</span> Connecting several logic gates: mux1</h3>
 <div class="outline-text-3" id="text-3-2">
 <p>
 Files: <b>examples/mux/Mux1.hs</b> and <b>examples/mux/Mux1Run.hs</b>
@@ -1131,7 +1265,7 @@ Here is the complete module defining the multiplexer:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-hydra" id="org8812545">module Mux1 where
+<pre class="src src-hydra" id="org5052b4e">module Mux1 where
 import HDL.Hydra.Core.Lib
 
 -- mux1 is defined in the Hydra circuit libraries, so here the circuit
@@ -1145,7 +1279,7 @@ mymux1 c x y = or2 (and2 (inv c) x) (and2 c y)
 </div>
 
 <div class="org-src-container">
-<pre class="src src-hydra" id="orgcf6b9ce">module Main where
+<pre class="src src-hydra" id="org72cdcd1">module Main where
 -- Mux1Run: test the mux1 circuit
 
 import HDL.Hydra.Core.Lib
@@ -1202,8 +1336,8 @@ m4<sub>include</sub>(`examples/mux/Mux1Run.hs')
 </div>
 </div>
 
-<div id="outline-container-org22468c6" class="outline-3">
-<h3 id="org22468c6"><span class="section-number-3">3.3</span> Producing several outputs: halfAdd</h3>
+<div id="outline-container-org6dd668e" class="outline-3">
+<h3 id="org6dd668e"><span class="section-number-3">3.3</span> Producing several outputs: halfAdd</h3>
 <div class="outline-text-3" id="text-3-3">
 <p>
 Files: <b>examples/adder/HalfAdd.hs</b> and <b>examples/adder/HalfAddRun.hs</b>
@@ -1269,8 +1403,8 @@ Input: x = 1 y = 1  Output: c = 1 s = 0
 </div>
 </div>
 
-<div id="outline-container-org495c8a6" class="outline-3">
-<h3 id="org495c8a6"><span class="section-number-3">3.4</span> Black box with internal signals: add4</h3>
+<div id="outline-container-org48acacb" class="outline-3">
+<h3 id="org48acacb"><span class="section-number-3">3.4</span> Black box with internal signals: add4</h3>
 <div class="outline-text-3" id="text-3-4">
 <p>
 Files: <b>adder/Add4.hs</b> and <b>examples/Add4Run.hs</b>
@@ -1307,8 +1441,8 @@ m4<sub>include</sub>(`examples/adder/Add4Run.hs')
 </div>
 </div>
 
-<div id="outline-container-orgfb1c593" class="outline-3">
-<h3 id="orgfb1c593"><span class="section-number-3">3.5</span> Feedback and changing state: BSR4</h3>
+<div id="outline-container-orgc81e6d5" class="outline-3">
+<h3 id="orgc81e6d5"><span class="section-number-3">3.5</span> Feedback and changing state: BSR4</h3>
 <div class="outline-text-3" id="text-3-5">
 <p>
 Files: <b>BSR4.hs</b> and <b>BSR4Run.hs</b>
@@ -1396,12 +1530,12 @@ op=00 l=0 r=0 x=0   Output lo=1 ro=1 y=9
 </div>
 </div>
 
-<div id="outline-container-org39bde7e" class="outline-2">
-<h2 id="org39bde7e"><span class="section-number-2">4</span> Modules and files</h2>
+<div id="outline-container-org6ec47ad" class="outline-2">
+<h2 id="org6ec47ad"><span class="section-number-2">4</span> Modules and files</h2>
 </div>
 
-<div id="outline-container-orga8e2a3f" class="outline-2">
-<h2 id="orga8e2a3f"><span class="section-number-2">5</span> Connecting components with signals</h2>
+<div id="outline-container-orga57392e" class="outline-2">
+<h2 id="orga57392e"><span class="section-number-2">5</span> Connecting components with signals</h2>
 <div class="outline-text-2" id="text-5">
 <p>
 A data value in a circuit is called a <b>signal</b>.  A signal is carried
@@ -1437,8 +1571,8 @@ and T characters &#x2013; they can be hard to tell apart!).
 </p>
 </div>
 
-<div id="outline-container-org1b5faa4" class="outline-3">
-<h3 id="org1b5faa4"><span class="section-number-3">5.1</span> Logic gates</h3>
+<div id="outline-container-org55d586c" class="outline-3">
+<h3 id="org55d586c"><span class="section-number-3">5.1</span> Logic gates</h3>
 <div class="outline-text-3" id="text-5-1">
 <p>
 To design a new circuit, you need to take a set of existing circuits
@@ -1503,8 +1637,8 @@ gates.
 </div>
 </div>
 
-<div id="outline-container-org23a2a3d" class="outline-3">
-<h3 id="org23a2a3d"><span class="section-number-3">5.2</span> Connecting a circuit to inputs</h3>
+<div id="outline-container-orge100e82" class="outline-3">
+<h3 id="orge100e82"><span class="section-number-3">5.2</span> Connecting a circuit to inputs</h3>
 <div class="outline-text-3" id="text-5-2">
 <p>
 Suppose we have two signals named <b>x</b> and <b>y</b>, and want to connect
@@ -1542,8 +1676,8 @@ nor4 a zero c d
 </div>
 </div>
 
-<div id="outline-container-org2327c52" class="outline-3">
-<h3 id="org2327c52"><span class="section-number-3">5.3</span> Anonymous signals</h3>
+<div id="outline-container-org53892f0" class="outline-3">
+<h3 id="org53892f0"><span class="section-number-3">5.3</span> Anonymous signals</h3>
 <div class="outline-text-3" id="text-5-3">
 <p>
 A signal may be given a name, such as <b>x</b> or <b>y</b>, although this is
@@ -1659,8 +1793,8 @@ EndSolution
 </div>
 </div>
 
-<div id="outline-container-orga40ee60" class="outline-3">
-<h3 id="orga40ee60"><span class="section-number-3">5.4</span> Named signals and equations</h3>
+<div id="outline-container-org6f31aa4" class="outline-3">
+<h3 id="org6f31aa4"><span class="section-number-3">5.4</span> Named signals and equations</h3>
 <div class="outline-text-3" id="text-5-4">
 <p>
 Sometimes it's useful to give a name to a signal, rather than using it
@@ -1729,8 +1863,8 @@ always a signal name.
 </div>
 </div>
 
-<div id="outline-container-org1169b9f" class="outline-3">
-<h3 id="org1169b9f"><span class="section-number-3">5.5</span> Constant signals</h3>
+<div id="outline-container-orgd6ec5d3" class="outline-3">
+<h3 id="orgd6ec5d3"><span class="section-number-3">5.5</span> Constant signals</h3>
 <div class="outline-text-3" id="text-5-5">
 <p>
 A constant signal always carries the same value: either it is always
@@ -1744,8 +1878,8 @@ lead to bizarre error messages.
 </div>
 </div>
 
-<div id="outline-container-org528e875" class="outline-2">
-<h2 id="org528e875"><span class="section-number-2">6</span> Defining new circuits</h2>
+<div id="outline-container-org9b51f3a" class="outline-2">
+<h2 id="org9b51f3a"><span class="section-number-2">6</span> Defining new circuits</h2>
 <div class="outline-text-2" id="text-6">
 <p>
 A new circuit can be designed by connecting together a number of
@@ -1766,8 +1900,8 @@ computation.  A circuit definition contains up to three parts:
 </ol>
 </div>
 
-<div id="outline-container-orgd75fcf0" class="outline-3">
-<h3 id="orgd75fcf0"><span class="section-number-3">6.1</span> Circuit type</h3>
+<div id="outline-container-org989c762" class="outline-3">
+<h3 id="org989c762"><span class="section-number-3">6.1</span> Circuit type</h3>
 <div class="outline-text-3" id="text-6-1">
 <p>
 The circuit type is covered in a later section.  It's optional,
@@ -1784,8 +1918,8 @@ halfAdd :: Bit a =&gt; a -&gt; a -&gt; (a,a)
 </div>
 </div>
 
-<div id="outline-container-org6175a26" class="outline-3">
-<h3 id="org6175a26"><span class="section-number-3">6.2</span> Interface</h3>
+<div id="outline-container-org7d2be1a" class="outline-3">
+<h3 id="org7d2be1a"><span class="section-number-3">6.2</span> Interface</h3>
 <div class="outline-text-3" id="text-6-2">
 <p>
 The interface gives the name of the circuit and names its inputs and
@@ -1823,8 +1957,8 @@ at all, to the inputs of <b>mycirc</b>.
 </div>
 </div>
 
-<div id="outline-container-org8498a6e" class="outline-3">
-<h3 id="org8498a6e"><span class="section-number-3">6.3</span> Internal signals</h3>
+<div id="outline-container-orga0ca0d6" class="outline-3">
+<h3 id="orga0ca0d6"><span class="section-number-3">6.3</span> Internal signals</h3>
 <div class="outline-text-3" id="text-6-3">
 <p>
 This part of a definition is optional; if present it follows the
@@ -1875,12 +2009,12 @@ wrong then the specification will be parsed incorrectly.
 </div>
 </div>
 
-<div id="outline-container-org6a345d8" class="outline-3">
-<h3 id="org6a345d8"><span class="section-number-3">6.4</span> Multiple outputs</h3>
+<div id="outline-container-org6fb97ea" class="outline-3">
+<h3 id="org6fb97ea"><span class="section-number-3">6.4</span> Multiple outputs</h3>
 </div>
 
-<div id="outline-container-org6fb44f4" class="outline-3">
-<h3 id="org6fb44f4"><span class="section-number-3">6.5</span> Feedback</h3>
+<div id="outline-container-org7035cca" class="outline-3">
+<h3 id="org7035cca"><span class="section-number-3">6.5</span> Feedback</h3>
 <div class="outline-text-3" id="text-6-5">
 <p>
 A register is a circuit with an internal state, and with the ability
@@ -1890,7 +2024,7 @@ to load an external value into the state and to read out the state.
 
 
 <div class="org-src-container">
-<pre class="src src-ghci" id="org3e90483">module Reg1 where
+<pre class="src src-ghci" id="orgefc2142">module Reg1 where
 import HDL.Hydra.Core.Lib
 import HDL.Hydra.Circuits.Combinational
 
@@ -1965,8 +2099,8 @@ runReg1 input = runAllInput input output
 </div>
 
 
-<div id="outline-container-org1b21883" class="outline-2">
-<h2 id="org1b21883"><span class="section-number-2">7</span> Signal and circuit types</h2>
+<div id="outline-container-org32c4eb8" class="outline-2">
+<h2 id="org32c4eb8"><span class="section-number-2">7</span> Signal and circuit types</h2>
 <div class="outline-text-2" id="text-7">
 <p>
 The <b>type</b> of a value determines what operations you can perform on
@@ -2041,8 +2175,8 @@ A type declaration contains several parts:
 </ul>
 </div>
 
-<div id="outline-container-org4220e24" class="outline-3">
-<h3 id="org4220e24"><span class="section-number-3">7.1</span> Signal types and classes</h3>
+<div id="outline-container-org5102ceb" class="outline-3">
+<h3 id="org5102ceb"><span class="section-number-3">7.1</span> Signal types and classes</h3>
 <div class="outline-text-3" id="text-7-1">
 <p>
 <b>Short version.</b> If you're writing a routine circuit and just want to
@@ -2083,8 +2217,8 @@ than <b>Bool</b> as the bit signal type.
 </div>
 </div>
 
-<div id="outline-container-org3b1171d" class="outline-3">
-<h3 id="org3b1171d"><span class="section-number-3">7.2</span> Combinational signals: Bit a</h3>
+<div id="outline-container-org418048c" class="outline-3">
+<h3 id="org418048c"><span class="section-number-3">7.2</span> Combinational signals: Bit a</h3>
 <div class="outline-text-3" id="text-7-2">
 <p>
 <code>~~</code>
@@ -2130,8 +2264,8 @@ as logic gates.</li>
 </div>
 </div>
 
-<div id="outline-container-org9d01ff1" class="outline-3">
-<h3 id="org9d01ff1"><span class="section-number-3">7.3</span> Clocked signals: CBit a</h3>
+<div id="outline-container-orgb408f9b" class="outline-3">
+<h3 id="orgb408f9b"><span class="section-number-3">7.3</span> Clocked signals: CBit a</h3>
 <div class="outline-text-3" id="text-7-3">
 <p>
 The signal class constraint 
@@ -2154,8 +2288,8 @@ Base signal types
 </div>
 </div>
 
-<div id="outline-container-org78e7da3" class="outline-3">
-<h3 id="org78e7da3"><span class="section-number-3">7.4</span> Inputs and outputs</h3>
+<div id="outline-container-org276a89a" class="outline-3">
+<h3 id="org276a89a"><span class="section-number-3">7.4</span> Inputs and outputs</h3>
 <div class="outline-text-3" id="text-7-4">
 <p>
 After the signal class (i.e. after the <b>=&gt;</b> symbol) come the types of
@@ -2220,8 +2354,8 @@ Containers.
 </div>
 </div>
 
-<div id="outline-container-org4a4c76a" class="outline-2">
-<h2 id="org4a4c76a"><span class="section-number-2">8</span> Containers</h2>
+<div id="outline-container-org84fef09" class="outline-2">
+<h2 id="org84fef09"><span class="section-number-2">8</span> Containers</h2>
 <div class="outline-text-2" id="text-8">
 <p>
 In a physical circuit, every wire carries one bit, and doesn't have
@@ -2271,8 +2405,8 @@ to write compact and readable descriptions of such large circuits.
 </p>
 </div>
 
-<div id="outline-container-orgb659379" class="outline-3">
-<h3 id="orgb659379"><span class="section-number-3">8.1</span> Tuples</h3>
+<div id="outline-container-orgf0af86b" class="outline-3">
+<h3 id="orgf0af86b"><span class="section-number-3">8.1</span> Tuples</h3>
 <div class="outline-text-3" id="text-8-1">
 <p>
 Tuples provide the simplest way to give a single name to a bundle of
@@ -2505,8 +2639,8 @@ output type <b>(a,b)</b>.
 </div>
 </div>
 
-<div id="outline-container-org43cb2ed" class="outline-3">
-<h3 id="org43cb2ed"><span class="section-number-3">8.2</span> Words</h3>
+<div id="outline-container-orga35cd9a" class="outline-3">
+<h3 id="orga35cd9a"><span class="section-number-3">8.2</span> Words</h3>
 <div class="outline-text-3" id="text-8-2">
 <p>
 There are two kinds of cluster that allow several signals to be
@@ -2651,8 +2785,8 @@ example circuits will be presented.
 </div>
 </div>
 
-<div id="outline-container-org5f63ec2" class="outline-3">
-<h3 id="org5f63ec2"><span class="section-number-3">8.3</span> A circuit with words and internal signals</h3>
+<div id="outline-container-orgc803821" class="outline-3">
+<h3 id="orgc803821"><span class="section-number-3">8.3</span> A circuit with words and internal signals</h3>
 <div class="outline-text-3" id="text-8-3">
 <p>
 Files: <b>Add4.hs</b> and <b>Add4Run.hs</b>
@@ -2699,8 +2833,8 @@ $ ghc -e main Add4Run
 </p>
 </div>
 
-<div id="outline-container-orgedeb3fe" class="outline-4">
-<h4 id="orgedeb3fe"><span class="section-number-4">8.3.1</span> Building words</h4>
+<div id="outline-container-org490c32f" class="outline-4">
+<h4 id="org490c32f"><span class="section-number-4">8.3.1</span> Building words</h4>
 <div class="outline-text-4" id="text-8-3-1">
 <p>
 If you have expressions that define some signals, a word comprising
@@ -2774,8 +2908,8 @@ length (w1 +</del> w2) = length w1 + length w2
 </div>
 </div>
 
-<div id="outline-container-orgf8ecb5d" class="outline-4">
-<h4 id="orgf8ecb5d"><span class="section-number-4">8.3.2</span> Accessing parts of a word</h4>
+<div id="outline-container-org48a7010" class="outline-4">
+<h4 id="org48a7010"><span class="section-number-4">8.3.2</span> Accessing parts of a word</h4>
 <div class="outline-text-4" id="text-8-3-2">
 <p>
 Often we can perform operations on entire words, using word-oriented
@@ -2895,8 +3029,8 @@ no matter how large.
 </div>
 </div>
 
-<div id="outline-container-org824862d" class="outline-3">
-<h3 id="org824862d"><span class="section-number-3">8.4</span> Nested clusters</h3>
+<div id="outline-container-org7c45dfb" class="outline-3">
+<h3 id="org7c45dfb"><span class="section-number-3">8.4</span> Nested clusters</h3>
 <div class="outline-text-3" id="text-8-4">
 <p>
 The cluster types can be nested.  A tuple may contain words (or deeper
@@ -3026,8 +3160,8 @@ connect them up appropriately.
 </div>
 </div>
 
-<div id="outline-container-org62bed7f" class="outline-2">
-<h2 id="org62bed7f"><span class="section-number-2">9</span> Combinational simulation</h2>
+<div id="outline-container-orgfd5fb29" class="outline-2">
+<h2 id="orgfd5fb29"><span class="section-number-2">9</span> Combinational simulation</h2>
 <div class="outline-text-2" id="text-9">
 <p>
 One way to simulate a combinational circuit is to apply it directly to
@@ -3083,8 +3217,8 @@ the following section.
 </div>
 </div>
 
-<div id="outline-container-org79cf54f" class="outline-2">
-<h2 id="org79cf54f"><span class="section-number-2">10</span> Synchronous sequential simulation</h2>
+<div id="outline-container-orgf5ef9d0" class="outline-2">
+<h2 id="orgf5ef9d0"><span class="section-number-2">10</span> Synchronous sequential simulation</h2>
 <div class="outline-text-2" id="text-10">
 <p>
 A sequential circuit may have feedback and state.  A sequential
@@ -3097,8 +3231,8 @@ The execution of a synchronous circuit can be
 </p>
 </div>
 
-<div id="outline-container-org7df19dc" class="outline-3">
-<h3 id="org7df19dc"><span class="section-number-3">10.1</span> General form</h3>
+<div id="outline-container-org589f322" class="outline-3">
+<h3 id="org589f322"><span class="section-number-3">10.1</span> General form</h3>
 <div class="outline-text-3" id="text-10-1">
 <p>
 <code>~~</code>
@@ -3149,8 +3283,8 @@ simCirc input = runAllInput input output
 </div>
 </div>
 
-<div id="outline-container-org2566e12" class="outline-3">
-<h3 id="org2566e12"><span class="section-number-3">10.2</span> Parsing the inputs</h3>
+<div id="outline-container-org38ff0c7" class="outline-3">
+<h3 id="org38ff0c7"><span class="section-number-3">10.2</span> Parsing the inputs</h3>
 <div class="outline-text-3" id="text-10-2">
 <p>
 The input data is written as a list of lists.  For the outer list,
@@ -3178,29 +3312,29 @@ signal; this is analogous to an input format specifier.
 </div>
 </div>
 
-<div id="outline-container-orgd230559" class="outline-3">
-<h3 id="orgd230559"><span class="section-number-3">10.3</span> Formatting the outputs</h3>
+<div id="outline-container-orgcd5c019" class="outline-3">
+<h3 id="orgcd5c019"><span class="section-number-3">10.3</span> Formatting the outputs</h3>
 </div>
 
-<div id="outline-container-org9bba282" class="outline-3">
-<h3 id="org9bba282"><span class="section-number-3">10.4</span> Defining a main program</h3>
+<div id="outline-container-orgb185aec" class="outline-3">
+<h3 id="orgb185aec"><span class="section-number-3">10.4</span> Defining a main program</h3>
 </div>
 
-<div id="outline-container-orgbe8c0d7" class="outline-3">
-<h3 id="orgbe8c0d7"><span class="section-number-3">10.5</span> Modules and libraries</h3>
+<div id="outline-container-orga9cfd58" class="outline-3">
+<h3 id="orga9cfd58"><span class="section-number-3">10.5</span> Modules and libraries</h3>
 </div>
 
-<div id="outline-container-orgfb501bf" class="outline-3">
-<h3 id="orgfb501bf"><span class="section-number-3">10.6</span> Compilation and interpretation</h3>
+<div id="outline-container-orgd129e6d" class="outline-3">
+<h3 id="orgd129e6d"><span class="section-number-3">10.6</span> Compilation and interpretation</h3>
 </div>
 </div>
 
-<div id="outline-container-org2a04213" class="outline-2">
-<h2 id="org2a04213"><span class="section-number-2">11</span> Standard library for bits</h2>
+<div id="outline-container-org1d79cfc" class="outline-2">
+<h2 id="org1d79cfc"><span class="section-number-2">11</span> Standard library for bits</h2>
 <div class="outline-text-2" id="text-11">
 </div>
-<div id="outline-container-org1d97749" class="outline-3">
-<h3 id="org1d97749"><span class="section-number-3">11.1</span> Constant signals</h3>
+<div id="outline-container-org3ef8a8d" class="outline-3">
+<h3 id="org3ef8a8d"><span class="section-number-3">11.1</span> Constant signals</h3>
 <div class="outline-text-3" id="text-11-1">
 <p>
 <code>~~</code>
@@ -3211,8 +3345,8 @@ one                    signal with constant 1 value
 </div>
 </div>
 
-<div id="outline-container-org53d2240" class="outline-3">
-<h3 id="org53d2240"><span class="section-number-3">11.2</span> Logic gates</h3>
+<div id="outline-container-org708ec33" class="outline-3">
+<h3 id="org708ec33"><span class="section-number-3">11.2</span> Logic gates</h3>
 <div class="outline-text-3" id="text-11-2">
 <p>
 <code>~~</code>
@@ -3227,8 +3361,8 @@ xor2, xor3, xor4       xor gate with 2, 3, 4 inputs
 </div>
 </div>
 
-<div id="outline-container-org20af8b8" class="outline-3">
-<h3 id="org20af8b8"><span class="section-number-3">11.3</span> Replicating a signal</h3>
+<div id="outline-container-orgeaba281" class="outline-3">
+<h3 id="orgeaba281"><span class="section-number-3">11.3</span> Replicating a signal</h3>
 <div class="outline-text-3" id="text-11-3">
 <p>
 Fanout takes a signal and splits it to several outputs.
@@ -3253,8 +3387,8 @@ fanout4 x = (x,x,x,x)
 </div>
 </div>
 
-<div id="outline-container-org5b5c9dc" class="outline-3">
-<h3 id="org5b5c9dc"><span class="section-number-3">11.4</span> Multiplexers and demultiplexers</h3>
+<div id="outline-container-org8bcf335" class="outline-3">
+<h3 id="org8bcf335"><span class="section-number-3">11.4</span> Multiplexers and demultiplexers</h3>
 <div class="outline-text-3" id="text-11-4">
 <p>
 <code>~~~</code>
@@ -3454,8 +3588,8 @@ demux2 (c0,c1) x = (y0,y1,y2,y3)
 </div>
 </div>
 
-<div id="outline-container-orgffca555" class="outline-3">
-<h3 id="orgffca555"><span class="section-number-3">11.5</span> Bit addition</h3>
+<div id="outline-container-orge269af8" class="outline-3">
+<h3 id="orge269af8"><span class="section-number-3">11.5</span> Bit addition</h3>
 <div class="outline-text-3" id="text-11-5">
 <p>
 When two bits are added together, the result could be 0, 1, or 2.  Two
@@ -3804,8 +3938,8 @@ bcarry (x,y) c = or3 (and2 x y) (and2 x c) (and2 y c)
 </div>
 </div>
 
-<div id="outline-container-org9de4436" class="outline-3">
-<h3 id="org9de4436"><span class="section-number-3">11.6</span> Flip flops and registers</h3>
+<div id="outline-container-orgc9e973d" class="outline-3">
+<h3 id="orgc9e973d"><span class="section-number-3">11.6</span> Flip flops and registers</h3>
 <div class="outline-text-3" id="text-11-6">
 <p>
 <code>~~</code>
@@ -3822,8 +3956,8 @@ reg1 :: CBit a =&gt; a -&gt; a -&gt; a
 </div>
 </div>
 
-<div id="outline-container-org1c27e73" class="outline-2">
-<h2 id="org1c27e73"><span class="section-number-2">12</span> Standard library for words</h2>
+<div id="outline-container-orgd450033" class="outline-2">
+<h2 id="orgd450033"><span class="section-number-2">12</span> Standard library for words</h2>
 <div class="outline-text-2" id="text-12">
 <p>
 <code>~~</code>
@@ -3838,12 +3972,12 @@ mux2                   use two bit control to select one of four inputs
 </p>
 </div>
 
-<div id="outline-container-orgc9f13da" class="outline-3">
-<h3 id="orgc9f13da"><span class="section-number-3">12.1</span> Replication and constant words</h3>
+<div id="outline-container-org46e28c6" class="outline-3">
+<h3 id="org46e28c6"><span class="section-number-3">12.1</span> Replication and constant words</h3>
 </div>
 
-<div id="outline-container-org5d1bbfc" class="outline-3">
-<h3 id="org5d1bbfc"><span class="section-number-3">12.2</span> Replicating a word</h3>
+<div id="outline-container-orgd7c7818" class="outline-3">
+<h3 id="orgd7c7818"><span class="section-number-3">12.2</span> Replicating a word</h3>
 <div class="outline-text-3" id="text-12-2">
 <p>
 fanout :: Bit a =&gt; Int -&gt; a -&gt; [a]
@@ -3938,12 +4072,12 @@ boolword n b           form an n-bit word, lsb = b, other bits = 0
 </div>
 </div>
 
-<div id="outline-container-orgb1588f3" class="outline-3">
-<h3 id="orgb1588f3"><span class="section-number-3">12.3</span> Rearranging bits in a word</h3>
+<div id="outline-container-org7a4eb90" class="outline-3">
+<h3 id="org7a4eb90"><span class="section-number-3">12.3</span> Rearranging bits in a word</h3>
 <div class="outline-text-3" id="text-12-3">
 </div>
-<div id="outline-container-org8a71152" class="outline-4">
-<h4 id="org8a71152"><span class="section-number-4">12.3.1</span> Combinational shifting</h4>
+<div id="outline-container-org839f282" class="outline-4">
+<h4 id="org839f282"><span class="section-number-4">12.3.1</span> Combinational shifting</h4>
 <div class="outline-text-4" id="text-12-3-1">
 <p>
 Shift a word to the right (shr) or to the left (shl).  In both cases,
@@ -4010,8 +4144,8 @@ shl x = [x!!i | i &lt;- [1..k-1]] ++ [zero]
 </div>
 </div>
 
-<div id="outline-container-org4851b61" class="outline-4">
-<h4 id="org4851b61"><span class="section-number-4">12.3.2</span> Bit slice representation</h4>
+<div id="outline-container-org3c0e341" class="outline-4">
+<h4 id="org3c0e341"><span class="section-number-4">12.3.2</span> Bit slice representation</h4>
 <div class="outline-text-4" id="text-12-3-2">
 <p>
 <code>~~</code>
@@ -4028,8 +4162,8 @@ unbitslice2 :: [(a,b)] -&gt; ([a], [b])
 </div>
 </div>
 
-<div id="outline-container-orga4e17cf" class="outline-3">
-<h3 id="orga4e17cf"><span class="section-number-3">12.4</span> Logic on words</h3>
+<div id="outline-container-orge6ea057" class="outline-3">
+<h3 id="orge6ea057"><span class="section-number-3">12.4</span> Logic on words</h3>
 <div class="outline-text-3" id="text-12-4">
 <p>
 Calculating a bit from a word
@@ -4085,12 +4219,12 @@ winv x = map inv x
 </div>
 </div>
 
-<div id="outline-container-org1577344" class="outline-3">
-<h3 id="org1577344"><span class="section-number-3">12.5</span> Conditionals and addresses</h3>
+<div id="outline-container-orgc772e15" class="outline-3">
+<h3 id="orgc772e15"><span class="section-number-3">12.5</span> Conditionals and addresses</h3>
 <div class="outline-text-3" id="text-12-5">
 </div>
-<div id="outline-container-orgcf9972e" class="outline-4">
-<h4 id="orgcf9972e"><span class="section-number-4">12.5.1</span> Multiplexers</h4>
+<div id="outline-container-org18ea8fe" class="outline-4">
+<h4 id="org18ea8fe"><span class="section-number-4">12.5.1</span> Multiplexers</h4>
 <div class="outline-text-4" id="text-12-5-1">
 <p>
 <code>~~</code>
@@ -4149,8 +4283,8 @@ EndSolution
 </div>
 </div>
 
-<div id="outline-container-orgca5eb1a" class="outline-4">
-<h4 id="orgca5eb1a"><span class="section-number-4">12.5.2</span> Demultiplexers</h4>
+<div id="outline-container-orgbec8323" class="outline-4">
+<h4 id="orgbec8323"><span class="section-number-4">12.5.2</span> Demultiplexers</h4>
 <div class="outline-text-4" id="text-12-5-2">
 <p>
 <code>~~~</code>
@@ -4197,12 +4331,12 @@ demux4w [c0,c1,c2,c3] x =
 </div>
 </div>
 
-<div id="outline-container-orga4a473c" class="outline-3">
-<h3 id="orga4a473c"><span class="section-number-3">12.6</span> Arithmetic</h3>
+<div id="outline-container-orgd796357" class="outline-3">
+<h3 id="orgd796357"><span class="section-number-3">12.6</span> Arithmetic</h3>
 <div class="outline-text-3" id="text-12-6">
 </div>
-<div id="outline-container-org969bfcc" class="outline-4">
-<h4 id="org969bfcc"><span class="section-number-4">12.6.1</span> Binary addition</h4>
+<div id="outline-container-orga430183" class="outline-4">
+<h4 id="orga430183"><span class="section-number-4">12.6.1</span> Binary addition</h4>
 <div class="outline-text-4" id="text-12-6-1">
 <p>
 <code>~~~</code>
@@ -4227,8 +4361,8 @@ circuit generator, which allows input words of any size.
 </div>
 </div>
 
-<div id="outline-container-org089b474" class="outline-3">
-<h3 id="org089b474"><span class="section-number-3">12.7</span> Registers</h3>
+<div id="outline-container-org45f5361" class="outline-3">
+<h3 id="org45f5361"><span class="section-number-3">12.7</span> Registers</h3>
 <div class="outline-text-3" id="text-12-7">
 <p>
 <code>~~</code>
@@ -4265,8 +4399,8 @@ reg n ld x                 n-bit register with load control ld, data input x
 </div>
 
 
-<div id="outline-container-orgca3af77" class="outline-3">
-<h3 id="orgca3af77"><span class="section-number-3">12.8</span> Registers</h3>
+<div id="outline-container-orgb2bc9ec" class="outline-3">
+<h3 id="orgb2bc9ec"><span class="section-number-3">12.8</span> Registers</h3>
 <div class="outline-text-3" id="text-12-8">
 <p>
 <code>~~</code>
@@ -4295,12 +4429,12 @@ regfile n k ld d sa sb x   register file with 2<sup>k</sup> registers, each n-bi
 </div>
 </div>
 
-<div id="outline-container-org02f458f" class="outline-2">
-<h2 id="org02f458f"><span class="section-number-2">13</span> Circuit generators</h2>
+<div id="outline-container-org40fa125" class="outline-2">
+<h2 id="org40fa125"><span class="section-number-2">13</span> Circuit generators</h2>
 <div class="outline-text-2" id="text-13">
 </div>
-<div id="outline-container-org65498ec" class="outline-3">
-<h3 id="org65498ec"><span class="section-number-3">13.1</span> Operating on words</h3>
+<div id="outline-container-org064098b" class="outline-3">
+<h3 id="org064098b"><span class="section-number-3">13.1</span> Operating on words</h3>
 <div class="outline-text-3" id="text-13-1">
 <p>
 Duplicating a bit to form a word: fanout takes a wordsize k and a
@@ -4380,8 +4514,8 @@ shl x = [x!!i * i &lt;- [1..k-1]] ++ [zero]
 </div>
 </div>
 
-<div id="outline-container-org35ed1b6" class="outline-3">
-<h3 id="org35ed1b6"><span class="section-number-3">13.2</span> Recursive circuit definitions</h3>
+<div id="outline-container-org4f35e82" class="outline-3">
+<h3 id="org4f35e82"><span class="section-number-3">13.2</span> Recursive circuit definitions</h3>
 <div class="outline-text-3" id="text-13-2">
 <p>
 <code>~~~</code>
@@ -4421,8 +4555,8 @@ demux4w [c0,c1,c2,c3] x =
 </div>
 </div>
 
-<div id="outline-container-orgc66626c" class="outline-3">
-<h3 id="orgc66626c"><span class="section-number-3">13.3</span> Tree structured circuits</h3>
+<div id="outline-container-org3947ba0" class="outline-3">
+<h3 id="org3947ba0"><span class="section-number-3">13.3</span> Tree structured circuits</h3>
 <div class="outline-text-3" id="text-13-3">
 <p>
 <code>~~~</code>
@@ -4460,8 +4594,8 @@ regfile n k ld d sa sb x =
 </div>
 </div>
 
-<div id="outline-container-orge1fdecb" class="outline-3">
-<h3 id="orge1fdecb"><span class="section-number-3">13.4</span> Memory</h3>
+<div id="outline-container-org9efc779" class="outline-3">
+<h3 id="org9efc779"><span class="section-number-3">13.4</span> Memory</h3>
 <div class="outline-text-3" id="text-13-4">
 <p>
 <code>~~~</code>
@@ -4519,8 +4653,8 @@ memw n k sto p x =
 </div>
 </div>
 
-<div id="outline-container-org0393e71" class="outline-2">
-<h2 id="org0393e71"><span class="section-number-2">14</span> Combinators</h2>
+<div id="outline-container-org062c459" class="outline-2">
+<h2 id="org062c459"><span class="section-number-2">14</span> Combinators</h2>
 <div class="outline-text-2" id="text-14">
 <p>
 We will generally specify large circuits using a circuit generator,
@@ -4547,8 +4681,8 @@ parameters (with a type like <b>Int</b>).
 </p>
 </div>
 
-<div id="outline-container-org73e0d6d" class="outline-3">
-<h3 id="org73e0d6d"><span class="section-number-3">14.1</span> Map</h3>
+<div id="outline-container-org18d6c6f" class="outline-3">
+<h3 id="org18d6c6f"><span class="section-number-3">14.1</span> Map</h3>
 <div class="outline-text-3" id="text-14-1">
 <p>
 Word inverter: winv takes a word and inverts each of its bits
@@ -4765,8 +4899,8 @@ mux1w c x y = map2 (mux1 c) x y
 </p>
 </div>
 
-<div id="outline-container-org7497594" class="outline-4">
-<h4 id="org7497594"><span class="section-number-4">14.1.1</span> Sized map</h4>
+<div id="outline-container-org1682134" class="outline-4">
+<h4 id="org1682134"><span class="section-number-4">14.1.1</span> Sized map</h4>
 <div class="outline-text-4" id="text-14-1-1">
 <p>
 The <b>mapn</b> pattern is similar to <b>map</b>, except it
@@ -4791,8 +4925,8 @@ Combinational circuits may be defined using <b>map</b>, so
 </div>
 </div>
 
-<div id="outline-container-org6567c68" class="outline-3">
-<h3 id="org6567c68"><span class="section-number-3">14.2</span> Fold</h3>
+<div id="outline-container-org582d53d" class="outline-3">
+<h3 id="org582d53d"><span class="section-number-3">14.2</span> Fold</h3>
 <div class="outline-text-3" id="text-14-2">
 <p>
 The folding patterns define a linear circuit structure.
@@ -4830,8 +4964,8 @@ accumulator registers!).
 </p>
 </div>
 
-<div id="outline-container-org47c3309" class="outline-4">
-<h4 id="org47c3309"><span class="section-number-4">14.2.1</span> Fold from the left</h4>
+<div id="outline-container-orge5469bf" class="outline-4">
+<h4 id="orge5469bf"><span class="section-number-4">14.2.1</span> Fold from the left</h4>
 <div class="outline-text-4" id="text-14-2-1">
 <p>
 In general, a fold can proceed either direction across the word.
@@ -4946,8 +5080,8 @@ If the circuit isn't on the critical path, it makes no
 </div>
 </div>
 
-<div id="outline-container-org9cb326a" class="outline-4">
-<h4 id="org9cb326a"><span class="section-number-4">14.2.2</span> Binary comparison using foldl</h4>
+<div id="outline-container-org779a304" class="outline-4">
+<h4 id="org779a304"><span class="section-number-4">14.2.2</span> Binary comparison using foldl</h4>
 <div class="outline-text-4" id="text-14-2-2">
 <p>
 The problem: input two binary numbers, in bit slice form:
@@ -4995,8 +5129,8 @@ rippleCmp = foldl cmp1 (zero,one,zero)
 </div>
 </div>
 
-<div id="outline-container-org3b4dcc2" class="outline-4">
-<h4 id="org3b4dcc2"><span class="section-number-4">14.2.3</span> Fold from the right: foldr</h4>
+<div id="outline-container-org835955a" class="outline-4">
+<h4 id="org835955a"><span class="section-number-4">14.2.3</span> Fold from the right: foldr</h4>
 <div class="outline-text-4" id="text-14-2-3">
 <p>
 You can also run a fold across a word from the right to the left.
@@ -5029,8 +5163,8 @@ The foldr pattern
 </div>
 </div>
 
-<div id="outline-container-org41136f7" class="outline-3">
-<h3 id="org41136f7"><span class="section-number-3">14.3</span> Scan</h3>
+<div id="outline-container-orgabcae84" class="outline-3">
+<h3 id="orgabcae84"><span class="section-number-3">14.3</span> Scan</h3>
 <div class="outline-text-3" id="text-14-3">
 <p>
 A fold calculates a sequence of intermediate values, one for every bit
@@ -5043,8 +5177,8 @@ exist that implement scans efficiently.
 </p>
 </div>
 
-<div id="outline-container-org3c14060" class="outline-4">
-<h4 id="org3c14060"><span class="section-number-4">14.3.1</span> Scan from the left: scanl</h4>
+<div id="outline-container-org8d0dc73" class="outline-4">
+<h4 id="org8d0dc73"><span class="section-number-4">14.3.1</span> Scan from the left: scanl</h4>
 <div class="outline-text-4" id="text-14-3-1">
 <p>
 \includegraphics[angle=0,scale=0.5]{figures/xfig/scanl4.eps}
@@ -5064,8 +5198,8 @@ exist that implement scans efficiently.
 </div>
 </div>
 
-<div id="outline-container-orgf3e49ef" class="outline-4">
-<h4 id="orgf3e49ef"><span class="section-number-4">14.3.2</span> Scan from the right: scanr</h4>
+<div id="outline-container-org9848c47" class="outline-4">
+<h4 id="org9848c47"><span class="section-number-4">14.3.2</span> Scan from the right: scanr</h4>
 <div class="outline-text-4" id="text-14-3-2">
 <p>
 The <b>ascanr</b> pattern yields the word of intermediate results
@@ -5114,8 +5248,8 @@ ascanr f a (x:xs) = (f x a', a':xs')
 </div>
 </div>
 
-<div id="outline-container-orga60bec5" class="outline-4">
-<h4 id="orga60bec5"><span class="section-number-4">14.3.3</span> Combining a map with a scan</h4>
+<div id="outline-container-orgce3c56f" class="outline-4">
+<h4 id="orgce3c56f"><span class="section-number-4">14.3.3</span> Combining a map with a scan</h4>
 <div class="outline-text-4" id="text-14-3-3">
 <p>
 Many circuits combine a map with a scan: they output a value in each
@@ -5184,8 +5318,8 @@ fullAdd (x,y) c = (bcarry (x,y) c, bsum (x,y) c)
 </div>
 </div>
 
-<div id="outline-container-org6f7bcd9" class="outline-4">
-<h4 id="org6f7bcd9"><span class="section-number-4">14.3.4</span> Ripple carry addition</h4>
+<div id="outline-container-orgbd406e1" class="outline-4">
+<h4 id="orgbd406e1"><span class="section-number-4">14.3.4</span> Ripple carry addition</h4>
 <div class="outline-text-4" id="text-14-3-4">
 <p>
 rippleAdd4
@@ -5255,8 +5389,8 @@ addSub sub xy = rippleAdd sub (map f xy)
 </div>
 </div>
 
-<div id="outline-container-org38d2d1f" class="outline-4">
-<h4 id="org38d2d1f"><span class="section-number-4">14.3.5</span> Bidirectional scan</h4>
+<div id="outline-container-orgbaaac3a" class="outline-4">
+<h4 id="orgbaaac3a"><span class="section-number-4">14.3.5</span> Bidirectional scan</h4>
 <div class="outline-text-4" id="text-14-3-5">
 <p>
 A very general pattern is the <b>mscan</b> pattern, which takes a
@@ -5297,8 +5431,8 @@ mscan f a b (x:xs) = (b'', a'', y:ys)
 </div>
 </div>
 
-<div id="outline-container-org342beb5" class="outline-2">
-<h2 id="org342beb5"><span class="section-number-2">15</span> Circuit semantics</h2>
+<div id="outline-container-orgdd4aca8" class="outline-2">
+<h2 id="orgdd4aca8"><span class="section-number-2">15</span> Circuit semantics</h2>
 <div class="outline-text-2" id="text-15">
 <p>
 A digital circuit takes some input signals, performs a computation,
@@ -5309,37 +5443,37 @@ in the chapter on synchronous circuits.
 </p>
 </div>
 
-<div id="outline-container-org957850d" class="outline-3">
-<h3 id="org957850d"><span class="section-number-3">15.1</span> Boolean signals</h3>
+<div id="outline-container-orgd7ddda1" class="outline-3">
+<h3 id="orgd7ddda1"><span class="section-number-3">15.1</span> Boolean signals</h3>
 </div>
 
-<div id="outline-container-org818f24d" class="outline-3">
-<h3 id="org818f24d"><span class="section-number-3">15.2</span> Streams</h3>
+<div id="outline-container-orge15b28b" class="outline-3">
+<h3 id="orge15b28b"><span class="section-number-3">15.2</span> Streams</h3>
 </div>
 
-<div id="outline-container-orgbd34366" class="outline-3">
-<h3 id="orgbd34366"><span class="section-number-3">15.3</span> Synchronous circuits</h3>
+<div id="outline-container-org7c3b3cd" class="outline-3">
+<h3 id="org7c3b3cd"><span class="section-number-3">15.3</span> Synchronous circuits</h3>
 </div>
 
-<div id="outline-container-org10a1a46" class="outline-3">
-<h3 id="org10a1a46"><span class="section-number-3">15.4</span> Multiple semantics</h3>
+<div id="outline-container-org72f1194" class="outline-3">
+<h3 id="org72f1194"><span class="section-number-3">15.4</span> Multiple semantics</h3>
 </div>
 
-<div id="outline-container-org8a07686" class="outline-3">
-<h3 id="org8a07686"><span class="section-number-3">15.5</span> Path depth</h3>
+<div id="outline-container-orgb5ed1da" class="outline-3">
+<h3 id="orgb5ed1da"><span class="section-number-3">15.5</span> Path depth</h3>
 </div>
 
-<div id="outline-container-orgdd24a14" class="outline-3">
-<h3 id="orgdd24a14"><span class="section-number-3">15.6</span> Netlists</h3>
+<div id="outline-container-org6dc14da" class="outline-3">
+<h3 id="org6dc14da"><span class="section-number-3">15.6</span> Netlists</h3>
 </div>
 </div>
 
-<div id="outline-container-org67c77fc" class="outline-2">
-<h2 id="org67c77fc"><span class="section-number-2">16</span> Equational reasoning</h2>
+<div id="outline-container-orgf92375e" class="outline-2">
+<h2 id="orgf92375e"><span class="section-number-2">16</span> Equational reasoning</h2>
 <div class="outline-text-2" id="text-16">
 </div>
-<div id="outline-container-orgaf7eead" class="outline-3">
-<h3 id="orgaf7eead"><span class="section-number-3">16.1</span> Substituting equals for equals</h3>
+<div id="outline-container-orgbdec369" class="outline-3">
+<h3 id="orgbdec369"><span class="section-number-3">16.1</span> Substituting equals for equals</h3>
 <div class="outline-text-3" id="text-16-1">
 <p>
 An equation in Hydra is a true mathematical equation, not an
@@ -5430,17 +5564,17 @@ how equational reasoning can solve some quite challenging problems.
 </div>
 </div>
 
-<div id="outline-container-org2274a1f" class="outline-3">
-<h3 id="org2274a1f"><span class="section-number-3">16.2</span> Equivalent ways to describe a circuit</h3>
+<div id="outline-container-orgc0c0efa" class="outline-3">
+<h3 id="orgc0c0efa"><span class="section-number-3">16.2</span> Equivalent ways to describe a circuit</h3>
 </div>
 </div>
 
-<div id="outline-container-orgd61f0f6" class="outline-2">
-<h2 id="orgd61f0f6"><span class="section-number-2">17</span> Common errors and error messages</h2>
+<div id="outline-container-org147ffbb" class="outline-2">
+<h2 id="org147ffbb"><span class="section-number-2">17</span> Common errors and error messages</h2>
 <div class="outline-text-2" id="text-17">
 </div>
-<div id="outline-container-org047f6a4" class="outline-3">
-<h3 id="org047f6a4"><span class="section-number-3">17.1</span> zero, one, 0, 1</h3>
+<div id="outline-container-orge4f0e63" class="outline-3">
+<h3 id="orge4f0e63"><span class="section-number-3">17.1</span> zero, one, 0, 1</h3>
 <div class="outline-text-3" id="text-17-1">
 <p>
 See examples/ErrorExamples/ConstantSignals.hs
@@ -5524,8 +5658,8 @@ $
 </div>
 </div>
 
-<div id="outline-container-org34c3df6" class="outline-2">
-<h2 id="org34c3df6"><span class="section-number-2">18</span> Summary of syntax</h2>
+<div id="outline-container-orgfe0e4d4" class="outline-2">
+<h2 id="orgfe0e4d4"><span class="section-number-2">18</span> Summary of syntax</h2>
 <div class="outline-text-2" id="text-18">
 <p>
 This section summarises the language syntax.  Hydra is actually
@@ -5542,8 +5676,8 @@ Comments.  There are two ways to indicate a comment
 </p>
 </div>
 
-<div id="outline-container-org8b1d549" class="outline-3">
-<h3 id="org8b1d549"><span class="section-number-3">18.1</span> Indentation</h3>
+<div id="outline-container-org5f07560" class="outline-3">
+<h3 id="org5f07560"><span class="section-number-3">18.1</span> Indentation</h3>
 <div class="outline-text-3" id="text-18-1">
 <p>
 Haskell normally uses indentation, rather than punctuation, to
@@ -5588,8 +5722,8 @@ circ x y = a  &#x2013; a bad definition
 </div>
 </div>
 
-<div id="outline-container-org20db39b" class="outline-3">
-<h3 id="org20db39b"><span class="section-number-3">18.2</span> Names</h3>
+<div id="outline-container-org3f62abc" class="outline-3">
+<h3 id="org3f62abc"><span class="section-number-3">18.2</span> Names</h3>
 <div class="outline-text-3" id="text-18-2">
 <p>
 Names (also called identifiers) are used for circuits (e.g. logic
@@ -5622,8 +5756,8 @@ x?3        &#x2013; contains invalid character ?
 </div>
 </div>
 
-<div id="outline-container-org4990c05" class="outline-3">
-<h3 id="org4990c05"><span class="section-number-3">18.3</span> Signal expressions</h3>
+<div id="outline-container-orgeaca4db" class="outline-3">
+<h3 id="orgeaca4db"><span class="section-number-3">18.3</span> Signal expressions</h3>
 <div class="outline-text-3" id="text-18-3">
 <p>
 A signal is specified in Hydra by an expression.  The simplest form of
@@ -5715,8 +5849,8 @@ way to get started is to follow the patterns shown in the examples.
 </div>
 </div>
 
-<div id="outline-container-orgdbf50db" class="outline-3">
-<h3 id="orgdbf50db"><span class="section-number-3">18.4</span> Specifications</h3>
+<div id="outline-container-org408fe11" class="outline-3">
+<h3 id="org408fe11"><span class="section-number-3">18.4</span> Specifications</h3>
 <div class="outline-text-3" id="text-18-4">
 <p>
 In any system design, it is valuable to make a distinction between a
@@ -5755,8 +5889,8 @@ components, and this geometry may be used in fabricating the circuit.
 </div>
 </div>
 
-<div id="outline-container-orgad5af6c" class="outline-3">
-<h3 id="orgad5af6c"><span class="section-number-3">18.5</span> Hardware description languages</h3>
+<div id="outline-container-org88537e7" class="outline-3">
+<h3 id="org88537e7"><span class="section-number-3">18.5</span> Hardware description languages</h3>
 <div class="outline-text-3" id="text-18-5">
 <p>
 An alternative approach is to use a computer hardware description
@@ -5788,8 +5922,8 @@ language.
 </div>
 </div>
 
-<div id="outline-container-org82de330" class="outline-3">
-<h3 id="org82de330"><span class="section-number-3">18.6</span> Functional hardware description</h3>
+<div id="outline-container-orge28be2e" class="outline-3">
+<h3 id="orge28be2e"><span class="section-number-3">18.6</span> Functional hardware description</h3>
 <div class="outline-text-3" id="text-18-6">
 <p>
 A functional language uses mathematical functions and equations to
@@ -5831,8 +5965,8 @@ Haskell compiler and linked with the Hydra library.
 </div>
 </div>
 
-<div id="outline-container-orgce63d43" class="outline-3">
-<h3 id="orgce63d43"><span class="section-number-3">18.7</span> Signals</h3>
+<div id="outline-container-org0ae50f6" class="outline-3">
+<h3 id="org0ae50f6"><span class="section-number-3">18.7</span> Signals</h3>
 <div class="outline-text-3" id="text-18-7">
 <p>
 A data value in a circuit is called a \emph{signal}.  Signals are
@@ -5869,8 +6003,8 @@ those notations have other meanings.)
 </div>
 </div>
 
-<div id="outline-container-orge3132c4" class="outline-3">
-<h3 id="orge3132c4"><span class="section-number-3">18.8</span> Circuits</h3>
+<div id="outline-container-org1f88013" class="outline-3">
+<h3 id="org1f88013"><span class="section-number-3">18.8</span> Circuits</h3>
 <div class="outline-text-3" id="text-18-8">
 <p>
 A circuit is a machine that takes some input signals, performs a
@@ -6051,8 +6185,8 @@ Hmmm
 </div>
 </div>
 
-<div id="outline-container-org5def883" class="outline-3">
-<h3 id="org5def883"><span class="section-number-3">18.9</span> Equations</h3>
+<div id="outline-container-org2b0d937" class="outline-3">
+<h3 id="org2b0d937"><span class="section-number-3">18.9</span> Equations</h3>
 <div class="outline-text-3" id="text-18-9">
 <p>
 So far, we have seen expressions that define a new signal as the
@@ -6499,41 +6633,42 @@ the existence and the value of a function, not its name.
 </div>
 </div>
 
-<div id="outline-container-org8f7a615" class="outline-2">
-<h2 id="org8f7a615"><span class="section-number-2">19</span> Notes</h2>
+<div id="outline-container-orgb239af4" class="outline-2">
+<h2 id="orgb239af4"><span class="section-number-2">19</span> Development notes</h2>
 <div class="outline-text-2" id="text-19">
 </div>
-<div id="outline-container-org932aed5" class="outline-3">
-<h3 id="org932aed5"><span class="section-number-3">19.1</span> export to html</h3>
+<div id="outline-container-org850d0d2" class="outline-3">
+<h3 id="org850d0d2"><span class="section-number-3">19.1</span> Emacs</h3>
 <div class="outline-text-3" id="text-19-1">
+</div>
+<div id="outline-container-orgf09f654" class="outline-4">
+<h4 id="orgf09f654"><span class="section-number-4">19.1.1</span> Export to html</h4>
+<div class="outline-text-4" id="text-19-1-1">
 <ul class="org-ul">
-<li>C-c C-e h h &#x2014; export to .html file</li>
-<li>C-c C-e h H &#x2014; export to buffer</li>
+<li>C-c C-e h h  &#x2013;  export to .html file</li>
+<li>C-c C-e h H  &#x2013;  export to buffer</li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-org4619aec" class="outline-3">
-<h3 id="org4619aec"><span class="section-number-3">19.2</span> tangle</h3>
-<div class="outline-text-3" id="text-19-2">
+<div id="outline-container-orgfb3137c" class="outline-4">
+<h4 id="orgfb3137c"><span class="section-number-4">19.1.2</span> Tangle</h4>
+<div class="outline-text-4" id="text-19-1-2">
 <ul class="org-ul">
-<li>tangle the current file
-<ul class="org-ul">
-<li>org-babel-tangle</li>
-<li>C-c C-v t</li>
-<li>with prefix argument, only tangle the current 'src' code block</li>
-<li>C-u C-c C-v t</li>
-</ul></li>
+<li>C-c C-v t       &#x2013; tangle the file</li>
+<li>C-u C-c C-v t   &#x2013; tangle current src code block</li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-org51e2957" class="outline-3">
-<h3 id="org51e2957"><span class="section-number-3">19.3</span> </h3>
-<div class="outline-text-3" id="text-19-3">
-<p>
-asd #+TITLE: Hydra User Guide
-</p>
+<div id="outline-container-orgd939538" class="outline-4">
+<h4 id="orgd939538"><span class="section-number-4">19.1.3</span> Set emacs variables</h4>
+<div class="outline-text-4" id="text-19-1-3">
+<ul class="org-ul">
+<li>The version and date are defined below</li>
+<li>These meta comments must be near the end of the file</li>
+</ul>
+</div>
 </div>
 </div>
 </div>

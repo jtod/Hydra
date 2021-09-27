@@ -5,9 +5,7 @@
 module Main where
 import HDL.Hydra.Core.Lib
 import HelloWorld
-last line if first piece
 
-first line in second piece
 main :: IO ()
 main = do
   helloRun testdata

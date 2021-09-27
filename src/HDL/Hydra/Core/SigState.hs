@@ -11,7 +11,7 @@ import Data.Maybe
 import Data.Typeable
 import Data.Data
 import Data.Generics
-import Generics.SYB
+-- import Generics.SYB
 
 import HDL.Hydra.Core.Signal
 import HDL.Hydra.Core.SigBool

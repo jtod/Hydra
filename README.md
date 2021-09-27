@@ -1,5 +1,11 @@
 # Hydra: functional computer hardware description language
 
+**NOTE: The latest version of Hydra is included in the latest version of
+Sigma16, and it is temporarily recommended (during Autumn 2021) that
+you download and install Sigma16 rather than the Hydra package.  This
+ensures that Hydra, the M1 CPU circuit, and the Sigma16 tools are all
+consistent with each other.**
+
 Hydra is a functional computer hardware description language for
 specifying the structure and behavior of digital circuits. It supports
 several levels of abstraction, including logic gates, register
@@ -16,6 +22,7 @@ this on the github page, the org link is better; if you've downloaded
 the files to your computer, the html link gives better formatting.
 
 ## Installation
+
 
 Before using Hydra, you need some standard software tools.  All of the
 software described here is free and open source, and all of it runs on
