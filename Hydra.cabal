@@ -1,6 +1,6 @@
 cabal-version:   3.4
-name:	         Hydra
-version:         3.0.0
+name:	         hydra
+version:         3.4.0
 synopsis:        Computer hardware description language
 author:	         John T. O'Donnell
 copyright:       (c) 2021 John T. O'Donnell
@@ -28,14 +28,17 @@ source-repository head
   type:     git
   location: https://github.com/jtod/Hydra
 
-extra-doc-files: docs/userguide/HydraUserGuide.html \
-                   docs/userguide/userguide-style.css
+extra-doc-files: docs/HydraUserGuide/HydraUserGuide.html
+                 docs/HydraUserGuide/HydraUserGuide.css
 
 library
   default-language: Haskell2010
   build-depends:    base >= 4 && < 5,
                     transformers >= 0.3 && < 0.6,
                     mtl,
+                    containers,
+                    filepath,
+                    ansi-terminal,
                     parsec
   hs-source-dirs:   src
   exposed-modules:

@@ -1,4 +1,5 @@
 *~
 dist*
-cabal.project.local
+cabal.project.local*
 protected
+protect*

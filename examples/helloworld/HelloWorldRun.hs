@@ -1,36 +1,40 @@
--- File: examples/HelloWorld/HelloWorldRun.hs   (see Hydra/README.md)
--- Simulation driver for HelloWorld circuit
--- To run a simulation, enter:  ghc -e main HelloWorldRun
+-- HelloWorldRun.hs:  simulation driver for HelloWorld circuit
 
 module Main where
 import HDL.Hydra.Core.Lib
 import HelloWorld
 
-main :: IO ()
-main = do
-  helloRun testdata
-
-testdata :: [[Int]]
-testdata =
+testdata1 :: [String]
+testdata1=
 ------------------------------
---   x   y     expected output (ref:datalabels)
+--   x   y     expected output
 ------------------------------
-  [ [0,  0]   --  0
-  , [0,  1]   --  0
-  , [1,  0]   --  0
-  , [1,  1]   --  1
+  [ "0  0"   --  0
+  , "0  1"   --  0
+  , "1  0"   --  0
+  , "1  1"   --  1
   ]
 
-helloRun input = runAllInput input output
-  where
--- Extract input signals
-    x = getbit input 0
-    y = getbit input 1
--- The circuit to be simulated
-    z = hello x y
--- Format the output
-    output =
-      [string "  x=", bit x,
-       string "  y=", bit y,
-       string "  output z=", bit z
-      ]
+main :: IO ()
+main = driver $ do
+  useData testdata1
+
+-- Input ports
+  in_x <- inPortBit "x"
+  in_y <- inPortBit "y"
+
+-- Input signals
+  let x = inbsig in_x
+  let y = inbsig in_y
+
+-- Circuit
+  let z = hello x y
+
+-- Formatted output
+  format [string "x=", bit x,
+          string "  y=", bit y,
+          string "   output = ", bit z,
+          string "\n"
+         ]
+
+  runSimulation

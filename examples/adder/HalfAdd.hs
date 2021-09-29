@@ -1,5 +1,4 @@
 -- HalfAdd: define a half adder circuit
--- This file is part of Hydra, see Hydra/README.md for copyright and license
 
 module HalfAdd where
 import HDL.Hydra.Core.Lib
@@ -9,5 +8,9 @@ import HDL.Hydra.Core.Lib
 -- libraries.  Note that there aren't any imports for circuits; the
 -- only import is for the core library.
 
-halfAdd :: Bit a => a -> a -> (a,a)
-halfAdd x y = (and2 x y, xor2 x y)
+-- The circuit is named myHalfAdd to avoid confusion with the halfAdd
+-- circuit in the Hydra library (its definition is identical to this
+-- one).
+
+myHalfAdd :: Bit a => a -> a -> (a,a)
+myHalfAdd x y = (and2 x y, xor2 x y)

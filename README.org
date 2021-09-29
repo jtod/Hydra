@@ -1,0 +1,24 @@
+# Hydra: functional computer hardware description language
+
+Hydra is a functional computer hardware description language for
+specifying the structure and behavior of digital circuits. It supports
+several levels of abstraction, including logic gates, register
+transfer level, datapath and control, and processors. There are tools
+for simulating circuits, generating netlists, and emulating
+instruction set architectures. It is an embedded domain specific
+language implemented using Haskell.  This is free and open source
+software released under the GPL-3 license.
+
+For documentation, see  the User Guide in the docs directory.  This
+also explains how to install and run the software.
+
+** About Hydra
+
+* Author: John T. O'Donnell, School of Computing Science, University
+  of Glasgow
+* Copyright (c) 2021 John T. O'Donnell
+* License: This software is free and open source, using the GPL-3
+  license.  See LICENSE.txt.
+* Hydra web page: https://github.com/jtod/Hydra
+* Author's web page: https://jtod.github.io/index.html
+* Version: see Hydra.cabal

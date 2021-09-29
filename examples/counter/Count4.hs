@@ -1,5 +1,5 @@
 -- Count4: a 4-bit binary counter circuit
--- This file is part of Hydra; see Hydra/README.md for copyright and license
+-- John O'Donnell, 2021
 
 module Count4 where
 import HDL.Hydra.Core.Lib
