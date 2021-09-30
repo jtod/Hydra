@@ -1,9 +1,10 @@
 body {
     margin: auto;
+    max-width: 35em;
     padding-right: 2em;
     padding-left: 2em;
-    border-left: 1px solid black;
-    border-right: 1px solid black;
+/*    border-left: 1px solid black;
+    border-right: 1px solid black; */
     color: black;
     font-family: Verdana, sans-serif;
     font-size: 100%;
@@ -19,6 +20,11 @@ pre {
 code {
     font-family: monospace;
     }
+
+pre.example {
+    background-color: #d3f0f5; /* light blue background */
+    color: black;
+}
 
 pre.src-hydra {
     background-color: #d3f0f5; /* light blue background */
