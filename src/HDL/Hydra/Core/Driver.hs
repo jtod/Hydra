@@ -91,7 +91,7 @@ import System.Environment
 import System.FilePath
 import System.IO
 import System.IO.Unsafe
-import System.Console.ANSI
+-- import System.Console.ANSI   portability problems, disabling
 
 ------------------------------------------------------------------------
 -- Interface to driver
@@ -1315,6 +1315,7 @@ readIfReady = do
       xs <- hGetLine stdin
       return (Just xs)
 
+{- Disabling because of portability problems with ansi terminal package
 --  testTextColors
 testTextColors :: IO ()
 testTextColors = do
@@ -1327,6 +1328,7 @@ testTextColors = do
   putStrLn "This text is blue"
   setSGR [Reset]  -- Reset to default colour scheme
   putStrLn "Back to the default colors"
+-}
 
 --------------------------------------------------------------------------------
 -- Utilities
