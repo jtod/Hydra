@@ -45,6 +45,9 @@ boolInt True = 1
 showBin :: [Bool] -> String
 showBin xs = show (binint (map boolInt xs))
 
+boolsInt :: [Bool] -> Int
+boolsInt = binint . map boolInt
+
 binint :: [Int] -> Int
 binint bs = sum [b * 2^i | (i,b) <- zip [k-1, k-2 .. 0] bs]
   where

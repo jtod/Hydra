@@ -12,6 +12,59 @@ software released under the GPL-3 license.
 For documentation, see  the User Guide in the docs directory.  This
 also explains how to install and run the software.
 
+*** Installing Hydra
+
+- cabal v2-configure
+- cabal v2-build
+  
+**** Prerequisite: Haskell
+
+Install Haskell Platform (www.haskell.org). This gives you the ghc
+compiler and the cabal package system.  Check that these are installed
+with these commands:
+
+#+BEGIN_EXAMPLE
+$ ghc --version
+The Glorious Glasgow Haskell Compilation System, version 9.0.1
+$ cabal --version
+cabal-install version 3.4.0.0
+#+END_EXAMPLE
+
+**** Install Hydra
+
+The Hydra software (version 3.4.0) is available to download and run
+here and in github (https://github.com/jtod/Hydra/releases).
+
+#+BEGIN_EXAMPLE
+Hydra-3.4.0.zip
+Hydra-3.4.0.tar.gz
+#+END_EXAMPLE
+
+Put the file somewhere in your user workspace and uppack it:
+
+- On Linux: tar -xzf Hydra-i.j.k.tgz
+- On Windows use 7zip or tar
+
+Using your shell (bash, or Windows Command Prompt), enter the Hydra
+directory and issue the following commands (these commands are the
+same for both bash and Windows Command Prompt. They update the Haskell
+package database from the Internet, compile the dependencies, and
+build a documentation web page):
+
+#+BEGIN_EXAMPLE
+cd /path/to/Hydra
+cabal v2-update
+cabal v2-install --lib
+#+END_EXAMPLE
+
+Test that it's working. In your shell, go to Hydra/examples/adder and enter:
+
+#+BEGIN_EXAMPLE
+ghc -e main Add4Run
+#+END_EXAMPLE
+
+*** Sigma16
+
 ** About Hydra
 
 * Author: John T. O'Donnell, School of Computing Science, University

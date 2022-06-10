@@ -3,3 +3,5 @@ dist*
 cabal.project.local*
 protected
 protect*
+*.o
+*.hi
