@@ -1,6 +1,0 @@
-*~
-dist*
-cabal.project.local*
-protect*
-*.o
-*.hi

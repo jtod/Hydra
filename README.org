@@ -14,8 +14,11 @@ also explains how to install and run the software.
 
 *** Installing Hydra
 
-- cabal v2-configure
-- cabal v2-build
+#+BEGIN_EXAMPLE
+cabal v1-configure
+cabal v1-build
+cabal v1-install
+#+END_EXAMPLE
   
 **** Prerequisite: Haskell
 
@@ -67,11 +70,11 @@ ghc -e main Add4Run
 
 ** About Hydra
 
-* Author: John T. O'Donnell, School of Computing Science, University
+- Author: John T. O'Donnell, School of Computing Science, University
   of Glasgow
-* Copyright (c) 2021 John T. O'Donnell
-* License: This software is free and open source, using the GPL-3
+- Copyright (c) 2021 John T. O'Donnell
+- License: This software is free and open source, using the GPL-3
   license.  See LICENSE.txt.
-* Hydra web page: https://github.com/jtod/Hydra
-* Author's web page: https://jtod.github.io/index.html
-* Version: see Hydra.cabal
+- Hydra web page: https://github.com/jtod/Hydra
+- Author's web page: https://jtod.github.io/index.html
+- Version: see Hydra.cabal
