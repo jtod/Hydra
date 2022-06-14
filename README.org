@@ -6,73 +6,95 @@ several levels of abstraction, including logic gates, register
 transfer level, datapath and control, and processors. There are tools
 for simulating circuits, generating netlists, and emulating
 instruction set architectures. It is an embedded domain specific
-language implemented using Haskell.  This is free and open source
-software released under the GPL-3 license.
+language implemented using Haskell.
+
+This is free and open source software released under the GPL-3
+license.
 
 For documentation, see  the User Guide in the docs directory.  This
 also explains how to install and run the software.
 
-*** Installing Hydra
+*** Installation
 
-#+BEGIN_EXAMPLE
-cabal v1-configure
-cabal v1-build
+Windows
+
+Run in Windows PowerShell with administrator priveleges
+
+choco install ghc --force -y
+choco install cabal --force -y
+
+- force shouldn't be necessary but seems to be needed if installing
+  after a failed installation attempt
+- -y is necessary; this tells choco to answer with y automatically
+  when it needs permission to do something.  Without the -y, it
+  doesn't actually ask permission, and the whole installation fails
+- There is also choco upgrade ghc but this failed to work
+
+Enter Hydra directory and issue these commands:
 cabal v1-install
-#+END_EXAMPLE
-  
-**** Prerequisite: Haskell
 
-Install Haskell Platform (www.haskell.org). This gives you the ghc
-compiler and the cabal package system.  Check that these are installed
-with these commands:
+
+
+Hydra requires the ghc implementation of Haskell.
+
+- Haskell installers for Macintosh, Windows, and Linux are available
+  at https://www.haskell.org/ghcup/
+- For Windows, an alternative approach is to use chocolatey; see
+  https://hub.zhox.com/posts/introducing-haskell-dev/
+
+Check that the Haskell tools are working:
 
 #+BEGIN_EXAMPLE
 $ ghc --version
 The Glorious Glasgow Haskell Compilation System, version 9.0.1
 $ cabal --version
 cabal-install version 3.4.0.0
+compiled using version 3.4.0.0 of the Cabal library
 #+END_EXAMPLE
 
-**** Install Hydra
-
-The Hydra software (version 3.4.0) is available to download and run
-here and in github (https://github.com/jtod/Hydra/releases).
-
-#+BEGIN_EXAMPLE
-Hydra-3.4.0.zip
-Hydra-3.4.0.tar.gz
-#+END_EXAMPLE
-
-Put the file somewhere in your user workspace and uppack it:
+The Hydra source code is available at https://github.com/jtod/Hydra in
+either zip or tgz format.  Put the file somewhere in your user
+workspace and uppack it:
 
 - On Linux: tar -xzf Hydra-i.j.k.tgz
-- On Windows use 7zip or tar
+- On Windows use zip, 7zip or tar
 
-Using your shell (bash, or Windows Command Prompt), enter the Hydra
-directory and issue the following commands (these commands are the
-same for both bash and Windows Command Prompt. They update the Haskell
-package database from the Internet, compile the dependencies, and
-build a documentation web page):
+The directory contains the source code, documentation, and a set of
+examples.  Install using these commands:
 
 #+BEGIN_EXAMPLE
-cd /path/to/Hydra
-cabal v2-update
-cabal v2-install --lib
+cabal v1-configure
+cabal v1-build
+cabal v1-haddock
+cabal v1-install
 #+END_EXAMPLE
 
-Test that it's working. In your shell, go to Hydra/examples/adder and enter:
+Test that it's working. In your shell, go to Hydra/examples/adder and
+enter:
 
 #+BEGIN_EXAMPLE
 ghc -e main Add4Run
 #+END_EXAMPLE
 
+There are several forms of documentation.
+- [[docs/HydraUserGuide/HydraUserGuide.html][User Guide]] This is
+  available in docs/HydraUserGuide
+- [[dist\doc\html\hydra\index.html][API reference]] The file is in
+  dist\doc\html\hydra\index.html
+
 *** Sigma16
+
+*** Haskell installation
+
+Windows
+Run in PowerShell with admin privilege
+choco upgrade ghc cabal -y
 
 ** About Hydra
 
 - Author: John T. O'Donnell, School of Computing Science, University
   of Glasgow
-- Copyright (c) 2021 John T. O'Donnell
+- Copyright (c) 2022 John T. O'Donnell
 - License: This software is free and open source, using the GPL-3
   license.  See LICENSE.txt.
 - Hydra web page: https://github.com/jtod/Hydra

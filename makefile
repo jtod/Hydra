@@ -6,25 +6,11 @@
 #  make devinstall      developer requires ghc, cabal, pandoc
 #  make clean           delete temp files but keep documentation
 
-.PHONY : clean
-clean :
-	find . \( -name '*~' \
-	  -o -name '*.hi' \
-	  -o -name '*.log' \
-	  -o -name '*.aux' \
-	  -o -name '*.out' \
-	  -o -name '*.toc' \
-	  -o -name '*.bak' \) -delete
-	rm -rf docs/auto
-	rm -f m1output.txt
-	rm -f m1write.txt
-
-#	rm -f docs/M1_System_Circuit.tex
-
 #----------------------------------------------------------------------
 # Calculate parameters: don't need to edit these
 
-# Obtain version number from cabal file to use in generated html documentation
+# Obtain version number from cabal file to use in generated html
+# documentation
 VERSION != grep < Hydra.cabal ^version
 
 # Define dates in several formats, for inclusion in the app and user guide
@@ -39,18 +25,23 @@ MDLATEST="For latest version, see <a href='https://github.com/jtod/Hydra' target
 MDHEADER=$(MDVERSION).\ $(MDCOPYRIGHT).\ $(MDLATEST).
 
 #----------------------------------------------------------------------
-# Installation
+# User installation
 
-# User: install Haskell libraries needed to run circuits
 .PHONY : userinstall
 userinstall :
-	cabal update
-	cabal install --lib
-	cabal haddock
-	# Warning: Cabal install does not actually install the code
-	# See README.md, which explains how to run Hydra
+	cabal v2-update
+	cabal v2-install --lib
+	cabal v2-haddock
 
 # Developer: build files to be disseminated
+
+# make setVersion
+
+.PHONY: setVersion
+setVersion:
+	echo "$(VERSION)" > VERSION.txt
+	echo "Copyright (c) $(YEAR) John T. O'Donnell" > COPYRIGHT.txt
+
 .PHONY : build
 build :
 	echo ${MDHEADER}
@@ -88,4 +79,19 @@ index.html : README.md \
           --variable=css:index.css \
           --output=index.html \
 	  README.md
+
+.PHONY : clean
+clean :
+	find . \( -name '*~' \
+	  -o -name '*.hi' \
+	  -o -name '*.log' \
+	  -o -name '*.aux' \
+	  -o -name '*.out' \
+	  -o -name '*.toc' \
+	  -o -name '*.bak' \) -delete
+	rm -rf docs/auto
+	rm -f m1output.txt
+	rm -f m1write.txt
+
+#	rm -f docs/M1_System_Circuit.tex
 
