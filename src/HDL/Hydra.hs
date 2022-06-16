@@ -5,7 +5,7 @@ import HDL.Hydra.Circuits.Combinational
 import HDL.Hydra.Circuits.Register
 
 hydraVersion :: String
-hydraVersion = "3.4.11"
+hydraVersion = "3.4.15edited-but-not-installed"
 
 printVersion :: IO ()
 printVersion = putStrLn ("Hydra version " ++ hydraVersion)

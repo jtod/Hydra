@@ -16,6 +16,20 @@ also explains how to install and run the software.
 
 *** Installation
 
+Unpack hydra directory
+cabal install --lib
+
+Troubleshooting: on Windows, if there is a previous version, delete
+the directory
+C:\Users\yourname\AppData\Roaming\cabal\store
+
+(more precisely, delete this, for the version of ghc you're using:
+C:\Users\johnt\AppData\Roaming\cabal\store\ghc-9.2.3
+
+other commands
+ghc-pkg list
+ghc-pkg unregister hydra-i.j.k
+
 Windows
 
 Run in Windows PowerShell with administrator priveleges
