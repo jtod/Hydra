@@ -1,5 +1,5 @@
 # Hydra User Guide
-# Copyright (C) 2021 John T. O'Donnell.
+# Copyright (c) 2022 John T. O'Donnell.
 # License: GNU GPL Version 3 or later. See Hydra/README.md, LICENSE.txt
 
 # This file is part of Sigma16.  Hydra is free software: you can
@@ -111,6 +111,7 @@ must be software".  That's doubly wrong: visual programming languages
 use pictures to describe software, and hardware description languages
 like Hydra use text to describe hardware.
 
+
 ** Modeling circuits as functions
 
 Some HDLs are based on imperative programming languages, using the
@@ -139,85 +140,7 @@ programs don't correspond to circuits.
 
 * Installation
 
-All of the software required for Hydra is free and open source, and
-all of it runs on Windows, Macintosh, and Gnu/Linux.
-
-** Install ghc
-
-Install the ghc Haskell compiler, which you can download from the
-Haskell web page [[https://www.haskell.org/]].  A standard
-installation will also install the packaging tool =cabal=.  Check that
-the installation succeeded with =ghc --version= and =cabal --version=.
-
-#+BEGIN_EXAMPLE
-$ ghc --version
-The Glorious Glasgow Haskell Compilation System, version 9.0.1
-$ cabal --version
-cabal-install version 3.4.0.0
-compiled using version 3.4.0.0 of the Cabal library
-#+END_EXAMPLE
-
-** Install Hydra
-
-/Download./ Visit [[https://github.com/jtod/Hydra]], click Releases and
-download the most recent version.  The installation file is
-Hydra-i.j.k.zip (or .tgz), where i.j.k is the version number.
-
-/Unpack./ Put the file somewhere in your user workspace and uppack it.
-On Linux, enter =tar -xzf Hydra-i.j.k.tgz= and on Windows use 7zip or
-similar.
-  
-/Compile./ Unzip the file, change to the directory, and enter the
-following commands:
-
-#+BEGIN_SRC shell
-cd /path/to/Hydra
-cabal v2-update
-cabal v2-install --lib
-#+END_SRC
-
-** Test the installation
-
-Enter the directory Hydra/examples/adder.  This contans a circuit
-Add4.hs and a simulation driver Add4Run.hs.  Run it with the following
-commands:
-
-#+BEGIN_EXAMPLE
-$ cd examples/adder/
-$ ghc -e main Add4Run
-Batch mode
-----------------------------------------------------------------------
-Cycle 0
-Inputs:   x =  5  y =  8  cin = 0    Outputs: cout = 0  s = 13
-
-----------------------------------------------------------------------
-Cycle 1
-Inputs:   x =  7  y =  3  cin = 0    Outputs: cout = 0  s = 10
-
-----------------------------------------------------------------------
-Cycle 2
-Inputs:   x =  8  y = 12  cin = 0    Outputs: cout = 1  s =  4
-
-----------------------------------------------------------------------
-Cycle 3
-Inputs:   x =  8  y =  1  cin = 0    Outputs: cout = 0  s =  9
-
-----------------------------------------------------------------------
-Cycle 4
-Inputs:   x = 12  y =  1  cin = 1    Outputs: cout = 0  s = 14
-
-----------------------------------------------------------------------
-Cycle 5
-Inputs:   x =  2  y =  3  cin = 1    Outputs: cout = 0  s =  6
-
-----------------------------------------------------------------------
-Cycle 6
-Inputs:   x = 15  y = 15  cin = 1    Outputs: cout = 1  s = 15
-
-----------------------------------------------------------------------
-Cycle 7
-$
-#+END_EXAMPLE
+#+INCLUDE: "../../README.org"
 
 * Tutorial
 
@@ -3088,3 +3011,61 @@ d = and2 (a,b);       -- wrong! don't use ( , ) ;
 
 - The version and date are defined below
 - These meta comments must be near the end of the file
+
+*** Figures
+
+**** Generated svg
+
+C-c C-e C-s h h
+
+Include an svg file; it will be incorporated inso the html.  The
+figure will have the svg code inline.  The figure is not being
+included as an image or object.
+
+test #+INCLUDE: "./figures/gensvg/defs.svg" export html
+
+-----
+test #+INCLUDE: "./figures/gensvg/fig2.svg" export html
+-----
+
+**** More figure tests
+
+Here is simplefig2
+
+-----
+[[./figures/svg/simplefig2.svg]]
+-----
+
+That was simplefig2
+
+Using the double bracket notation produces an object link and there is
+a huge amount of unwanted space after the figure
+
+-----
+[[file:./figures/svg/simplefig2.svg]]
+-----
+
+Here is a figure.
+
+-----
+[[./figures/svg/logic_gates.svg]]
+-----
+
+Here is another one
+
+-----
+[[./figures/svg/coordinate-systems-basic.svg]]
+-----
+
+Here is another one
+
+-----
+[[./figures/svg/RXformat.svg]]
+-----
+/Here is another one
+
+-----
+[[./figures/xfig/inv-xor2.png]]
+-----
+
+*** End
