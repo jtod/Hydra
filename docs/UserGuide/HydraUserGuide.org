@@ -1,6 +1,6 @@
 # Hydra User Guide
 # Copyright (c) 2022 John T. O'Donnell.
-# License: GNU GPL Version 3 or later. See Hydra/README.md, LICENSE.txt
+# License: GNU GPL Version 3. See Hydra/README.md, LICENSE.txt
 
 # This file is part of Sigma16.  Hydra is free software: you can
 # redistribute it and/or modify it under the terms of the GNU General
@@ -13,7 +13,7 @@
 # copy of the GNU General Public License along with Sigma16.  If not,
 # see <https://www.gnu.org/licenses/>.
 
-#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="./HydraUserGuide.css" />
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../doc.css" />
 #+OPTIONS: toc:nil
 #+OPTIONS: num:nil
 
@@ -112,6 +112,7 @@ use pictures to describe software, and hardware description languages
 like Hydra use text to describe hardware.
 
 
+
 ** Modeling circuits as functions
 
 Some HDLs are based on imperative programming languages, using the
@@ -140,7 +141,8 @@ programs don't correspond to circuits.
 
 * Installation
 
-#+INCLUDE: "../../README.org"
+foo #+INCLUDE: "../../README.org"
+
 
 * Tutorial
 
@@ -1064,9 +1066,6 @@ runReg1 input = runAllInput input output
        string " x = ", bit x,
        string "   Output = ", bit y]
 #+END_SRC
-
-#+RESULTS
-
 
 * Signal and circuit types
 
@@ -2990,7 +2989,7 @@ c = and2 a b          -- correct
 d = and2 (a,b);       -- wrong! don't use ( , ) ;
 #+END_EXAMPLE
 
-
+ 
 * Development notes
 
 ** Emacs
@@ -3069,3 +3068,4 @@ Here is another one
 -----
 
 *** End
+
