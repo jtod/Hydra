@@ -1,0 +1,100 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Creator: fig2dev Version 3.2 Patchlevel 5d -->
+<!-- CreationDate: Sat Jan 12 13:54:20 2019 -->
+<!-- Magnification: 1.000 -->
+<svg	xmlns="http://www.w3.org/2000/svg"
+	xmlns:xlink="http://www.w3.org/1999/xlink"
+	width="3.7in" height="0.6in"
+	viewBox="2160 2667 4472 665">
+<g style="stroke-width:.025in; fill:none">
+<!-- Text -->
+<text xml:space="preserve" x="6525" y="3075" fill="#000000"  font-family="Times" font-style="normal" font-weight="normal" font-size="144" text-anchor="start">z</text>
+<!-- Line -->
+<polyline points="6375,3000
+6000,3000
+" style="stroke:#000000;stroke-width:7;
+stroke-linejoin:miter; stroke-linecap:butt;
+"/>
+<!-- Text -->
+<text xml:space="preserve" x="2175" y="2925" fill="#000000"  font-family="Times" font-style="normal" font-weight="normal" font-size="144" text-anchor="start">x</text>
+<!-- Text -->
+<text xml:space="preserve" x="2175" y="3225" fill="#000000"  font-family="Times" font-style="normal" font-weight="normal" font-size="144" text-anchor="start">y</text>
+<!-- Line -->
+<polyline points="3525,2850
+2400,2850
+" style="stroke:#000000;stroke-width:7;
+stroke-linejoin:miter; stroke-linecap:butt;
+"/>
+<!-- Line -->
+<polyline points="3525,3150
+2400,3150
+" style="stroke:#000000;stroke-width:7;
+stroke-linejoin:miter; stroke-linecap:butt;
+"/>
+<!-- Circle -->
+<circle cx="5625" cy="3000" r="75"
+ style="fill:#ffffff;stroke:#000000;stroke-width:7;"/>
+<!-- Line -->
+<polygon points="5550,3000
+5100,2775
+5100,3225
+5550,3000
+" style="stroke:#000000;stroke-width:7;
+stroke-linejoin:miter; stroke-linecap:butt;
+fill:#ffffff;
+"/>
+<!-- Line -->
+<polygon points="3750,2700
+4500,3000
+3750,3300
+3750,2700
+" style="stroke:#000000;stroke-width:0;
+stroke-linejoin:miter; stroke-linecap:butt;
+fill:#ffffff;
+"/>
+<!-- Line -->
+<polyline points="4800,3000
+5100,3000
+" style="stroke:#000000;stroke-width:7;
+stroke-linejoin:miter; stroke-linecap:butt;
+"/>
+<!-- Arc -->
+<path style="stroke:#000000;stroke-width:7;stroke-linecap:butt;"
+d="M 3750,2700 A 375 375  0  0  1  3750  3300 " />
+<!-- Arc -->
+<path style="stroke:#000000;stroke-width:7;stroke-linecap:butt;fill:#ffffff"
+d="M 3750,2700 A 673 673  0  0  1  4500  3000 " />
+<!-- Arc -->
+<path style="stroke:#000000;stroke-width:7;stroke-linecap:butt;fill:#ffffff"
+d="M 3750,3300 A 673 673  0  0  0  4500  3000 " />
+<!-- Line -->
+<polyline points="4500,3000
+4800,3000
+" style="stroke:#000000;stroke-width:7;
+stroke-linejoin:miter; stroke-linecap:butt;
+"/>
+<!-- Line -->
+<polyline points="3525,3150
+3870,3150
+" style="stroke:#000000;stroke-width:7;
+stroke-linejoin:miter; stroke-linecap:butt;
+"/>
+<!-- Line -->
+<polyline points="3525,2850
+3870,2850
+" style="stroke:#000000;stroke-width:7;
+stroke-linejoin:miter; stroke-linecap:butt;
+"/>
+<!-- Arc -->
+<path style="stroke:#000000;stroke-width:7;stroke-linecap:butt;"
+d="M 3600,2700 A 375 375  0  0  1  3600  3300 " />
+<!-- Line -->
+<polyline points="5700,3000
+6000,3000
+" style="stroke:#000000;stroke-width:7;
+stroke-linejoin:miter; stroke-linecap:butt;
+"/>
+</g>
+</svg>
