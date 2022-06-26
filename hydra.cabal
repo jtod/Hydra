@@ -1,10 +1,6 @@
 cabal-version: 3.4
 name: hydra
-<<<<<<< HEAD
 version: 3.4.16
-=======
-version: 3.4.15
->>>>>>> 0f019b698764ae7a30fec5120de54e8f99c591c5
 synopsis: Computer hardware description language
 author: John T. O'Donnell
 copyright: (c) 2022 John T. O'Donnell
@@ -27,14 +23,14 @@ description: Hydra is a functional computer hardware description
              and emulate instruction set architectures.  Documentation
              includes a User Guide in the docs directory, an API
              reference in the dist directory, and a collection of
-             examples.  extra-doc-files: docs/HydraUserGuide/HydraUserGuide.html,
-                 docs/HydraUserGuide/HydraUserGuide.css
+             examples.
+
+extra-doc-files: UserGuide/HydraUserGuide.html,
+                 UserGuide/HydraUserGuide.css
              
 source-repository head
   type:     git
   location: https://github.com/jtod/Hydra
-
-
 
 library
   default-language: Haskell2010
