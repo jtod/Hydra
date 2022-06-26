@@ -1,0 +1,61 @@
+cabal-version: 3.4
+name: hydra
+<<<<<<< HEAD
+version: 3.4.16
+=======
+version: 3.4.15
+>>>>>>> 0f019b698764ae7a30fec5120de54e8f99c591c5
+synopsis: Computer hardware description language
+author: John T. O'Donnell
+copyright: (c) 2022 John T. O'Donnell
+maintainer: john.t.odonnell9@gmail.com
+license: GPL-3.0-only
+license-file: LICENSE.txt
+category: Language Hardware Circuit
+stability: experimental
+homepage: https://github.com/jtod/Hydra
+build-type: Simple
+tested-with: GHC == 9.2.3
+
+description: Hydra is a functional computer hardware description
+             language for specifying the structure and behavior of
+             synchronous digital circuits.  It supports several levels
+             of abstraction, including logic gates and flip flops,
+             register transfer level, datapath and control, and
+             processors.  It provides readable specifications of
+             circuits, and can simulate circuits, generate netlists,
+             and emulate instruction set architectures.  Documentation
+             includes a User Guide in the docs directory, an API
+             reference in the dist directory, and a collection of
+             examples.  extra-doc-files: docs/HydraUserGuide/HydraUserGuide.html,
+                 docs/HydraUserGuide/HydraUserGuide.css
+             
+source-repository head
+  type:     git
+  location: https://github.com/jtod/Hydra
+
+
+
+library
+  default-language: Haskell2010
+  build-depends:    base >= 4 && < 5,
+                    transformers >= 0.3 && < 0.6,
+                    mtl,
+                    containers,
+                    filepath,
+                    ansi-terminal,
+                    parsec
+  hs-source-dirs:   src
+  exposed-modules:
+                    HDL.Hydra,
+                    HDL.Hydra.Core.Lib,
+                    HDL.Hydra.Circuits.Combinational,
+                    HDL.Hydra.Circuits.Register
+  other-modules:    HDL.Hydra.Core.Signal,
+                    HDL.Hydra.Core.SigStream,
+                    HDL.Hydra.Core.CombTools,
+                    HDL.Hydra.Core.Driver,
+                    HDL.Hydra.Core.SigBool,
+                    HDL.Hydra.Core.PrimData,
+                    HDL.Hydra.Core.Pattern,
+                    HDL.Hydra.Core.RTL
