@@ -1,5 +1,6 @@
 -- SimpleCircdRun.hs:  simulation driver for SimpleCirc
--- This file is part of Hydra. John O'Donnell, 2021.  See Hydra/README
+-- This file is part of Hydra.  https://github.com/jtod/Hydra
+-- John T. O'Donnell, 2022
 
 module Main where
 import HDL.Hydra.Core.Lib
@@ -20,6 +21,27 @@ testdata1=
   , "1  1"   --  1
   ]
 
+main :: IO ()
+main = driver $ do
+-- Input data
+--  useData testdata1
+    --  Omitting the useData statement causes the driver to run in
+    --  interactive mode instead of batch mode.
+
+-- Inputs
+  x <- inPortBit "x"
+  y <- inPortBit "y"
+
+-- Circuit
+  let z = simpleCirc x y
+
+-- Output ports
+  outPortBit "z" z
+
+-- Run
+  runSimulation
+
+{- SimpleCircRun...
 main :: IO ()
 main = driver $ do
 -- Input data
@@ -44,3 +66,4 @@ main = driver $ do
          ]
 
   runSimulation
+-}
