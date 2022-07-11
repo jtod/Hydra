@@ -1,0 +1,23 @@
+<svg width="410" height="310"
+    xmlns="http://www.w3.org/2000/svg"
+    xmlns:xlink="http://www.w3.org/1999/xlink">
+  <title>gates</title>
+  <desc>logic gates</desc>
+<line x1="0" y1="0" x2="410" y2="0" style="stroke: green"/>
+<line x1="0" y1="0" x2="0" y2="310" style="stroke: green"/>
+<line x1="0" y1="310" x2="410" y2="310" style="stroke: green"/>
+<line x1="410" y1="0" x2="410" y2="310" style="stroke: green"/>
+<defs>
+<g id="inv" style="stroke:black">
+<line x1="15" y1="25" x2="15" y2="0"/>
+<line x1="15" y1="25" x2="50" y2="12.5"/>
+<line x1="15" y1="0" x2="50" y2="12.5"/>
+<line x1="0" y1="12.5" x2="15" y2="12.5"/>
+<circle  cx="54" cy="12.5" r="4" style="fill: none; stroke: black"/>
+<line x1="58" y1="12.5" x2="73" y2="12.5"/>
+</g>
+</defs>
+<text x="200" y="250">special</text>
+<use xlink:href="#inv" x="50" y="90" />
+<use xlink:href="#inv" x="200" y="200" />
+</svg>

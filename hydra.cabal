@@ -25,8 +25,8 @@ description: Hydra is a functional computer hardware description
              reference in the dist directory, and a collection of
              examples.
 
-extra-doc-files: UserGuide/HydraUserGuide.html,
-                 UserGuide/HydraUserGuide.css
+extra-doc-files: docs/UserGuide/HydraUserGuide.html,
+                 docs/doc.css
              
 source-repository head
   type:     git

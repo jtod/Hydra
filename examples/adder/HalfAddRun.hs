@@ -1,4 +1,6 @@
 -- HalfAddRun: simulation driver for half adder
+-- This file is part of Hydra.  https://github.com/jtod/Hydra
+-- John O'Donnell, 2022
 
 module Main where
 import HDL.Hydra.Core.Lib
@@ -15,19 +17,16 @@ main :: IO ()
 main = driver $ do
   useData testdata
 
--- Input ports
-  in_x <- inPortBit "x"
-  in_y <- inPortBit "y"
-  
--- Input signals
-  let x = inbsig in_x
-  let y = inbsig in_y
+-- Inputs
+  x <- inPortBit "x"
+  y <- inPortBit "y"
 
--- CIrcuit
+-- Circuit
   let (c,s) = myHalfAdd x y
 
--- Output ports
-  out_c <- outPortBit "c" c
-  out_s <- outPortBit "s" s
+-- Outputs
+  outPortBit "c" c
+  outPortBit "s" s
 
+-- Run
   runSimulation

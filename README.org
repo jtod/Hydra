@@ -1,4 +1,20 @@
-# Hydra: functional computer hardware description language
+# Hydra README
+# Copyright (c) 2022 John T. O'Donnell.
+# License: GNU GPL Version 3. See Hydra/README.md, LICENSE.txt
+
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="./docs/doc.css" />
+#+OPTIONS: toc:nil
+#+OPTIONS: num:nil
+
+#+BEGIN_EXPORT html
+<h1>Hydra README</h1>
+#+END_EXPORT
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="./docs/doc.css" />
+
+* About Hydra
+
+#+INCLUDE: "./VERSION.txt" export html
+#+INCLUDE: "./COPYRIGHT.txt" export html
 
 Hydra is a functional computer hardware description language for
 specifying the structure and behavior of digital circuits. It supports
@@ -8,182 +24,119 @@ for simulating circuits, generating netlists, and emulating
 instruction set architectures. It is an embedded domain specific
 language implemented using Haskell.
 
+- The /User Guide/ explains how to use the language; it is available
+  in [[./docs/UserGuide/HydraUserGuide.html]]
+- The /API reference/ gives types of the exported definitions.  If you
+  build using cabal, it will be in the the =dist-newstyle= directory.
+  The path depends on software versions, but may be something like
+  this:
+  [[./dist-newstyle/build/x86_64-windows/ghc-9.2.3/hydra-3.4.16/doc/html/hydra/index.html]].
+  If you install using cabal, it should also be placed in the standard
+  location for Haskell API references.
+
 This is free and open source software released under the GPL-3
 license.
 
-*** Documentation
+- Author: John T. O'Donnell, School of Computing Science, University
+  of Glasgow
+- Copyright (c) 2022 John T. O'Donnell
+- Author's home page: [[https://jtod.github.io/index.html]]
+- License: This software is free and open source, released under the
+  GPL-3 license.  See LICENSE.txt.
+- Source code repository: [[https://github.com/jtod/Hydra]]
+- Version: see Hydra.cabal
 
-There are several forms of documentation.
-- The user guide, available in docs/HydraUserGuide, gives a tutorial
-  explanation of how to use the software.
-- The API reference is in the dist-newstyle directory.  The exact
-  location depends on software versions, but looks something like
-  this:
+* Installation
 
-#+BEGIN_EXAMPLE
-\Hydra\dist-newstyle\build\x86_64-windows\ghc-9.2.3\hydra-3.4.15\doc\html\hydra\index.html
-#+END_EXAMPLE
-
-*** Installation
-
-**** Haskell
+** Install Haskell
 
 Hydra requires the ghc toolset for Haskell, including ghc and cabal.
-Haskell installers for Macintosh, Windows, and Linux are available
-at https://www.haskell.org/ghcup/
+Haskell installers for Macintosh, Windows, and Linux are available at
+[[https://www.haskell.org/ghcup/]].
 
 For Windows, an alternative approach is to use chocolatey; see
-https://hub.zhox.com/posts/introducing-haskell-dev/
-If you have chocolatey installed, you can use it to install Haskell
-easily.  Run in Windows PowerShell with administrator priveleges:
+[[https://hub.zhox.com/posts/introducing-haskell-dev/]].  If you have
+chocolatey installed, you can use it to install Haskell easily.  Run
+these commands in Windows PowerShell with administrator priveleges:
 
 #+BEGIN_EXAMPLE
 choco install ghc --force -y
 choco install cabal --force -y
 #+END_EXAMPLE
 
-If you have a previous installation, the following might work:
+- =-y= tells choco to answer with y automatically when it needs
+  permission to do something.  Without the -y, it doesn't actually ask
+  permission and the whole installation fails.
+- =--force= shouldn't be necessary but seems to be needed if
+  installing after a failed installation attempt.
+
+/Verify that Haskell is working/
+
+#+BEGIN_EXAMPLE
+$ ghc --version
+The Glorious Glasgow Haskell Compilation System, version 9.2.3
+$ cabal --version
+cabal-install version 3.6.2.0
+compiled using version 3.6.2.0 of the Cabal library
+#+END_EXAMPLE
+
+/In case of difficulty/
+
+If you have a previous installation of ghc, and a new installation
+fails, the following might work:
+
 #+BEGIN_EXAMPLE
 choco upgrade ghc cabal -y
 #+END_EXAMPLE
 
-For documentation, see  the User Guide in the docs directory.  This
-also explains how to install and run the software.
+** Install Hydra
 
-*** Installation
+The Hydra source code is available at [[https://github.com/jtod/Hydra]].
+See the Releases section on the right side of the page, click on the
+latest release, and download the source code file, which is available
+in both =zip= and =.tar.gz= format.  Put the file somewhere in your
+user workspace and unpack it, using the correct version number for
+your download:
 
-Unpack hydra directory
-cabal install --lib
+- On Linux: tar -xzf Hydra-3.5.1.tar.gz
+- On Windows use zip, 7zip or tar
 
-Troubleshooting: on Windows, if there is a previous version, delete
-the directory
-C:\Users\yourname\AppData\Roaming\cabal\store
-
-(more precisely, delete this, for the version of ghc you're using:
-C:\Users\johnt\AppData\Roaming\cabal\store\ghc-9.2.3
-
-other commands
-ghc-pkg list
-ghc-pkg unregister hydra-i.j.k
-
-Windows
-
-Run in Windows PowerShell with administrator priveleges
-
-choco install ghc --force -y
-choco install cabal --force -y
-
-- force shouldn't be necessary but seems to be needed if installing
-  after a failed installation attempt
-- -y is necessary; this tells choco to answer with y automatically
-  when it needs permission to do something.  Without the -y, it
-  doesn't actually ask permission, and the whole installation fails
-
-/Test the Haskell tools/
-=======
-- There is also choco upgrade ghc but this failed to work
-
-Enter Hydra directory and issue these commands:
-cabal v1-install
-
-Hydra requires the ghc implementation of Haskell.
-
-- Haskell installers for Macintosh, Windows, and Linux are available
-  at https://www.haskell.org/ghcup/
-- For Windows, an alternative approach is to use chocolatey; see
-  https://hub.zhox.com/posts/introducing-haskell-dev/
-
-Check that the Haskell tools are working:
-
-#+BEGIN_EXAMPLE
-$ ghc --version
-The Glorious Glasgow Haskell Compilation System, version 9.0.1
-$ cabal --version
-cabal-install version 3.4.0.0
-compiled using version 3.4.0.0 of the Cabal library
-#+END_EXAMPLE
-
-**** Install Hydra
-
-- Download the source from https://github.com/jtod/Hydra
-- Unzip the source file and put it anywhere in your workspace.
-  - On Linux: tar -xzf Hydra-i.j.k.tgz
-  - On Windows use zip, 7zip or tar
-- In you shell, go to the source directory and enter
+This will create a directory that contains the source code (=src=
+directory), documentation (=docs= directory and =examples= directory),
+and build tools.  Install using these commands:
 
 #+BEGIN_EXAMPLE
 cabal install --lib
 cabal haddock
 #+END_EXAMPLE
 
-/Test the installation/
+/Verify that Hydra is working/
 
-In your shell, go to Hydra/examples/adder and enter
-
-The Hydra source code is available at https://github.com/jtod/Hydra in
-either zip or tgz format.  Put the file somewhere in your user
-workspace and uppack it:
-
-- On Linux: tar -xzf Hydra-i.j.k.tgz
-- On Windows use zip, 7zip or tar
-
-The directory contains the source code, documentation, and a set of
-examples.  Install using these commands:
+The following commands should simulate a 4-bit word adder for several
+clock cycles, with different inputs during each cycle.
 
 #+BEGIN_EXAMPLE
-cabal v1-configure
-cabal v1-build
-cabal v1-haddock
-cabal v1-install
+$ cd examples/adder
+$ ghc -e main Add4Run
 #+END_EXAMPLE
 
-Test that it's working. In your shell, go to Hydra/examples/adder and
-enter:
+/In case of difficulty/
+
+If the installation fails on Windows, delete the following directory
+(with your username and the right version numbers for ghc and hydra)
+and try again:
 
 #+BEGIN_EXAMPLE
-ghc -e main Add4Run
+C:\Users\username\AppData\Roaming\cabal\store\ghc-9.2.3\hydra-3.5.1-hash
 #+END_EXAMPLE
 
-This should produce several lines of simulation output showing inputs
-to the adder circuit and the corresponding outputs.
+See the user guides for ghc and cabal for more information.  The
+=ghc-pkg list= command shows the installed packages.
 
-/Troubleshooting/
+/Some alternative ways to run circuit simulations/
 
-On Windows: If cabal fails, delete this directory and try again:
-#+BEGIN_EXAMPLE
-C:\Users\yourname\AppData\Roaming\cabal\store
-#+END_EXAMPLE
+/Using ghci/
 
-Additional useful commands; see the ghc User Guide:
-#+BEGIN_EXAMPLE
-ghc-pkg list
-ghc-pkg unregister hydra-i.j.k
-#+END_EXAMPLE
+/Using cabal/
 
-There are several forms of documentation.
-- [[docs/HydraUserGuide/HydraUserGuide.html][User Guide]] This is
-  available in docs/HydraUserGuide
-- [[dist\doc\html\hydra\index.html][API reference]] The file is in
-  dist\doc\html\hydra\index.html
-
-*** Sigma16
-
-*** Haskell installation
-
-Windows
-Run in PowerShell with admin privilege
-choco upgrade ghc cabal -y
-
-** About Hydra
-
-- Author: John T. O'Donnell, School of Computing Science, University
-  of Glasgow
-- Copyright (c) 2022 John T. O'Donnell
-- License: This software is free and open source, using the GPL-3
-  license.  See LICENSE.txt.
-- Version: see Hydra.cabal
-- Hydra web page: https://github.com/jtod/Hydra
-- Author's web page: https://jtod.github.io/index.html
-- Hydra web page: https://github.com/jtod/Hydra
-- Author's web page: https://jtod.github.io/index.html
-- Version: see Hydra.cabal
+/Running Hydra without installing it/

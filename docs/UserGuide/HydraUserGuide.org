@@ -1,8 +1,10 @@
-# Hydra User Guide
-# Copyright (c) 2022 John T. O'Donnell.
-# License: GNU GPL Version 3. See Hydra/README.md, LICENSE.txt
+#+TITLE: Hydra User Guide
+#+AUTHOR: John T. O'Donnell
+# Copyright (c) 2022 John T. O'Donnell
 
-# This file is part of Sigma16.  Hydra is free software: you can
+# License: GNU GPL Version 3. See Hydra/README, LICENSE.txt
+
+# This file is part of Hydra.  Hydra is free software: you can
 # redistribute it and/or modify it under the terms of the GNU General
 # Public License as published by the Free Software Foundation, either
 # version 3 of the License, or (at your option) any later version.
@@ -14,13 +16,8 @@
 # see <https://www.gnu.org/licenses/>.
 
 #+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../doc.css" />
+
 #+OPTIONS: toc:nil
-#+OPTIONS: num:nil
-
-#+BEGIN_EXPORT html
-<h1>Hydra User Guide</h1>
-#+END_EXPORT
-
 #+INCLUDE: "../../VERSION.txt" export html
 #+INCLUDE: "../../COPYRIGHT.txt" export html
 #+TOC: headlines:3
@@ -111,8 +108,6 @@ must be software".  That's doubly wrong: visual programming languages
 use pictures to describe software, and hardware description languages
 like Hydra use text to describe hardware.
 
-
-
 ** Modeling circuits as functions
 
 Some HDLs are based on imperative programming languages, using the
@@ -139,12 +134,763 @@ best to think of Hydra as a distinct language: designing a circuit is
 not the same as writing a program in Haskell, and some Haskell
 programs don't correspond to circuits.
 
-* Installation
+* README
 
-foo #+INCLUDE: "../../README.org"
+#+INCLUDE: "../../README.org"
 
 
-* Tutorial
+* Connecting components with signals
+
+A data value in a circuit is called a *signal*.  A signal is carried
+by a wire, and it transmits information from one component to another.
+In logic design we don't usually care about the physical
+characteristics of a wire, although these can be important at the
+lower levels of chip design.  Therefore we will usually refer to
+signals rather than wires.
+
+The information carried by a signal may be represented as an
+individual bit or a cluster comprising several bits.  We can also
+describe circuits at a higher level, where signals represent integers
+or other data types.
+
+A bit (binary digit) can have one of two distinct values.  Several
+names are commonly used for these values, including 0/1, Low/High,
+False/True, and F/T.  In real hardware a bit signal is represented by
+a voltage, but the precise voltage value is unimportant at the level
+of logic design.  The particular names chosen for the two bit values
+are also unimportant, although they can affect the readability of a
+table showing the behavior of a circuit.  When Hydra prints out the
+values of bit signals, it will normally use 0 and 1, but you can tell
+it to use False and True, or any other names you prefer.  One
+advantage of 0/1 is that they are consistent with treating a bit as a
+binary digit (False/True suggest treating a bit as a Boolean).
+Another advantage of 0 and 1 is that they take up only one character
+and they look different.  (Try reading a table showing thousands of F
+and T characters -- they can be hard to tell apart!).
+
+** Logic gates
+
+To design a new circuit, you need to take a set of existing circuits
+and connect them with signals.  There are several libraries of
+existing circuits that you can start with, and you can also define
+libraries of your own circuits for further use.  The Hydra libraries
+provide as primitives the standard logic gates, summarised in the
+following table.
+
+The buffer simply produces an output that is the same as the input; it
+is the identify function.  The inverter outputs 0 if its input is 1,
+and outputs 1 if its input is 0.
+
+Many of the logical operations can be performed on any number of
+inputs.  For example, there is the logical conjunction (*and*) of two,
+three, or four inputs.  These correspond to distinct logic gates: the
+*and2* gate has two input ports and there is no way to connect three
+inputs to it.  Therefore Hydra doesn't have an *and* gate; it has
+distinct *and2*, *and3*, *and4* gates.  This doesn't go on
+indefinitely; Hydra does not define the *and5* gate or the *and73*
+gate!  (A convenient way to *and* together large number of inputs is
+to use *andw*.)
+
+Component          Description
+----------------   -----------------------
+buf a              buffer
+inv a              inverter
+and2 a b           2-input and gate
+and3 a b c         3-input and gate
+and4 a b c d       4-input and gate
+or2 a b            2-input or gate
+or3 a b c          3-input or gate
+or4 a b c d        4-input or gate
+xor2 a b           2-input xor gate
+xor3 a b c         3-input xor gate
+xor4 a b c d       4-input xor gate
+nand2 a b          2-input nand gate
+nand3 a b c        3-input nand gate
+nand4 a b c d      4-input nand gate
+nor2 a b           2-input nor gate
+nor3 a b c         3-input nor gate
+nor4 a b c d       4-input nor gate
+xnor2 a b          2-input xnor gate
+xnor3 a b c        3-input xnor gate
+xnor4 a b c d      4-input xnor gate
+
+Most of these logic gates are provided for convenience, but only a few
+of them are necessary.  For example, you can replace *and3 a b c* by
+*and2 a (and2 b c)*.  However, logic gates with several inputs can be
+fabricated on chips, they are slightly more efficient, and most
+importantly, it's more readable to use *and3* rather than two *and2*
+gates.
+
+** Connecting a circuit to inputs
+
+Suppose we have two signals named *x* and *y*, and want to connect
+them to the inputs of an *or2* gate.  This is done by writing the name
+of the component, followed by the names of the input signals:
+
+#+BEGIN_EXAMPLE
+or2 x y
+#+END_EXAMPLE
+
+The value of this expression is the output of the *or2* gate.  Such an
+expression is called an *application* because the component is applied
+to its input signals.
+
+Each circuit takes a specific number of inputs, and an application
+using that circuit must supply the corresponding number of input
+signals.  Here are several applications of logic gates, each with the
+right number of inputs.
+
+#+BEGIN_EXAMPLE
+inv x
+and2 a one
+xor3 p q r
+nor4 a zero c d
+#+END_EXAMPLE
+
+** Anonymous signals
+
+A signal may be given a name, such as *x* or *y*, although this is
+optional.  You can also refer to a signal using an application of a
+component to its inputs, such as *inv x*; the output of the inverter
+is an anonymous signal as it has no name.
+
+An anonymous signal is described by an expression with several tokens.
+When you use it as an input to a circuit, this expression must be
+enclosed by parentheses, to turn it into a single object.  For
+example, suppose we want to connect the first input to an *and2* gate
+to the output of an inverter whose input is *x*.  The second input to
+the *and2* gate should be *y*.  Here is the correct way to write it:
+
+#+BEGIN_EXAMPLE
+and2 (inv x) y
+#+END_EXAMPLE
+
+There are two expressions following *and2*, denoting its two inputs.
+The following notation would be wrong:
+
+#+BEGIN_EXAMPLE
+and2 inv x y   -- Wrong!
+#+END_EXAMPLE
+
+Here, it looks like the *and2* gate is being given three inputs, and
+the first one isn't even a signal.
+
+Parentheses are used in Hydra for grouping, just as in mathematics.
+You don't need to use parentheses just to specify the arguments to a
+function (that is, the inputs to a circuit).  Some programming
+languages requires lots of punctuation to indicate function
+application:
+
+#+BEGIN_EXAMPLE
+nand3 (x, and2 (p,q), z);   -- Wrong!
+#+END_EXAMPLE
+
+
+In Hydra (as in Haskell) you don't need the extra parentheses and
+commas, and they will lead to error messages.  Use parentheses only
+when they are necessary to get the right grouping:
+
+#+BEGIN_EXAMPLE
+nand3 x (and2 p q) z
+#+END_EXAMPLE
+
+It can be helpful to give both a schematic diagram and a textual
+specification for a circuit.  Each form of description provides
+insight, and having both together is often worthwhile.  It's important
+to check that the two descriptions of the circuit are consistent with
+each other.  To do this, check that every box in the diagram
+corresponds to a circuit (function) in the text, and check that the
+wires in the diagram correspond to the signals in the text.
+
+** Named signals and equations
+
+Sometimes it's useful to give a name to a signal, rather than using it
+anonymously.  A named signal can be used as an input to several
+different components, but an anonymous signal cannot.  Names can also
+make it easier to explain the circuit, and well chosen names help
+document the purpose of a signal.
+
+A signal can be named using an equation.  The left hand side of the
+equation is the name, and the right hand side is an expression that
+defines the signal.  The following equation says that the output of
+the *and3* gate has the name *x*.
+
+#+BEGIN_EXAMPLE
+x = and3 a (inv b) c
+#+END_EXAMPLE
+
+Sometimes the choice between anonymous and named signals is just a
+matter of style.  Here is a signal defined using three anonymous
+signals:
+
+#+BEGIN_EXAMPLE
+x = nand2 (xor2 a b) (inv (nor2 c d))
+#+END_EXAMPLE
+
+This can be rewritten so as to give every signal an explicit name, by
+introducing additional equations:
+
+#+BEGIN_EXAMPLE
+x = nand2 p q
+p = xor2 a b
+q = inv r
+r = nor2 c d
+#+END_EXAMPLE
+
+An equation like this is called a *defining equation*, because the
+left hand side has to be a signal name whose value is defined to be
+the right hand side.  It would be wrong, for example, to write
+
+
+#+BEGIN_EXAMPLE
+nand2 p q = x   -- Wrong!
+#+END_EXAMPLE
+
+
+When using *equational reasoning* you will encounter equations with a
+more general form, but in defining signals, the left hand side is
+always a signal name.
+
+** Constant signals
+
+A constant signal always carries the same value: either it is always
+0, or always 1.  The names of these two constants are written as
+*zero* and *one*.  Names in Hydra always begin with a lower case
+letter, never with a digit.  Don't use 0/1, or T/F, or True/False in a
+circuit specification; those notations have other meanings and will
+lead to bizarre error messages.
+
+** Connecting several logic gates: mux1
+
+So far we have just looked at a circuit comprising a single logic
+gate.  The next step is to define circuits with several gates and
+wires.
+
+Files: *examples/mux/Mux1.hs* and *examples/mux/Mux1Run.hs*
+
+The *multiplexer* is an example of a circuit that can be defined by
+conecting several logic gates together.  It's not just an arbitrary
+example: the multiplexer is one of the most important building blocks
+for larger systems.  There are many varieties of multiplexer; here we
+look at the 1-bit multiplexer, called *mux1*.
+
+A multiplexer is a hardware version of the if-then-else expression,
+and is used to perform conditional actions in a circuit.  It takes
+three inputs: a control input *c*, and two data inputs *x* and *y*.
+
+The idea is that the multiplexer will choose one of the data inputs
+(*x* or *y*) and output it.  The data input that is not chosen is
+simply ignored.  The choice is determined by the value of *c*.
+Informally, the behavior of the multiplexer is:
+
+#+BEGIN_EXAMPLE
+mux1 c x y = if c is zero then x else y
+#+END_EXAMPLE
+
+(Aside: Sometimes it's helpful to describe some signals as *control
+signals* because they affect what the circuit does, and to describe
+others as *data signals* because they carry variable values.  Since
+the behavior of the mux1 is controlled by *c*, this is a control
+input.  Since *x* and *y* are just arbitrary values, these are called
+data signals.  But it's important to realise that this terminology --
+control and data signal -- is just a way of talking about the signals.
+As far as the actual components and wires are concerned, there is no
+difference between data and control.)
+
+This if-then-else expression is a programming construct, and it
+doesn't directly correspond to digital hardware.  The multiplexer can
+be implemented with logic gates.
+
+To connect a circuit to an input, write the circuit followed by the
+input.  Thus *inv c* says there is an inverter, and its input is
+connected to *c*, and the entire expression *inv c* denotes the output
+signal produced by the inverter.  Similarly, *and2 (inv c) a* denotes
+the output of an and2 gate; its first input is the output of the
+inverter and its second input is *a*.
+
+#+BEGIN_EXAMPLE
+mux1 c x y = or2 (and2 (inv c) x) (and2 c y)
+#+END_EXAMPLE
+
+Here is the complete module defining the multiplexer:
+
+#+NAME: mux1
+#+BEGIN_SRC hydra :tangle ../../examples/mux/Mux1.hs
+module Mux1 where
+import HDL.Hydra.Core.Lib
+
+mux1 is defined in the Hydra circuit libraries, so here the circuit
+is called mymux1 to ensure that we're actually testing this
+definition
+
+mymux1 :: Bit a => a -> a -> a -> a
+mymux1 c x y = or2 (and2 (inv c) x) (and2 c y)
+#+END_SRC
+
+#+NAME: mux1-driver
+#+BEGIN_SRC hydra :tangle ../../examples/mux/Mux1Run.hs
+module Main where
+-- Mux1Run: test the mux1 circuit
+
+import HDL.Hydra.Core.Lib
+import Mux1
+
+main :: IO ()
+main = mux1Run testdata
+
+testdata :: [[Int]]
+testdata =
+-----------------------------------------
+--   c  x  y       expected result
+-----------------------------------------
+  [ [0, 0, 0]  --  0  (c=0 so output=x)
+  , [0, 0, 1]  --  0  (c=0 so output=x)
+  , [0, 1, 0]  --  1  (c=0 so output=x)
+  , [0, 1, 1]  --  1  (c=0 so output=x)
+  , [1, 0, 0]  --  0  (c=1 so output=y)
+  , [1, 0, 1]  --  1  (c=1 so output=y)
+  , [1, 1, 0]  --  0  (c=1 so output=y)
+  , [1, 1, 1]  --  1  (c=1 so output=y)
+  ]
+
+mux1Run input = runAllInput input output
+  where
+-- Extract input signals  
+    c = getbit input 0
+    x = getbit input 1
+    y = getbit input 2
+-- The circuit to be simulated
+    z = mymux1 c x y
+-- Format the output
+    output =
+      [string "  c=", bit c,
+       string "  x=", bit x,
+       string "  y=", bit y,
+       string "    output z=", bit z
+      ]
+#+END_SRC
+
+We can run it with a simulation driver that runs the circuit on all
+possible inputs, so the outputs form a truth table.  It's good
+practice to write the test data with clean indentation, so the inputs
+line up in columns, and to include the expected outputs in comments.
+
+See examples/mux/Mux1Run.hs')
+
+** Producing several outputs: halfAdd
+
+The circuits we have looked at so far have just one output.  We need a
+way to allow circuits to produce any number of outputs.
+
+Files: *examples/adder/HalfAdd.hs* and *examples/adder/HalfAddRun.hs*
+
+A half adder circuit takes two inputs *x* and *y*, and produces a pair
+of outputs, the carry output and the sum output.  The carry is the
+logical *and* of *x* and *y*, while the sum is their exclusive *or*.
+Here is the circuit specification (file *HalfAdd.hs*):
+
+The module statement gives a name to this module, and the import
+statement brings in the essential Hydra library definitions.  The
+circuit definition is a one-line equation which says *halfAdd* is a
+circuit, gives names *x* and *y* to its inputs, and calculates the
+outputs using *and2* and *xor2* logic gates.
+
+To see the circuit working, we can simulate it.  This requires
+three things, all provided in *HalfAddRun.hs*:
+
+  * Suitable test data, expressed as a list of *[x,y]* inputs
+
+  * A [Simulation driver](#simulation-drivers), which converts between
+    human readable input and output and the internal signal
+    representations.  The simulation driver is not part of the
+    circuit; it's simply formatting inputs and outputs.
+
+  * A main program that runs the simulation driver on the test data.
+
+See `examples/adder/HalfAddRun.hs'
+
+Run the simulation using any of the methods given above, e.g. enter
+*ghc -e main HalfAddRun*.  Here is the result:
+
+#+BEGIN_EXAMPLE
+$ ghc -e main HalfAddRun
+Input: x = 0 y = 0  Output: c = 0 s = 0
+Input: x = 0 y = 1  Output: c = 0 s = 1
+Input: x = 1 y = 0  Output: c = 0 s = 1
+Input: x = 1 y = 1  Output: c = 1 s = 0
+#+END_EXAMPLE
+
+* Defining new circuits
+
+A new circuit can be designed by connecting together a number of
+existing ones.  The examples given so far consist of logic gates,
+which are primitive components.  To design larger scale systems, we
+need the ability to define a circuit as a new *black box* component
+and reuse it.  This is similar to using abstraction in a programming
+language by defining a function or procedure for a commonly used
+computation.  A circuit definition contains up to three parts:
+
+  1. Circuit type (optional)
+
+  2. Interface (mandatory)
+
+  3. Internal signals (optional)
+
+** Circuit type
+
+The circuit type is covered in a later section.  It's optional,
+although it is generally best to include it.  If present, the type can
+be recognized by the :: symbol and a number of right arrow symbols; a
+typical example is
+
+#+BEGIN_EXAMPLE
+halfAdd :: Bit a => a -> a -> (a,a)
+#+END_EXAMPLE
+
+
+** Black box with internal signals: add4
+
+Files: *adder/Add4.hs* and *examples/Add4Run.hs*
+
+#+BEGIN_EXAMPLE
+*Main> :main
+  x =  5  y =  8  cin = 0    ==>    cout = 0  s = 13
+  x =  7  y =  3  cin = 0    ==>    cout = 0  s = 10
+  x =  8  y = 12  cin = 0    ==>    cout = 1  s =  4
+  x =  8  y =  1  cin = 0    ==>    cout = 0  s =  9
+  x = 12  y =  1  cin = 1    ==>    cout = 0  s = 14
+  x =  2  y =  3  cin = 1    ==>    cout = 0  s =  6
+  x = 15  y = 15  cin = 1    ==>    cout = 1  s = 15
+(0.00 secs, 252,808 bytes)
+*Main>
+#+END_EXAMPLE
+
+** Signal and circuit types
+
+The *type* of a value determines what operations you can perform on
+it.  This holds for hardware description just as for programming.  The
+type of a signal determines what kind of information it carries, and
+the type of a circuit specifies the types and organisation of its
+input and output signals.
+
+A circuit has an interface to the outside world, and an internal
+organization.  To use the circuit, all we need to know about is the
+interface: what inputs need to be provided and what the outputs mean.
+The type expresses a useful portion of this information: it describes
+the number and organization of the inputs and outputs.  The meanings
+of the circuit outputs are not specified by the type; they should be
+described in documentation for the circuit.  Since Hydra models a
+circuit as a function, a circuit type looks just like a function type.
+
+The type declaration for a circuit is optional, as the compiler can
+work out the type for itself.  If you omit the type, your circuit will
+still run.  However, there are several benefits in writing out the
+type explicitly:
+
+- The type gives useful information about the interface to the
+  circuit.  Later on, if you want to use this circuit in a larger one,
+  you will be more interested in the interface than the internal
+  components inside the circuit.
+
+- There is some redundancy between the type and the defining
+  equation.  If there is any inconsistency between the two, the
+  compiler will give a type error message.  That may be annoying, but
+  at least you know that the error lies somewhere in the (small)
+  specification of this one circuit.  If you omit the type
+  declaration, but there is an error in the defining equation, you may
+  get an error message that says, in effect, ``there is an error
+  somewhere in the (large) file'', but it's up to you to figure out
+  *where* the error is.
+
+- If you do get a type error message, the compiler will do its
+  best to give a helpful and informative message.  In practice,
+  though, the error messages will be far more understandable if you
+  include type declarations for your circuits.
+
+If present, the type of a circuit should come immediately before the
+defining equation.  Type declarations are easily recognizable: they
+always contain the symbol *::*, and usually contain some arrows *=>*
+and *->*.  A typical example is
+
+#+BEGIN_EXAMPLE
+reg1 :: CBit a => a -> a
+#+END_EXAMPLE
+
+
+A type declaration contains several parts:
+
+  * The circuit name (e.g. reg1)
+  * The :: symbol, read as "has type"
+  * The signal class ending with => (e.g. CBit a =>)
+  * The input and output signal types (e.g. a -> a)
+
+*** Signal types and classes
+
+*Short version.* If you're writing a routine circuit and just want to
+simulate it, you can just write *CBit a =>* for the signal class
+constraint and then use *a* as the type for every bit signal.  In more
+complicated situations, or if you want to know what this means, read
+on.
+
+When a circuit specification is executed, each signal has a specific
+type.  Many types can be used, for example *Bool* or *Stream Lattice*.
+The choice of type determines what happens during execution.  Some
+types lead to combinational simulation, others lead to synchronous
+simulation, others perform a path depth analysis, or generate a
+netlist.
+
+It's possible to define a circuit with a specific type, and if you do
+this the class constraint (the part before =>) is omitted.  For
+example, we could define a Bool version of the mux1 circuit (call it
+halfAddB) to operate in signals of type Bool:
+
+#+BEGIN_EXAMPLE
+halfAddB :: Bool -> Bool -> (Bool,Bool)
+halfAddB x y = (and2 x y, xor2 x y)
+#+END_EXAMPLE
+
+
+This is a little simpler than the standard definition halfAdd, which
+(1) uses the type class constraint Bit a =>, and (2) uses *a* rather
+than *Bool* as the bit signal type.
+
+*** Combinational signals: Bit a
+
+#+BEGIN_EXAMPLE
+halfAdd :: Bit a => a -> a -> (a,a)
+halfAdd x y = (and2 x y, xor2 x y)
+#+END_EXAMPLE
+
+
+The main disadvantage of using Bool as the signal type is that
+combinational simulation is the *only* thing you can do with the
+circuit.  However, Hydra provides many other options.  For example,
+you can perform synchronous simulations over many clock cycles, but to
+do that, the signals must have a different type.  You can do these
+other things with *halfAdd*, but not with *halfAddB*.
+
+There are several different types that can be used to represent a
+signal.  These are organized into two main sets: *Bit* and *CBit*.
+*Bit* is used for combinational circuits, and *CBit* ("clocked bit")
+is used for sequential circuits.
+
+signal.  The notation *Bit a =>* means that *a* can be any type in the
+set *Bit*, and therefore all of the Bit operations can be performed on
+a signal of type *a*.
+
+The commonest signal class constraints are:
+
+  * *Bit a =>* is used when *a* is a bit signal in a combinational
+    circuit.  The circuit may contain logic gates, but not flip flops.
+
+  * *CBit a =>* is used when *a* is a bit signal in a sequential
+    circuit, which may contain flip flops and feedback loops as well
+    as logic gates.
+
+*** Clocked signals: CBit a
+
+The signal class constraint 
+Classes
+
+Base signal types
+
+  * Bool    (defined in Haskell standard libraries)
+
+  * Word16  (defined in Haskell standard libraries)
+
+  * Word32  (defined in Haskell standard libraries)
+
+  * Lattice (defined in Hydra Core library)
+
+*** Inputs and outputs
+
+After the signal class (i.e. after the *=>* symbol) come the types of
+the inputs and output of the circuit.  In the simplest case, each
+input or output signal is just a bit of type *a*.  There may be any
+number of input arguments, and there must be one output result.  A
+single arrow *->* must follow each input; thus the number of single
+arrows in the type is the same as the number of inputs.
+
+The inverter has one input of type *a*, which is followed by *->*, and
+the type *a* of the output appears last.  The type declaration can be
+read as "inv uses signals in the Bit class; it takes one input and
+produces one output":
+Thus the entire type declaration ``*inv :: Bit a => a -> a*'' says
+``*inv* is a circuit that takes an input bit signal, and produces an
+output bit signal.''
+
+#+BEGIN_EXAMPLE
+inv :: Bit a => a -> a
+#+END_EXAMPLE
+
+
+The notation *a -> a* means "the circuit takes an input signal and
+produces an output signal".  This is similar to conventional
+mathematical notation; for example in mathematics there is a function
+*im* that is given a complex number (type $C$) and returns its
+imaginary part (type $R$), and a mathematician might write its type as
+im : C -> R.  (The reason :: is used in Haskell (and Hydra) is that :
+is used for something else.)
+
+Circuits that take several inputs have a slightly more complicated
+type.  For example, here are the types for the family of and-gates:
+
+#+BEGIN_EXAMPLE
+and2 :: Bit a => a -> a -> a
+and3 :: Bit a => a -> a -> a -> a
+and4 :: Bit a => a -> a -> a -> a -> a
+#+END_EXAMPLE
+
+There is always one output, but any number of inputs, and every input
+is followed by *->*.  To find out how many inputs a circuit takes,
+just count the number of times *->* appears in its type.
+
+If a circuit has several outputs, they must be enclosed in a
+container, and this is reflected in the type.  See the section on
+Containers.
+
+** Interface
+
+The interface gives the name of the circuit and names its inputs and
+outputs.  A circuit is created with a *circuit defining equation*.
+The left hand side of the equation is the name of the circuit followed
+by the names of the input signals.  There may be any number of inputs.
+The right hand side is an expression giving the value of the output
+signal:
+
+
+#+BEGIN_EXAMPLE
+circ_name input1 input2 = expression
+#+END_EXAMPLE
+
+This defines a circuit whose name is *circ_name*, which takes two
+inputs named *input1* and *input2*, and produces an output with the
+specified signal value.  Here is an example:
+
+#+BEGIN_EXAMPLE
+mycirc a b c = and3 a (inv b) c
+#+END_EXAMPLE
+
+
+The input names *a*, *b*, and *c*, are local to the definition of
+*mycirc*, and they can be used to calculate the value of the output.
+Another circuit can connect signals with arbitrary names, or no names
+at all, to the inputs of *mycirc*.
+
+** Internal signals
+
+This part of a definition is optional; if present it follows the
+*where* keyword.
+
+The expression that defines the circuit's output can become fairly
+complicated, and it's often simpler to define it using several other
+named signals.  Each of these needs a defining equation which is
+inside the circuit.  To do this, write the keyword *where* after the
+equation, and after the *where* you can write any number of signal
+defining equations.  The general form is:
+
+
+#+BEGIN_EXAMPLE
+circuit_name input1 input2 = output
+  where
+    output = ...
+    x = ... (internal signals...)
+    y = ...
+#+END_EXAMPLE
+
+Here is an example of a circuit named c22 that takes three inputs and
+produces one output.
+
+#+BEGIN_EXAMPLE
+c22 a b c = x
+  where
+    x = xor2 p q
+    p = and2 a b
+    q = or2 b c
+#+END_EXAMPLE
+
+
+The equations should be indented consistently, and there is no extra
+punctuation (no curly braces, no semicolons).  The compiler determines
+the structure of a definition from the indentation, not from
+punctuation.  Therefore the indentation is essential, and if it's
+wrong then the specification will be parsed incorrectly.
+
+** Multiple outputs
+
+** Feedback
+
+A register is a circuit with an internal state, and with the ability
+to load an external value into the state and to read out the state.
+
+
+
+#+NAME: reg1
+#+BEGIN_SRC ghci :tangle ../../examples/register/Reg1.hs
+module Reg1 where
+import HDL.Hydra.Core.Lib
+import HDL.Hydra.Circuits.Combinational
+
+reg1 :: CBit a => a -> a -> a
+reg1 ld x = r
+  where r = dff (mux1 ld r x)
+#+END_SRC
+
+The reg1 circuit has a feedback loop: the output of the flip flop is
+connected to one of the inputs to the mux1, whose output in turn is
+input to the flip flop.  Hydra does not allow feedback loops in pure
+combinational logic, but feedback that goes through a flip flop is
+fine.  When a circuit contains a feedback loop, there will be a
+circular path in the schematic diagram, and there will be circular
+equations in its specification.  For the reg1 circuit. the feedback
+loop can be seen in the equation which has r on both the left and
+right hand side.  Thus r is being defined in terms of itself.  The way
+this works, and the reason that r is well-defined, is explained in the
+section on circuit semantics.
+
+#+BEGIN_SRC ghci :tangle ../../examples/register/Reg1Run.hs
+-- Simulation driver for reg1
+module Main where
+import HDL.Hydra.Core.Lib
+import Reg1
+
+main :: IO ()
+main = do
+  runReg1 testdata
+
+testdata :: [[Int]]
+testdata =
+------------------------
+--  ld  x       output
+------------------------
+  [ [1, 1],  -- 0  output in cycle 0 is initial state
+    [0, 0],  -- 1  state changed to 1 at tick between cycles 0/1
+    [0, 1],  -- 1  no change
+    [0, 0],  -- 1  no change
+    [1, 0],  -- 1  still see 1 but at end of cycle, set state to 0
+    [0, 0],  -- 0 during this cycle can see result of state change
+    [1, 1],  -- 0 but set state to 1 on tick at end of cycle
+    [1, 0],  -- 1 the 1 becomes visible in this cycle
+    [0, 0],  -- 0 the 0 now becomes visible
+    [0, 0],  -- 0 no change
+    [0, 0]   -- no comma after last element of list
+  ]
+
+runReg1 input = runAllInput input output
+  where
+-- Input signals
+    ld = getbit input 0
+    x  = getbit input 1
+-- Circuit
+    y = reg1 ld x
+-- Format the input and output signals
+    output =
+      [string "Input ld = ", bit ld,
+       string " x = ", bit x,
+       string "   Output = ", bit y]
+#+END_SRC
+
+* Circuit simulation
 
 This section shows several examples of circuits of increasing
 complexity.  You should be able to design and simulate some circuits on
@@ -441,182 +1187,6 @@ You can try out both approaches with the SimpleCircRun driver.  It
 contains a useData, so it will run in batch mode.  But if you comment
 out the useData, the driver will revert to interactive mode.
 
-** Connecting several logic gates: mux1
-
-So far we have just looked at a circuit comprising a single logic
-gate.  The next step is to define circuits with several gates and
-wires.
-
-Files: *examples/mux/Mux1.hs* and *examples/mux/Mux1Run.hs*
-
-The *multiplexer* is an example of a circuit that can be defined by
-conecting several logic gates together.  It's not just an arbitrary
-example: the multiplexer is one of the most important building blocks
-for larger systems.  There are many varieties of multiplexer; here we
-look at the 1-bit multiplexer, called *mux1*.
-
-A multiplexer is a hardware version of the if-then-else expression,
-and is used to perform conditional actions in a circuit.  It takes
-three inputs: a control input *c*, and two data inputs *x* and *y*.
-
-The idea is that the multiplexer will choose one of the data inputs
-(*x* or *y*) and output it.  The data input that is not chosen is
-simply ignored.  The choice is determined by the value of *c*.
-Informally, the behavior of the multiplexer is:
-
-#+BEGIN_EXAMPLE
-mux1 c x y = if c is zero then x else y
-#+END_EXAMPLE
-
-(Aside: Sometimes it's helpful to describe some signals as *control
-signals* because they affect what the circuit does, and to describe
-others as *data signals* because they carry variable values.  Since
-the behavior of the mux1 is controlled by *c*, this is a control
-input.  Since *x* and *y* are just arbitrary values, these are called
-data signals.  But it's important to realise that this terminology --
-control and data signal -- is just a way of talking about the signals.
-As far as the actual components and wires are concerned, there is no
-difference between data and control.)
-
-This if-then-else expression is a programming construct, and it
-doesn't directly correspond to digital hardware.  The multiplexer can
-be implemented with logic gates.
-
-To connect a circuit to an input, write the circuit followed by the
-input.  Thus *inv c* says there is an inverter, and its input is
-connected to *c*, and the entire expression *inv c* denotes the output
-signal produced by the inverter.  Similarly, *and2 (inv c) a* denotes
-the output of an and2 gate; its first input is the output of the
-inverter and its second input is *a*.
-
-#+BEGIN_EXAMPLE
-mux1 c x y = or2 (and2 (inv c) x) (and2 c y)
-#+END_EXAMPLE
-
-Here is the complete module defining the multiplexer:
-
-#+NAME: mux1
-#+BEGIN_SRC hydra :tangle ../../examples/mux/Mux1.hs
-module Mux1 where
-import HDL.Hydra.Core.Lib
-
-mux1 is defined in the Hydra circuit libraries, so here the circuit
-is called mymux1 to ensure that we're actually testing this
-definition
-
-mymux1 :: Bit a => a -> a -> a -> a
-mymux1 c x y = or2 (and2 (inv c) x) (and2 c y)
-#+END_SRC
-
-#+NAME: mux1-driver
-#+BEGIN_SRC hydra :tangle ../../examples/mux/Mux1Run.hs
-module Main where
--- Mux1Run: test the mux1 circuit
-
-import HDL.Hydra.Core.Lib
-import Mux1
-
-main :: IO ()
-main = mux1Run testdata
-
-testdata :: [[Int]]
-testdata =
------------------------------------------
---   c  x  y       expected result
------------------------------------------
-  [ [0, 0, 0]  --  0  (c=0 so output=x)
-  , [0, 0, 1]  --  0  (c=0 so output=x)
-  , [0, 1, 0]  --  1  (c=0 so output=x)
-  , [0, 1, 1]  --  1  (c=0 so output=x)
-  , [1, 0, 0]  --  0  (c=1 so output=y)
-  , [1, 0, 1]  --  1  (c=1 so output=y)
-  , [1, 1, 0]  --  0  (c=1 so output=y)
-  , [1, 1, 1]  --  1  (c=1 so output=y)
-  ]
-
-mux1Run input = runAllInput input output
-  where
--- Extract input signals  
-    c = getbit input 0
-    x = getbit input 1
-    y = getbit input 2
--- The circuit to be simulated
-    z = mymux1 c x y
--- Format the output
-    output =
-      [string "  c=", bit c,
-       string "  x=", bit x,
-       string "  y=", bit y,
-       string "    output z=", bit z
-      ]
-#+END_SRC
-
-We can run it with a simulation driver that runs the circuit on all
-possible inputs, so the outputs form a truth table.  It's good
-practice to write the test data with clean indentation, so the inputs
-line up in columns, and to include the expected outputs in comments.
-
-See examples/mux/Mux1Run.hs')
-
-** Producing several outputs: halfAdd
-
-The circuits we have looked at so far have just one output.  We need a
-way to allow circuits to produce any number of outputs.
-
-Files: *examples/adder/HalfAdd.hs* and *examples/adder/HalfAddRun.hs*
-
-A half adder circuit takes two inputs *x* and *y*, and produces a pair
-of outputs, the carry output and the sum output.  The carry is the
-logical *and* of *x* and *y*, while the sum is their exclusive *or*.
-Here is the circuit specification (file *HalfAdd.hs*):
-
-The module statement gives a name to this module, and the import
-statement brings in the essential Hydra library definitions.  The
-circuit definition is a one-line equation which says *halfAdd* is a
-circuit, gives names *x* and *y* to its inputs, and calculates the
-outputs using *and2* and *xor2* logic gates.
-
-To see the circuit working, we can simulate it.  This requires
-three things, all provided in *HalfAddRun.hs*:
-
-  * Suitable test data, expressed as a list of *[x,y]* inputs
-
-  * A [Simulation driver](#simulation-drivers), which converts between
-    human readable input and output and the internal signal
-    representations.  The simulation driver is not part of the
-    circuit; it's simply formatting inputs and outputs.
-
-  * A main program that runs the simulation driver on the test data.
-
-See `examples/adder/HalfAddRun.hs'
-
-Run the simulation using any of the methods given above, e.g. enter
-*ghc -e main HalfAddRun*.  Here is the result:
-
-#+BEGIN_EXAMPLE
-$ ghc -e main HalfAddRun
-Input: x = 0 y = 0  Output: c = 0 s = 0
-Input: x = 0 y = 1  Output: c = 0 s = 1
-Input: x = 1 y = 0  Output: c = 0 s = 1
-Input: x = 1 y = 1  Output: c = 1 s = 0
-#+END_EXAMPLE
-
-** Black box with internal signals: add4
-
-Files: *adder/Add4.hs* and *examples/Add4Run.hs*
-
-#+BEGIN_EXAMPLE
-*Main> :main
-  x =  5  y =  8  cin = 0    ==>    cout = 0  s = 13
-  x =  7  y =  3  cin = 0    ==>    cout = 0  s = 10
-  x =  8  y = 12  cin = 0    ==>    cout = 1  s =  4
-  x =  8  y =  1  cin = 0    ==>    cout = 0  s =  9
-  x = 12  y =  1  cin = 1    ==>    cout = 0  s = 14
-  x =  2  y =  3  cin = 1    ==>    cout = 0  s =  6
-  x = 15  y = 15  cin = 1    ==>    cout = 1  s = 15
-(0.00 secs, 252,808 bytes)
-*Main>
-#+END_EXAMPLE
 
 ** Feedback and changing state: BSR4
 
@@ -675,581 +1245,32 @@ op=00 l=0 r=0 x=0   Output lo=1 ro=1 y=9
 #+END_EXAMPLE
 
 
-* Modules and files
+* Combinational simulation
 
-* Connecting components with signals
-
-A data value in a circuit is called a *signal*.  A signal is carried
-by a wire, and it transmits information from one component to another.
-In logic design we don't usually care about the physical
-characteristics of a wire, although these can be important at the
-lower levels of chip design.  Therefore we will usually refer to
-signals rather than wires.
-
-The information carried by a signal may be represented as an
-individual bit or a cluster comprising several bits.  We can also
-describe circuits at a higher level, where signals represent integers
-or other data types.
-
-A bit (binary digit) can have one of two distinct values.  Several
-names are commonly used for these values, including 0/1, Low/High,
-False/True, and F/T.  In real hardware a bit signal is represented by
-a voltage, but the precise voltage value is unimportant at the level
-of logic design.  The particular names chosen for the two bit values
-are also unimportant, although they can affect the readability of a
-table showing the behavior of a circuit.  When Hydra prints out the
-values of bit signals, it will normally use 0 and 1, but you can tell
-it to use False and True, or any other names you prefer.  One
-advantage of 0/1 is that they are consistent with treating a bit as a
-binary digit (False/True suggest treating a bit as a Boolean).
-Another advantage of 0 and 1 is that they take up only one character
-and they look different.  (Try reading a table showing thousands of F
-and T characters -- they can be hard to tell apart!).
-
-** Logic gates
-
-To design a new circuit, you need to take a set of existing circuits
-and connect them with signals.  There are several libraries of
-existing circuits that you can start with, and you can also define
-libraries of your own circuits for further use.  The Hydra libraries
-provide as primitives the standard logic gates, summarised in the
-following table.
-
-The buffer simply produces an output that is the same as the input; it
-is the identify function.  The inverter outputs 0 if its input is 1,
-and outputs 1 if its input is 0.
-
-Many of the logical operations can be performed on any number of
-inputs.  For example, there is the logical conjunction (*and*) of two,
-three, or four inputs.  These correspond to distinct logic gates: the
-*and2* gate has two input ports and there is no way to connect three
-inputs to it.  Therefore Hydra doesn't have an *and* gate; it has
-distinct *and2*, *and3*, *and4* gates.  This doesn't go on
-indefinitely; Hydra does not define the *and5* gate or the *and73*
-gate!  (A convenient way to *and* together large number of inputs is
-to use *andw*.)
-
-Component          Description
-----------------   -----------------------
-buf a              buffer
-inv a              inverter
-and2 a b           2-input and gate
-and3 a b c         3-input and gate
-and4 a b c d       4-input and gate
-or2 a b            2-input or gate
-or3 a b c          3-input or gate
-or4 a b c d        4-input or gate
-xor2 a b           2-input xor gate
-xor3 a b c         3-input xor gate
-xor4 a b c d       4-input xor gate
-nand2 a b          2-input nand gate
-nand3 a b c        3-input nand gate
-nand4 a b c d      4-input nand gate
-nor2 a b           2-input nor gate
-nor3 a b c         3-input nor gate
-nor4 a b c d       4-input nor gate
-xnor2 a b          2-input xnor gate
-xnor3 a b c        3-input xnor gate
-xnor4 a b c d      4-input xnor gate
-
-Most of these logic gates are provided for convenience, but only a few
-of them are necessary.  For example, you can replace *and3 a b c* by
-*and2 a (and2 b c)*.  However, logic gates with several inputs can be
-fabricated on chips, they are slightly more efficient, and most
-importantly, it's more readable to use *and3* rather than two *and2*
-gates.
-
-** Connecting a circuit to inputs
-
-Suppose we have two signals named *x* and *y*, and want to connect
-them to the inputs of an *or2* gate.  This is done by writing the name
-of the component, followed by the names of the input signals:
+One way to simulate a combinational circuit is to apply it directly to
+its inputs.  This works best if the circuit is defined with Bool as
+the signal type.   Here is an example:
 
 #+BEGIN_EXAMPLE
-or2 x y
-#+END_EXAMPLE
-
-The value of this expression is the output of the *or2* gate.  Such an
-expression is called an *application* because the component is applied
-to its input signals.
-
-Each circuit takes a specific number of inputs, and an application
-using that circuit must supply the corresponding number of input
-signals.  Here are several applications of logic gates, each with the
-right number of inputs.
-
-#+BEGIN_EXAMPLE
-inv x
-and2 a one
-xor3 p q r
-nor4 a zero c d
-#+END_EXAMPLE
-
-** Anonymous signals
-
-A signal may be given a name, such as *x* or *y*, although this is
-optional.  You can also refer to a signal using an application of a
-component to its inputs, such as *inv x*; the output of the inverter
-is an anonymous signal as it has no name.
-
-An anonymous signal is described by an expression with several tokens.
-When you use it as an input to a circuit, this expression must be
-enclosed by parentheses, to turn it into a single object.  For
-example, suppose we want to connect the first input to an *and2* gate
-to the output of an inverter whose input is *x*.  The second input to
-the *and2* gate should be *y*.  Here is the correct way to write it:
-
-#+BEGIN_EXAMPLE
-and2 (inv x) y
-#+END_EXAMPLE
-
-There are two expressions following *and2*, denoting its two inputs.
-The following notation would be wrong:
-
-#+BEGIN_EXAMPLE
-and2 inv x y   -- Wrong!
-#+END_EXAMPLE
-
-Here, it looks like the *and2* gate is being given three inputs, and
-the first one isn't even a signal.
-
-Parentheses are used in Hydra for grouping, just as in mathematics.
-You don't need to use parentheses just to specify the arguments to a
-function (that is, the inputs to a circuit).  Some programming
-languages requires lots of punctuation to indicate function
-application:
-
-#+BEGIN_EXAMPLE
-nand3 (x, and2 (p,q), z);   -- Wrong!
-#+END_EXAMPLE
-
-
-In Hydra (as in Haskell) you don't need the extra parentheses and
-commas, and they will lead to error messages.  Use parentheses only
-when they are necessary to get the right grouping:
-
-#+BEGIN_EXAMPLE
-nand3 x (and2 p q) z
-#+END_EXAMPLE
-
-It can be helpful to give both a schematic diagram and a textual
-specification for a circuit.  Each form of description provides
-insight, and having both together is often worthwhile.  It's important
-to check that the two descriptions of the circuit are consistent with
-each other.  To do this, check that every box in the diagram
-corresponds to a circuit (function) in the text, and check that the
-wires in the diagram correspond to the signals in the text.
-
-** Named signals and equations
-
-Sometimes it's useful to give a name to a signal, rather than using it
-anonymously.  A named signal can be used as an input to several
-different components, but an anonymous signal cannot.  Names can also
-make it easier to explain the circuit, and well chosen names help
-document the purpose of a signal.
-
-A signal can be named using an equation.  The left hand side of the
-equation is the name, and the right hand side is an expression that
-defines the signal.  The following equation says that the output of
-the *and3* gate has the name *x*.
-
-#+BEGIN_EXAMPLE
-x = and3 a (inv b) c
-#+END_EXAMPLE
-
-Sometimes the choice between anonymous and named signals is just a
-matter of style.  Here is a signal defined using three anonymous
-signals:
-
-#+BEGIN_EXAMPLE
-x = nand2 (xor2 a b) (inv (nor2 c d))
-#+END_EXAMPLE
-
-This can be rewritten so as to give every signal an explicit name, by
-introducing additional equations:
-
-#+BEGIN_EXAMPLE
-x = nand2 p q
-p = xor2 a b
-q = inv r
-r = nor2 c d
-#+END_EXAMPLE
-
-An equation like this is called a *defining equation*, because the
-left hand side has to be a signal name whose value is defined to be
-the right hand side.  It would be wrong, for example, to write
-
-
-#+BEGIN_EXAMPLE
-nand2 p q = x   -- Wrong!
-#+END_EXAMPLE
-
-
-When using *equational reasoning* you will encounter equations with a
-more general form, but in defining signals, the left hand side is
-always a signal name.
-
-** Constant signals
-
-A constant signal always carries the same value: either it is always
-0, or always 1.  The names of these two constants are written as
-*zero* and *one*.  Names in Hydra always begin with a lower case
-letter, never with a digit.  Don't use 0/1, or T/F, or True/False in a
-circuit specification; those notations have other meanings and will
-lead to bizarre error messages.
-
-* Defining new circuits
-
-A new circuit can be designed by connecting together a number of
-existing ones.  The examples given so far consist of logic gates,
-which are primitive components.  To design larger scale systems, we
-need the ability to define a circuit as a new *black box* component
-and reuse it.  This is similar to using abstraction in a programming
-language by defining a function or procedure for a commonly used
-computation.  A circuit definition contains up to three parts:
-
-  1. Circuit type (optional)
-
-  2. Interface (mandatory)
-
-  3. Internal signals (optional)
-
-** Circuit type
-
-The circuit type is covered in a later section.  It's optional,
-although it is generally best to include it.  If present, the type can
-be recognized by the :: symbol and a number of right arrow symbols; a
-typical example is
-
-#+BEGIN_EXAMPLE
-halfAdd :: Bit a => a -> a -> (a,a)
-#+END_EXAMPLE
-
-
-** Interface
-
-The interface gives the name of the circuit and names its inputs and
-outputs.  A circuit is created with a *circuit defining equation*.
-The left hand side of the equation is the name of the circuit followed
-by the names of the input signals.  There may be any number of inputs.
-The right hand side is an expression giving the value of the output
-signal:
-
-
-#+BEGIN_EXAMPLE
-circ_name input1 input2 = expression
-#+END_EXAMPLE
-
-This defines a circuit whose name is *circ_name*, which takes two
-inputs named *input1* and *input2*, and produces an output with the
-specified signal value.  Here is an example:
-
-#+BEGIN_EXAMPLE
-mycirc a b c = and3 a (inv b) c
-#+END_EXAMPLE
-
-
-The input names *a*, *b*, and *c*, are local to the definition of
-*mycirc*, and they can be used to calculate the value of the output.
-Another circuit can connect signals with arbitrary names, or no names
-at all, to the inputs of *mycirc*.
-
-** Internal signals
-
-This part of a definition is optional; if present it follows the
-*where* keyword.
-
-The expression that defines the circuit's output can become fairly
-complicated, and it's often simpler to define it using several other
-named signals.  Each of these needs a defining equation which is
-inside the circuit.  To do this, write the keyword *where* after the
-equation, and after the *where* you can write any number of signal
-defining equations.  The general form is:
-
-
-#+BEGIN_EXAMPLE
-circuit_name input1 input2 = output
-  where
-    output = ...
-    x = ... (internal signals...)
-    y = ...
-#+END_EXAMPLE
-
-Here is an example of a circuit named c22 that takes three inputs and
-produces one output.
-
-#+BEGIN_EXAMPLE
-c22 a b c = x
-  where
-    x = xor2 p q
-    p = and2 a b
-    q = or2 b c
-#+END_EXAMPLE
-
-
-The equations should be indented consistently, and there is no extra
-punctuation (no curly braces, no semicolons).  The compiler determines
-the structure of a definition from the indentation, not from
-punctuation.  Therefore the indentation is essential, and if it's
-wrong then the specification will be parsed incorrectly.
-
-** Multiple outputs
-
-** Feedback
-
-A register is a circuit with an internal state, and with the ability
-to load an external value into the state and to read out the state.
-
-
-
-#+NAME: reg1
-#+BEGIN_SRC ghci :tangle ../../examples/register/Reg1.hs
-module Reg1 where
+module HalfAddB where
 import HDL.Hydra.Core.Lib
-import HDL.Hydra.Circuits.Combinational
 
-reg1 :: CBit a => a -> a -> a
-reg1 ld x = r
-  where r = dff (mux1 ld r x)
-#+END_SRC
+-- Demonstrate a circuit with a concrete type Bool, instead of a type
+-- class constraint Bit a =>.
 
-The reg1 circuit has a feedback loop: the output of the flip flop is
-connected to one of the inputs to the mux1, whose output in turn is
-input to the flip flop.  Hydra does not allow feedback loops in pure
-combinational logic, but feedback that goes through a flip flop is
-fine.  When a circuit contains a feedback loop, there will be a
-circular path in the schematic diagram, and there will be circular
-equations in its specification.  For the reg1 circuit. the feedback
-loop can be seen in the equation which has r on both the left and
-right hand side.  Thus r is being defined in terms of itself.  The way
-this works, and the reason that r is well-defined, is explained in the
-section on circuit semantics.
-
-#+BEGIN_SRC ghci :tangle ../../examples/register/Reg1Run.hs
--- Simulation driver for reg1
-module Main where
-import HDL.Hydra.Core.Lib
-import Reg1
-
-main :: IO ()
-main = do
-  runReg1 testdata
-
-testdata :: [[Int]]
-testdata =
-------------------------
---  ld  x       output
-------------------------
-  [ [1, 1],  -- 0  output in cycle 0 is initial state
-    [0, 0],  -- 1  state changed to 1 at tick between cycles 0/1
-    [0, 1],  -- 1  no change
-    [0, 0],  -- 1  no change
-    [1, 0],  -- 1  still see 1 but at end of cycle, set state to 0
-    [0, 0],  -- 0 during this cycle can see result of state change
-    [1, 1],  -- 0 but set state to 1 on tick at end of cycle
-    [1, 0],  -- 1 the 1 becomes visible in this cycle
-    [0, 0],  -- 0 the 0 now becomes visible
-    [0, 0],  -- 0 no change
-    [0, 0]   -- no comma after last element of list
-  ]
-
-runReg1 input = runAllInput input output
-  where
--- Input signals
-    ld = getbit input 0
-    x  = getbit input 1
--- Circuit
-    y = reg1 ld x
--- Format the input and output signals
-    output =
-      [string "Input ld = ", bit ld,
-       string " x = ", bit x,
-       string "   Output = ", bit y]
-#+END_SRC
-
-* Signal and circuit types
-
-The *type* of a value determines what operations you can perform on
-it.  This holds for hardware description just as for programming.  The
-type of a signal determines what kind of information it carries, and
-the type of a circuit specifies the types and organisation of its
-input and output signals.
-
-A circuit has an interface to the outside world, and an internal
-organization.  To use the circuit, all we need to know about is the
-interface: what inputs need to be provided and what the outputs mean.
-The type expresses a useful portion of this information: it describes
-the number and organization of the inputs and outputs.  The meanings
-of the circuit outputs are not specified by the type; they should be
-described in documentation for the circuit.  Since Hydra models a
-circuit as a function, a circuit type looks just like a function type.
-
-The type declaration for a circuit is optional, as the compiler can
-work out the type for itself.  If you omit the type, your circuit will
-still run.  However, there are several benefits in writing out the
-type explicitly:
-
-- The type gives useful information about the interface to the
-  circuit.  Later on, if you want to use this circuit in a larger one,
-  you will be more interested in the interface than the internal
-  components inside the circuit.
-
-- There is some redundancy between the type and the defining
-  equation.  If there is any inconsistency between the two, the
-  compiler will give a type error message.  That may be annoying, but
-  at least you know that the error lies somewhere in the (small)
-  specification of this one circuit.  If you omit the type
-  declaration, but there is an error in the defining equation, you may
-  get an error message that says, in effect, ``there is an error
-  somewhere in the (large) file'', but it's up to you to figure out
-  *where* the error is.
-
-- If you do get a type error message, the compiler will do its
-  best to give a helpful and informative message.  In practice,
-  though, the error messages will be far more understandable if you
-  include type declarations for your circuits.
-
-If present, the type of a circuit should come immediately before the
-defining equation.  Type declarations are easily recognizable: they
-always contain the symbol *::*, and usually contain some arrows *=>*
-and *->*.  A typical example is
-
-#+BEGIN_EXAMPLE
-reg1 :: CBit a => a -> a
-#+END_EXAMPLE
-
-
-A type declaration contains several parts:
-
-  * The circuit name (e.g. reg1)
-  * The :: symbol, read as "has type"
-  * The signal class ending with => (e.g. CBit a =>)
-  * The input and output signal types (e.g. a -> a)
-
-** Signal types and classes
-
-*Short version.* If you're writing a routine circuit and just want to
-simulate it, you can just write *CBit a =>* for the signal class
-constraint and then use *a* as the type for every bit signal.  In more
-complicated situations, or if you want to know what this means, read
-on.
-
-When a circuit specification is executed, each signal has a specific
-type.  Many types can be used, for example *Bool* or *Stream Lattice*.
-The choice of type determines what happens during execution.  Some
-types lead to combinational simulation, others lead to synchronous
-simulation, others perform a path depth analysis, or generate a
-netlist.
-
-It's possible to define a circuit with a specific type, and if you do
-this the class constraint (the part before =>) is omitted.  For
-example, we could define a Bool version of the mux1 circuit (call it
-halfAddB) to operate in signals of type Bool:
-
-#+BEGIN_EXAMPLE
 halfAddB :: Bool -> Bool -> (Bool,Bool)
 halfAddB x y = (and2 x y, xor2 x y)
 #+END_EXAMPLE
 
 
-This is a little simpler than the standard definition halfAdd, which
-(1) uses the type class constraint Bit a =>, and (2) uses *a* rather
-than *Bool* as the bit signal type.
+* Synchronous sequential simulation
 
-** Combinational signals: Bit a
-
-#+BEGIN_EXAMPLE
-halfAdd :: Bit a => a -> a -> (a,a)
-halfAdd x y = (and2 x y, xor2 x y)
-#+END_EXAMPLE
+A sequential circuit may have feedback and state.  A sequential
+circuit is *synchronous* if it uses a clock to ensure that all flip
+flops change state simultaneously.
 
 
-The main disadvantage of using Bool as the signal type is that
-combinational simulation is the *only* thing you can do with the
-circuit.  However, Hydra provides many other options.  For example,
-you can perform synchronous simulations over many clock cycles, but to
-do that, the signals must have a different type.  You can do these
-other things with *halfAdd*, but not with *halfAddB*.
-
-There are several different types that can be used to represent a
-signal.  These are organized into two main sets: *Bit* and *CBit*.
-*Bit* is used for combinational circuits, and *CBit* ("clocked bit")
-is used for sequential circuits.
-
-signal.  The notation *Bit a =>* means that *a* can be any type in the
-set *Bit*, and therefore all of the Bit operations can be performed on
-a signal of type *a*.
-
-The commonest signal class constraints are:
-
-  * *Bit a =>* is used when *a* is a bit signal in a combinational
-    circuit.  The circuit may contain logic gates, but not flip flops.
-
-  * *CBit a =>* is used when *a* is a bit signal in a sequential
-    circuit, which may contain flip flops and feedback loops as well
-    as logic gates.
-
-** Clocked signals: CBit a
-
-The signal class constraint 
-Classes
-
-Base signal types
-
-  * Bool    (defined in Haskell standard libraries)
-
-  * Word16  (defined in Haskell standard libraries)
-
-  * Word32  (defined in Haskell standard libraries)
-
-  * Lattice (defined in Hydra Core library)
-
-** Inputs and outputs
-
-After the signal class (i.e. after the *=>* symbol) come the types of
-the inputs and output of the circuit.  In the simplest case, each
-input or output signal is just a bit of type *a*.  There may be any
-number of input arguments, and there must be one output result.  A
-single arrow *->* must follow each input; thus the number of single
-arrows in the type is the same as the number of inputs.
-
-The inverter has one input of type *a*, which is followed by *->*, and
-the type *a* of the output appears last.  The type declaration can be
-read as "inv uses signals in the Bit class; it takes one input and
-produces one output":
-Thus the entire type declaration ``*inv :: Bit a => a -> a*'' says
-``*inv* is a circuit that takes an input bit signal, and produces an
-output bit signal.''
-
-#+BEGIN_EXAMPLE
-inv :: Bit a => a -> a
-#+END_EXAMPLE
-
-
-The notation *a -> a* means "the circuit takes an input signal and
-produces an output signal".  This is similar to conventional
-mathematical notation; for example in mathematics there is a function
-*im* that is given a complex number (type $C$) and returns its
-imaginary part (type $R$), and a mathematician might write its type as
-im : C -> R.  (The reason :: is used in Haskell (and Hydra) is that :
-is used for something else.)
-
-Circuits that take several inputs have a slightly more complicated
-type.  For example, here are the types for the family of and-gates:
-
-#+BEGIN_EXAMPLE
-and2 :: Bit a => a -> a -> a
-and3 :: Bit a => a -> a -> a -> a
-and4 :: Bit a => a -> a -> a -> a -> a
-#+END_EXAMPLE
-
-There is always one output, but any number of inputs, and every input
-is followed by *->*.  To find out how many inputs a circuit takes,
-just count the number of times *->* appears in its type.
-
-If a circuit has several outputs, they must be enclosed in a
-container, and this is reflected in the type.  See the section on
-Containers.
+* Modules and files
 
 * Containers
 
@@ -1817,30 +1838,6 @@ connect them up appropriately.
 
 **Exercise.** Suppose *x = [x0,x1,x2]*, *y = [y0,y1,y2,y3]*, and *z =
   x++y*.  What are the values of *z*, *length z*, and *z!!4*?
-
-* Combinational simulation
-
-One way to simulate a combinational circuit is to apply it directly to
-its inputs.  This works best if the circuit is defined with Bool as
-the signal type.   Here is an example:
-
-#+BEGIN_EXAMPLE
-module HalfAddB where
-import HDL.Hydra.Core.Lib
-
--- Demonstrate a circuit with a concrete type Bool, instead of a type
--- class constraint Bit a =>.
-
-halfAddB :: Bool -> Bool -> (Bool,Bool)
-halfAddB x y = (and2 x y, xor2 x y)
-#+END_EXAMPLE
-
-
-* Synchronous sequential simulation
-
-A sequential circuit may have feedback and state.  A sequential
-circuit is *synchronous* if it uses a clock to ensure that all flip
-flops change state simultaneously.
 
 
 * Standard library for bits
@@ -2539,7 +2536,7 @@ regfile n k ld d sa sb x
 #+END_EXAMPLE
 
 
-* Combinators
+* Circuit generators
 
 We will generally specify large circuits using a circuit generator,
 not by drawing every component individually.  There are two kinds of
@@ -2990,7 +2987,7 @@ d = and2 (a,b);       -- wrong! don't use ( , ) ;
 #+END_EXAMPLE
 
  
-* Development notes
+* Development notes :noexport:
 
 ** Emacs
 
@@ -3013,19 +3010,20 @@ d = and2 (a,b);       -- wrong! don't use ( , ) ;
 
 *** Figures
 
+
 **** Generated svg
 
 C-c C-e C-s h h
 
-Include an svg file; it will be incorporated inso the html.  The
-figure will have the svg code inline.  The figure is not being
-included as an image or object.
+Include an svg file.  The block type is export and the language is
+html (not svg) because the code will be incorporated verbatim inso the
+html.  The figure is not included as an image or object.
 
-test #+INCLUDE: "./figures/gensvg/defs.svg" export html
+This is figures/gensvg/gates.svg
 
------
-test #+INCLUDE: "./figures/gensvg/fig2.svg" export html
------
+#+INCLUDE: "./figures/gensvg/gates.svg" export html
+
+The figure was included above.
 
 **** More figure tests
 

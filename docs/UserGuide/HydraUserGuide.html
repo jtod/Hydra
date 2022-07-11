@@ -3,11 +3,12 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2022-06-26 Sun 17:43 -->
+<!-- 2022-07-03 Sun 07:16 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>&lrm;</title>
+<title>Hydra User Guide</title>
 <meta name="generator" content="Org mode" />
+<meta name="author" content="John T. O'Donnell" />
 <style type="text/css">
  <!--/*--><![CDATA[/*><!--*/
   .title  { text-align: center;
@@ -193,6 +194,7 @@
   /*]]>*/-->
 </style>
 <link rel="stylesheet" type="text/css" href="../doc.css" />
+<link rel="stylesheet" type="text/css" href="./docs/doc.css" />
 <script type="text/javascript">
 // @license magnet:?xt=urn:btih:e95b018ef3580986a04669f1b5879592219e2a7a&dn=public-domain.txt Public Domain
 <!--/*--><![CDATA[/*><!--*/
@@ -240,158 +242,156 @@
 </head>
 <body>
 <div id="content">
-<h1>Hydra User Guide</h1>
-
+<h1 class="title">Hydra User Guide</h1>
 Version 3.4.16
 Copyright (c) 2022 John T. O'Donnell
 <div id="table-of-contents">
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#orgbfc8c6b">Introduction</a>
+<li><a href="#org98b4809">1. Introduction</a>
 <ul>
-<li><a href="#org87ff691">Hardware description languages</a></li>
-<li><a href="#orgc0e109c">Modeling circuits as functions</a></li>
+<li><a href="#org6b6554b">1.1. Hardware description languages</a></li>
+<li><a href="#orgd9c4e9c">1.2. Modeling circuits as functions</a></li>
 </ul>
 </li>
-<li><a href="#org8c20c52">Installation</a></li>
-<li><a href="#org43f52f7">Tutorial</a>
+<li><a href="#orgb8eaead">2. README</a>
 <ul>
-<li><a href="#org433bf79">A minimal example: SimpleCirc</a>
+<li><a href="#org5a06586">2.1. About Hydra</a></li>
+<li><a href="#org081feee">2.2. Installation</a>
 <ul>
-<li><a href="#orgecec4d5">The circuit specification</a></li>
-<li><a href="#org5037e00">The simulation driver</a></li>
-<li><a href="#orgaa79b72">Running the circuit simulation</a></li>
-</ul>
-</li>
-<li><a href="#org6a3a61d">Output mode:  Automatic and Formatted</a></li>
-<li><a href="#org8b2378e">Simultation modes:  Batch and Interactive</a></li>
-<li><a href="#orgb4a8b46">Connecting several logic gates: mux1</a></li>
-<li><a href="#org4a298e2">Producing several outputs: halfAdd</a></li>
-<li><a href="#org7ada42c">Black box with internal signals: add4</a></li>
-<li><a href="#orgb9c8001">Feedback and changing state: BSR4</a></li>
-</ul>
-</li>
-<li><a href="#orgd1bedd3">Modules and files</a></li>
-<li><a href="#org5ca8a57">Connecting components with signals</a>
-<ul>
-<li><a href="#orgb0308d8">Logic gates</a></li>
-<li><a href="#org7b996fd">Connecting a circuit to inputs</a></li>
-<li><a href="#org072b203">Anonymous signals</a></li>
-<li><a href="#orgaafc81f">Named signals and equations</a></li>
-<li><a href="#org44082b7">Constant signals</a></li>
-</ul>
-</li>
-<li><a href="#orged09865">Defining new circuits</a>
-<ul>
-<li><a href="#org5c683c2">Circuit type</a></li>
-<li><a href="#orgb426823">Interface</a></li>
-<li><a href="#org68b82c6">Internal signals</a></li>
-<li><a href="#orgdafbfcb">Multiple outputs</a></li>
-<li><a href="#org614f290">Feedback</a></li>
-</ul>
-</li>
-<li><a href="#org0a3963b">Signal and circuit types</a>
-<ul>
-<li><a href="#orgeb7624e">Signal types and classes</a></li>
-<li><a href="#org859cbc0">Combinational signals: Bit a</a></li>
-<li><a href="#org1e8734d">Clocked signals: CBit a</a></li>
-<li><a href="#orga230b6c">Inputs and outputs</a></li>
-</ul>
-</li>
-<li><a href="#orge2a445d">Containers</a>
-<ul>
-<li><a href="#org773e982">Tuples</a></li>
-<li><a href="#org284e499">Words</a></li>
-<li><a href="#orgf1ef5be">A circuit with words and internal signals</a>
-<ul>
-<li><a href="#org49168c5">Building words</a></li>
-<li><a href="#org17df880">Accessing parts of a word</a></li>
-</ul>
-</li>
-<li><a href="#org9029402">Nested clusters</a></li>
-</ul>
-</li>
-<li><a href="#org3543c87">Combinational simulation</a></li>
-<li><a href="#org69d70b0">Synchronous sequential simulation</a></li>
-<li><a href="#org01ea78c">Standard library for bits</a>
-<ul>
-<li><a href="#org5930e4f">Constant signals</a></li>
-<li><a href="#orgeb0b9e5">Logic gates</a></li>
-<li><a href="#org0d8ea77">Replicating a signal</a></li>
-<li><a href="#org68146f6">Multiplexers and demultiplexers</a></li>
-<li><a href="#orgf523fa8">Bit addition</a></li>
-<li><a href="#org3836ed9">Flip flops and registers</a></li>
-</ul>
-</li>
-<li><a href="#orgfd616f5">Standard library for words</a>
-<ul>
-<li><a href="#org5c98f2e">Replicating a bit</a></li>
-<li><a href="#orga653ab3">Rearranging bits in a word</a>
-<ul>
-<li><a href="#orgc3223b3">Combinational shifting</a></li>
-<li><a href="#orgdc2afa8">Bit slice representation</a></li>
-</ul>
-</li>
-<li><a href="#org46ad4c1">Logic on words</a></li>
-<li><a href="#org7654a0f">Conditionals and addresses</a>
-<ul>
-<li><a href="#org8ff3ee9">Multiplexers</a></li>
-<li><a href="#org03cc2f7">Demultiplexers</a></li>
-</ul>
-</li>
-<li><a href="#org79ba58c">Arithmetic</a>
-<ul>
-<li><a href="#org2187ed0">Binary addition</a></li>
-</ul>
-</li>
-<li><a href="#org2042033">Registers</a></li>
-</ul>
-</li>
-<li><a href="#orge94871b">Combinators</a>
-<ul>
-<li><a href="#org91779b4">Map</a>
-<ul>
-<li><a href="#org36c4909">The map combinator</a></li>
-<li><a href="#org0327fc7">Sized map</a></li>
-</ul>
-</li>
-<li><a href="#orgddf4951">Fold</a>
-<ul>
-<li><a href="#org28569b8">Fold from the left</a></li>
-<li><a href="#org0644db0">Binary comparison using foldl</a></li>
-<li><a href="#org54c6195">Fold from the right: foldr</a></li>
+<li><a href="#orgfedc772">2.2.1. Haskell</a></li>
+<li><a href="#org7f3ce39">2.2.2. Verify that Haskell is working</a></li>
+<li><a href="#orgbd985e2">2.2.3. Install Hydra</a></li>
+<li><a href="#org6547ddd">2.2.4. Verify that Hydra is working</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#org58aaeca">Summary of syntax</a>
+<li><a href="#orgd3835f0">3. Connecting components with signals</a>
 <ul>
-<li><a href="#org173fb15">Indentation</a></li>
-<li><a href="#orgc9289d4">Names</a></li>
-<li><a href="#org8c15d0a">Signal expressions</a></li>
+<li><a href="#orgbd398b3">3.1. Logic gates</a></li>
+<li><a href="#orga3b8da3">3.2. Connecting a circuit to inputs</a></li>
+<li><a href="#orge5e64b6">3.3. Anonymous signals</a></li>
+<li><a href="#orgf70afed">3.4. Named signals and equations</a></li>
+<li><a href="#org6fc8662">3.5. Constant signals</a></li>
+<li><a href="#orgfe63655">3.6. Connecting several logic gates: mux1</a></li>
+<li><a href="#org34fd7c0">3.7. Producing several outputs: halfAdd</a></li>
 </ul>
 </li>
-<li><a href="#orge607622">Development notes</a>
+<li><a href="#org2072a11">4. Defining new circuits</a>
 <ul>
-<li><a href="#org0063191">Emacs</a>
+<li><a href="#orgf3aaf31">4.1. Circuit type</a></li>
+<li><a href="#org7a4e636">4.2. Black box with internal signals: add4</a></li>
+<li><a href="#orgf7d9675">4.3. Signal and circuit types</a>
 <ul>
-<li><a href="#orgeec6eef">Export to html</a></li>
-<li><a href="#orgfcfcc5b">Tangle</a></li>
-<li><a href="#org7c16d80">Set emacs variables</a></li>
-<li><a href="#orged32d73">Figures</a></li>
-<li><a href="#orgba97e45">End</a></li>
+<li><a href="#org0bf0dcc">4.3.1. Signal types and classes</a></li>
+<li><a href="#org12b63f8">4.3.2. Combinational signals: Bit a</a></li>
+<li><a href="#org27a82a8">4.3.3. Clocked signals: CBit a</a></li>
+<li><a href="#org8d9e657">4.3.4. Inputs and outputs</a></li>
 </ul>
 </li>
+<li><a href="#orgff95f0b">4.4. Interface</a></li>
+<li><a href="#orgc517e6f">4.5. Internal signals</a></li>
+<li><a href="#org3c29f65">4.6. Multiple outputs</a></li>
+<li><a href="#org3f62fe4">4.7. Feedback</a></li>
+</ul>
+</li>
+<li><a href="#org95d2563">5. Circuit simulation</a>
+<ul>
+<li><a href="#orgfbc4458">5.1. A minimal example: SimpleCirc</a>
+<ul>
+<li><a href="#org9348043">5.1.1. The circuit specification</a></li>
+<li><a href="#org6a33eeb">5.1.2. The simulation driver</a></li>
+<li><a href="#orgd4fc5a7">5.1.3. Running the circuit simulation</a></li>
+</ul>
+</li>
+<li><a href="#orgf48120b">5.2. Output mode:  Automatic and Formatted</a></li>
+<li><a href="#org46f1ee5">5.3. Simultation modes:  Batch and Interactive</a></li>
+<li><a href="#org1073aba">5.4. Feedback and changing state: BSR4</a></li>
+</ul>
+</li>
+<li><a href="#org89fa2c8">6. Combinational simulation</a></li>
+<li><a href="#org41232ba">7. Synchronous sequential simulation</a></li>
+<li><a href="#org1c54c49">8. Modules and files</a></li>
+<li><a href="#org54793de">9. Containers</a>
+<ul>
+<li><a href="#orgc1be2ae">9.1. Tuples</a></li>
+<li><a href="#orga8773c3">9.2. Words</a></li>
+<li><a href="#orge44b1bb">9.3. A circuit with words and internal signals</a>
+<ul>
+<li><a href="#org29ee008">9.3.1. Building words</a></li>
+<li><a href="#org2af935f">9.3.2. Accessing parts of a word</a></li>
+</ul>
+</li>
+<li><a href="#org2bfe54f">9.4. Nested clusters</a></li>
+</ul>
+</li>
+<li><a href="#org0f970a2">10. Standard library for bits</a>
+<ul>
+<li><a href="#org6d6dc16">10.1. Constant signals</a></li>
+<li><a href="#org10bb67a">10.2. Logic gates</a></li>
+<li><a href="#org0cfea13">10.3. Replicating a signal</a></li>
+<li><a href="#org7b80850">10.4. Multiplexers and demultiplexers</a></li>
+<li><a href="#org1e4e1b6">10.5. Bit addition</a></li>
+<li><a href="#org38bd3b6">10.6. Flip flops and registers</a></li>
+</ul>
+</li>
+<li><a href="#org7d0deb4">11. Standard library for words</a>
+<ul>
+<li><a href="#org3d805a8">11.1. Replicating a bit</a></li>
+<li><a href="#org36cec50">11.2. Rearranging bits in a word</a>
+<ul>
+<li><a href="#org7d8aa54">11.2.1. Combinational shifting</a></li>
+<li><a href="#orgac34e2b">11.2.2. Bit slice representation</a></li>
+</ul>
+</li>
+<li><a href="#org9e8c6d3">11.3. Logic on words</a></li>
+<li><a href="#org273b6b3">11.4. Conditionals and addresses</a>
+<ul>
+<li><a href="#org9d09267">11.4.1. Multiplexers</a></li>
+<li><a href="#org159da49">11.4.2. Demultiplexers</a></li>
+</ul>
+</li>
+<li><a href="#org3e7deb6">11.5. Arithmetic</a>
+<ul>
+<li><a href="#org36dbe23">11.5.1. Binary addition</a></li>
+</ul>
+</li>
+<li><a href="#orgdf266f3">11.6. Registers</a></li>
+</ul>
+</li>
+<li><a href="#org002d148">12. Circuit generators</a>
+<ul>
+<li><a href="#orgb0ba126">12.1. Map</a>
+<ul>
+<li><a href="#orgc1662d5">12.1.1. The map combinator</a></li>
+<li><a href="#org16ddda7">12.1.2. Sized map</a></li>
+</ul>
+</li>
+<li><a href="#orgdd213e2">12.2. Fold</a>
+<ul>
+<li><a href="#org0afe1ab">12.2.1. Fold from the left</a></li>
+<li><a href="#orgd0a8141">12.2.2. Binary comparison using foldl</a></li>
+<li><a href="#org1a7a30b">12.2.3. Fold from the right: foldr</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#orgbf108f0">13. Summary of syntax</a>
+<ul>
+<li><a href="#org5632aec">13.1. Indentation</a></li>
+<li><a href="#org3414a03">13.2. Names</a></li>
+<li><a href="#org457acca">13.3. Signal expressions</a></li>
 </ul>
 </li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-orgbfc8c6b" class="outline-2">
-<h2 id="orgbfc8c6b">Introduction</h2>
-<div class="outline-text-2" id="text-orgbfc8c6b">
+<div id="outline-container-org98b4809" class="outline-2">
+<h2 id="org98b4809"><span class="section-number-2">1</span> Introduction</h2>
+<div class="outline-text-2" id="text-1">
 <p>
 Hydra is a computer hardware description language (CHDL or HDL) that
 enables you to design, analyse, and simulate digital circuits.  It
@@ -436,9 +436,9 @@ synchronous, using one global clock.
 </p>
 </div>
 
-<div id="outline-container-org87ff691" class="outline-3">
-<h3 id="org87ff691">Hardware description languages</h3>
-<div class="outline-text-3" id="text-org87ff691">
+<div id="outline-container-org6b6554b" class="outline-3">
+<h3 id="org6b6554b"><span class="section-number-3">1.1</span> Hardware description languages</h3>
+<div class="outline-text-3" id="text-1-1">
 <p>
 To design a circuit, and to do anything useful with it, we need a way
 to describe it.  The description can take two forms.  A
@@ -502,11 +502,9 @@ like Hydra use text to describe hardware.
 </div>
 </div>
 
-
-
-<div id="outline-container-orgc0e109c" class="outline-3">
-<h3 id="orgc0e109c">Modeling circuits as functions</h3>
-<div class="outline-text-3" id="text-orgc0e109c">
+<div id="outline-container-orgd9c4e9c" class="outline-3">
+<h3 id="orgd9c4e9c"><span class="section-number-3">1.2</span> Modeling circuits as functions</h3>
+<div class="outline-text-3" id="text-1-2">
 <p>
 Some HDLs are based on imperative programming languages, using the
 assignment statement to model a state change in a circuit.  In
@@ -538,719 +536,204 @@ programs don't correspond to circuits.
 </div>
 </div>
 
-<div id="outline-container-org8c20c52" class="outline-2">
-<h2 id="org8c20c52">Installation</h2>
-<div class="outline-text-2" id="text-org8c20c52">
-<p>
-foo #+INCLUDE: "../../README.org"
-</p>
-</div>
+<div id="outline-container-orgb8eaead" class="outline-2">
+<h2 id="orgb8eaead"><span class="section-number-2">2</span> README</h2>
+<div class="outline-text-2" id="text-2">
 </div>
 
-
-<div id="outline-container-org43f52f7" class="outline-2">
-<h2 id="org43f52f7">Tutorial</h2>
-<div class="outline-text-2" id="text-org43f52f7">
-<p>
-This section shows several examples of circuits of increasing
-complexity.  You should be able to design and simulate some circuits on
-your own by following and modifying these examples.  The various
-design techniques are described in more detail in later sections.  For
-now, just run the examples, and refer back to them as the subsequent
-sections explain the language.  See the examples directory for a
-collection of circuits.
-</p>
+<div id="outline-container-org5a06586" class="outline-3">
+<h3 id="org5a06586"><span class="section-number-3">2.1</span> About Hydra</h3>
+<div class="outline-text-3" id="text-2-1">
+Version 3.4.16
+Copyright (c) 2022 John T. O'Donnell
 
 <p>
-To run a circuit, two definitions are needed: a circuit specification,
-and a simulation driver.  The circuit specification states precisely
-the interface to the circuit, what components it contains, and how
-they are connected.  The simulation driver describes how to provide
-inputs using a readable input format, and how to format the outputs to
-make them readable.  For example, Reg1.hs defines a 1-bit register
-circuit, and Reg1Run.hs is the simulation driver which handles
-conversion between readable notation and internal signals.
-</p>
-
-<p>
-It's good practice to place the circuit definition and its simulation
-driver in separate files.  By convention, the filename of the driver
-ends in "Run".
-</p>
-</div>
-
-<div id="outline-container-org433bf79" class="outline-3">
-<h3 id="org433bf79">A minimal example: SimpleCirc</h3>
-<div class="outline-text-3" id="text-org433bf79">
-<p>
-To illustrate how to use Hydra, let's start with a very simple
-circuit.  It is just an and2 logic gate, with two 1-bit inputs and a
-1-bit output.  The example is in the directory examples/SimpleCirc,
-and it consists of two files:
+Hydra is a functional computer hardware description language for
+specifying the structure and behavior of digital circuits. It supports
+several levels of abstraction, including logic gates, register
+transfer level, datapath and control, and processors. There are tools
+for simulating circuits, generating netlists, and emulating
+instruction set architectures. It is an embedded domain specific
+language implemented using Haskell.
 </p>
 
 <ul class="org-ul">
-<li>SimpleCirc.hs defines a circuit named <code>simpleCirc</code>, which takes two input
-bits and outputs their logical <i>and</i>.  In other words, the <code>simpleCirc</code>
-circuit is just an <code>and2</code> logic gate.</li>
-
-<li>SimpleCircRun.hs defines a simulation driver for the circuit.  The
-file provides a main program named <code>main</code> which runs the simulation
-on test data which is also defined in the file.  In
-SimpleCircRun.hs, the test data runs the circuit on all possible
-inputs 00, 01, 10, 11.  Since the circuit is really just an and2
-gate, the results should be 0, 0, 0, 1.</li>
-</ul>
-</div>
-
-<div id="outline-container-orgecec4d5" class="outline-4">
-<h4 id="orgecec4d5">The circuit specification</h4>
-<div class="outline-text-4" id="text-orgecec4d5">
-<p>
-The circuit itself is defined in a module <code>SimpleCirc</code>, which is in the
-file named <code>SimpleCirc.hs</code>.
-</p>
-
-<pre class="example" id="orgb62db87">
--- SimpleCirc -- A minimal example of a circuit description
--- This file is part of Hydra. John O'Donnell, 2021.  See Hydra/README
-
-module SimpleCirc where
-import HDL.Hydra.Core.Lib
-
--- Define a circuit "simpleCirc" which takes two input bits and outputs
--- their logical conjunction, using an and2 logic gate
-
-simpleCirc :: Bit a =&gt; a -&gt; a -&gt; a   -- interface: two inputs, one output
-simpleCirc x y = and2 x y            -- implementation uses an and2 logic gate
-</pre>
-
-<p>
-A module begins with a <code>module</code> statement that gives its , followed by
-statements that import other modules.  All Hydra modules must contain
-<code>import HDL.Hydra.Core.Lib</code>, which defines, among other things, the
-<code>and2</code> logic gate.
-</p>
-
-<p>
-Following the imports, the module may contain any number of circuit
-definitions.  The definition of the circuit <code>simpleCirc</code> contains two lines
-of code: a <i>type declaration</i> which contains the symbol <code>::</code> and a
-<i>defining equation</i> which contains the symbol =.
-</p>
-
-<p>
-A type declaration specifies the name of the circuit and its
-interface.  The declaration <i>simpleCirc :: Bit a =&gt; a -&gt; a -&gt; a</i> contains
-several parts:
-</p>
-
-<ul class="org-ul">
-<li>The beginning  means "simpleCirc has type&#x2026;".</li>
-<li>Bit a    means the circuit uses Bit signals, and we will use the
-name <i>a</i> for the type of a bit signal</li>
-<li><i>a -&gt; a -&gt; a</i> says the circuit takes an input of type <i>a</i>, a second
-input also of type <i>a</i>, and it outputs a signal of type <i>a</i></li>
-<li>There may be any number of inputs, and each is followed by <i>-&gt;</i>.
-This means that the number of inputs is the number of <i>-&gt;</i> in the
-type.</li>
-<li>There must be exactly one output.  The last <i>a</i> in the type is the
-type of the output.  Later, we will see how to allow a circuit to
-produce several outputs.</li>
+<li>The <i>User Guide</i> explains how to use the language; it is available
+in <code>docs/ UserGuide/ HydraUserGuide.html</code></li>
+<li>The <i>API reference</i> gives types of the exported definitions.  If you
+build using cabal, it will be in the the <code>dist-newstyle</code> directory.
+The path depends on software versions, but may be something like
+<code>dist-newstyle \build \x86_64-windows \ghc-9.2.3 \hydra-3.4.15 \doc
+  \html \hydra \index.html</code> (without the spaces).  If you install using
+cabal, it should also be placed in the standard location for Haskell
+API references.</li>
 </ul>
 
 <p>
-The defining equation specifies local names for the circuit's inputs,
-and it gives a circuit that produces its output.  The defining
-equation for this circuit is <code>simpleCirc x y = and2 x y</code>.  This says
+This is free and open source software released under the GPL-3
+license.
 </p>
+
 <ul class="org-ul">
-<li>We will use the names <code>x</code> and <code>y</code> as local names for the inputs to
-the circuit</li>
-<li>There is an <code>and2</code> logic gate with inputs <code>x</code> and <code>y</code></li>
-<li>The output of that logic gate is the output of the circuit</li>
+<li>Author: John T. O'Donnell, School of Computing Science, University
+of Glasgow</li>
+<li>Copyright (c) 2022 John T. O'Donnell</li>
+<li>License: This software is free and open source, released under the
+GPL-3 license.  See LICENSE.txt.</li>
+<li>Source code repository: <a href="https://github.com/jtod/Hydra">https://github.com/jtod/Hydra</a></li>
+<li>Author's web page: <a href="https://jtod.github.io/index.html">https://jtod.github.io/index.html</a></li>
+<li>Version: see Hydra.cabal</li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-org5037e00" class="outline-4">
-<h4 id="org5037e00">The simulation driver</h4>
-<div class="outline-text-4" id="text-org5037e00">
-<p>
-To test the circuit, we can simulate it with some inputs.  This
-requires a <i>simulation driver</i> which is defined in a separate module
-in the file SimpleCircRun.hs.  The simulation driver defines the
-interface to the circuit and specifies how to format the inputs and
-outputs, so you don't have to read and write thousands of 0s and 1s.
-</p>
-
-<p>
-The file begins by defining the module and importing some required
-libraries.  Every Hydra file needs to import HDL.Hydra.Core.Lib.  In
-addition, a simulation driver like SimpleCircRun needs to import the
-circuit file, which should be in the same directory.
-</p>
-
-<pre class="example" id="org37a06de">
--- SimpleCircdRun.hs:  simulation driver for SimpleCirc
--- This file is part of Hydra. John O'Donnell, 2021.  See Hydra/README
-
-module Main where
-import HDL.Hydra.Core.Lib
-import SimpleCirc
-</pre>
-
-<p>
-A simulation driver can define input data, although this is not
-required.  The data is given as a list of strings.  Each string
-corresponds to one clock cycle, and it gives the values of the inputs
-during that cycle.
-</p>
-
-<pre class="example" id="orga781129">
-testdata1 :: [String]
-testdata1=
-------------------------------
---   x   y     expected output
-------------------------------
-  [ "0  0"   --  0
-  , "0  1"   --  0
-  , "1  0"   --  0
-  , "1  1"   --  1
-  ]
-</pre>
-
-<p>
-The file defines a function <code>main</code> that will run the simulation.
-These two lines are boiler plate and every driver should contain them:
-</p>
-
-<pre class="example" id="org2889082">
-main :: IO ()
-main = driver $ do
-</pre>
-
-<p>
-If you want the simulation to use any test data (e.g. testdata1), the
-useData statement specifies which test data to use.  This command is
-optional; if you don't include it (or if you comment it out) the
-simulation will be interactive, and prompt you for the input values
-every clock cycle.  But if the useData statement is present, the
-simulation will run to completion without any intervention by the
-user.
-</p>
-
-<pre class="example" id="org99f2f61">
--- Input data
-  useData testdata1
-</pre>
-
-<p>
-Every driver is required to define an input port for every circuit
-input.  The convention is that in input signal named x has an input
-prt named in<sub>x</sub>.  Each input port is created with a statement of the
-form portname &lt;- inPortBit "signame".  If the inport is a word, rather
-than a bit, you would definit like this: in<sub>w</sub> &lt;- inPortWord "w" 8
-where 8 is the word size.
-</p>
-
-<p>
-There must be an input signal for each port.  These are defined using
-inbsig for bits, and inwsig for words.
-</p>
-
-<p>
-What is the difference between a port and a signal?  A signal is a
-wire, and it can be connected directly to a circuit.  A port is a data
-structure that contains the signal and also some addiitonal metadata
-required by the simulator.
-</p>
-
-<p>
-Notice that ports are defined using &lt;- and signals are defined with
-the let keyword and =.
-</p>
-
-<pre class="example" id="org0748982">
--- Input ports
-  in_x &lt;- inPortBit "x"
-  in_y &lt;- inPortBit "y"
-
--- Input signals
-  let x = inbsig in_x
-  let y = inbsig in_y
-</pre>
-
-<p>
-The next piece of the driver is an equation that connects the input
-and output signals to the circuit.  This equation is given in a let
-statement
-</p>
-
-<pre class="example" id="orgee9c626">
--- Circuit
-  let z = simpleCirc x y
-</pre>
-
-<p>
-The simulator will print out the values of all the signals for each
-clock cycle.  You can either have the system do this automatically, or
-you can supply a detailed format that gives precise control over the
-output.
-</p>
-
-<p>
-The easiest approach is to ask for automatic output of all the
-signals.  To do this, you need to define an output port for each
-output signal.  This uses the outPortBit function, which takes the
-name of the signal "z" and the corresponding signal z.
-</p>
-
-<pre class="example" id="orgd3c27a1">
--- Output ports
-  out_z &lt;- outPortBit "z" z
-</pre>
-
-<p>
-Alternatively, you can use the format statement which gives precise
-control over the formatting of the simulation output.  The format is a
-list of field specifiers.  The field specifier string "&#x2026;" says that
-the literal string "&#x2026;" should appear in the output.  The field
-specifier bit x says that x is a signal; its value should be printed
-in the output (it will be either 0 or 1).
-</p>
-
-<pre class="example" id="org8b871ac">
--- Formatted output
-  format [string "x=", bit x,
-          string "  y=", bit y,
-          string "   output = ", bit z,
-          string "\n"
-         ]
-</pre>
-
-<p>
-There are several format specifiers, that allow output of words using
-bit strings, decimal, hexadecimal, and both binary and two's
-complement.  See examples/SimDriver for examples of these specifiers.
-</p>
-
-<p>
-The final piece of the driver is the command runSimulation.  If you
-omit this, the simulation won't run and there won't be any output.
-</p>
-
-<pre class="example" id="org3c244e9">
-runSimulation
-</pre>
+<div id="outline-container-org081feee" class="outline-3">
+<h3 id="org081feee"><span class="section-number-3">2.2</span> Installation</h3>
+<div class="outline-text-3" id="text-2-2">
 </div>
-</div>
-
-<div id="outline-container-orgaa79b72" class="outline-4">
-<h4 id="orgaa79b72">Running the circuit simulation</h4>
-<div class="outline-text-4" id="text-orgaa79b72">
+<div id="outline-container-orgfedc772" class="outline-4">
+<h4 id="orgfedc772"><span class="section-number-4">2.2.1</span> Haskell</h4>
+<div class="outline-text-4" id="text-2-2-1">
 <p>
-To run a circuit you should cd to the directory that
-contains the circuit (Circuit.hs) and its simulation driver
-(CircuitRun.hs) files.
+Hydra requires the ghc toolset for Haskell, including ghc and cabal.
+Haskell installers for Macintosh, Windows, and Linux are available at
+<a href="https://www.haskell.org/ghcup/">https://www.haskell.org/ghcup/</a>.
 </p>
 
 <p>
-One way to run the simulation is to use the ghc command, which will
-run the main program in CircuitRun as a single command:
+For Windows, an alternative approach is to use chocolatey; see
+<a href="https://hub.zhox.com/posts/introducing-haskell-dev/">https://hub.zhox.com/posts/introducing-haskell-dev/</a>.  If you have
+chocolatey installed, you can use it to install Haskell easily.  Run
+these commands in Windows PowerShell with administrator priveleges:
 </p>
 
-<pre class="example" id="org687b97a">
-ghc -e main CircuitRun
+<pre class="example" id="orgc5e85f6">
+choco install ghc --force -y
+choco install cabal --force -y
 </pre>
-
-<p>
-An alternative is to use the ghci command, which launches the
-interactive version of ghc.  This offers many useful debugging tools,
-but you need to give it several commands to run the simulation:
-</p>
-
-<pre class="example" id="org48a95b0">
-ghci
-:load CircuitRun
-:main
-</pre>
-</div>
-</div>
-</div>
-
-<div id="outline-container-org6a3a61d" class="outline-3">
-<h3 id="org6a3a61d">Output mode:  Automatic and Formatted</h3>
-<div class="outline-text-3" id="text-org6a3a61d">
-<p>
-You can choose between automatic or manual formatting of the
-simulation results.
-</p>
 
 <ul class="org-ul">
-<li>If a format statement is present, the automatic output is disabled
-and the outport is produced entirely by the format.  However, the
-system will indicate the clock cycles.</li>
-<li>If the format is omitted, then the system will generate output using
-the port definitions.  In this case, outport definitions are
-required.</li>
+<li>-y is necessary; this tells choco to answer with y automatically
+when it needs permission to do something.  Without the -y, it
+doesn't actually ask permission, and the whole installation fails.</li>
+<li>force shouldn't be necessary but seems to be needed if installing
+after a failed installation attempt.</li>
 </ul>
 
 <p>
-A simulation driver must either define the outports, or it must
-contain a format.  If it contains both, the outports are ignored.  So
-if you wish to provide a format there is no need to define the
-outports.
+If you have a previous installation, the following might work:
 </p>
 
-<p>
-For small circuits, it may be easiest to define the outports and use
-the automatic output.  For large circuits, you can make the results
-more compact and more readable by defining a format.
-</p>
-</div>
-</div>
-
-<div id="outline-container-org8b2378e" class="outline-3">
-<h3 id="org8b2378e">Simultation modes:  Batch and Interactive</h3>
-<div class="outline-text-3" id="text-org8b2378e">
-<p>
-You can run a circuit simulation in batch mode, which will run to
-completion with no intervention by the user.  Alternatively, you can
-run it interactively.  The choice between the modes is determined by
-just one line of code: the presence or absence of a useData statement.
-</p>
-
-<p>
-If you run a simulation in interactive mode, the system will prompt
-"hydra&gt;" and wait for you to enter a command.  When it does so, just
-press Enter, which is the command to simulate one clock cycle.  It
-will then prompt you for the value of each signal; enter a decimal
-number.  When all the inputs have been provided, the driver will now
-print out all the signal values and prompt for a command again.  The
-help command will print a list of the available commands.
-</p>
-
-<p>
-You can try out both approaches with the SimpleCircRun driver.  It
-contains a useData, so it will run in batch mode.  But if you comment
-out the useData, the driver will revert to interactive mode.
-</p>
-</div>
-</div>
-
-<div id="outline-container-orgb4a8b46" class="outline-3">
-<h3 id="orgb4a8b46">Connecting several logic gates: mux1</h3>
-<div class="outline-text-3" id="text-orgb4a8b46">
-<p>
-So far we have just looked at a circuit comprising a single logic
-gate.  The next step is to define circuits with several gates and
-wires.
-</p>
-
-<p>
-Files: <b>examples/mux/Mux1.hs</b> and <b>examples/mux/Mux1Run.hs</b>
-</p>
-
-<p>
-The <b>multiplexer</b> is an example of a circuit that can be defined by
-conecting several logic gates together.  It's not just an arbitrary
-example: the multiplexer is one of the most important building blocks
-for larger systems.  There are many varieties of multiplexer; here we
-look at the 1-bit multiplexer, called <b>mux1</b>.
-</p>
-
-<p>
-A multiplexer is a hardware version of the if-then-else expression,
-and is used to perform conditional actions in a circuit.  It takes
-three inputs: a control input <b>c</b>, and two data inputs <b>x</b> and <b>y</b>.
-</p>
-
-<p>
-The idea is that the multiplexer will choose one of the data inputs
-(<b>x</b> or <b>y</b>) and output it.  The data input that is not chosen is
-simply ignored.  The choice is determined by the value of <b>c</b>.
-Informally, the behavior of the multiplexer is:
-</p>
-
-<pre class="example" id="org2fdf814">
-mux1 c x y = if c is zero then x else y
-</pre>
-
-<p>
-(Aside: Sometimes it's helpful to describe some signals as <b>control
-signals</b> because they affect what the circuit does, and to describe
-others as <b>data signals</b> because they carry variable values.  Since
-the behavior of the mux1 is controlled by <b>c</b>, this is a control
-input.  Since <b>x</b> and <b>y</b> are just arbitrary values, these are called
-data signals.  But it's important to realise that this terminology &#x2013;
-control and data signal &#x2013; is just a way of talking about the signals.
-As far as the actual components and wires are concerned, there is no
-difference between data and control.)
-</p>
-
-<p>
-This if-then-else expression is a programming construct, and it
-doesn't directly correspond to digital hardware.  The multiplexer can
-be implemented with logic gates.
-</p>
-
-<p>
-To connect a circuit to an input, write the circuit followed by the
-input.  Thus <b>inv c</b> says there is an inverter, and its input is
-connected to <b>c</b>, and the entire expression <b>inv c</b> denotes the output
-signal produced by the inverter.  Similarly, <b>and2 (inv c) a</b> denotes
-the output of an and2 gate; its first input is the output of the
-inverter and its second input is <b>a</b>.
-</p>
-
-<pre class="example" id="org34455bc">
-mux1 c x y = or2 (and2 (inv c) x) (and2 c y)
-</pre>
-
-<p>
-Here is the complete module defining the multiplexer:
-</p>
-
-<div class="org-src-container">
-<pre class="src src-hydra" id="org4fc30e4">module Mux1 where
-import HDL.Hydra.Core.Lib
-
-mux1 is defined in the Hydra circuit libraries, so here the circuit
-is called mymux1 to ensure that we're actually testing this
-definition
-
-mymux1 :: Bit a =&gt; a -&gt; a -&gt; a -&gt; a
-mymux1 c x y = or2 (and2 (inv c) x) (and2 c y)
+<pre class="example" id="orgda79953">
+choco upgrade ghc cabal -y
 </pre>
 </div>
+</div>
 
-<div class="org-src-container">
-<pre class="src src-hydra" id="org84dd43f">module Main where
--- Mux1Run: test the mux1 circuit
-
-import HDL.Hydra.Core.Lib
-import Mux1
-
-main :: IO ()
-main = mux1Run testdata
-
-testdata :: [[Int]]
-testdata =
------------------------------------------
---   c  x  y       expected result
------------------------------------------
-  [ [0, 0, 0]  --  0  (c=0 so output=x)
-  , [0, 0, 1]  --  0  (c=0 so output=x)
-  , [0, 1, 0]  --  1  (c=0 so output=x)
-  , [0, 1, 1]  --  1  (c=0 so output=x)
-  , [1, 0, 0]  --  0  (c=1 so output=y)
-  , [1, 0, 1]  --  1  (c=1 so output=y)
-  , [1, 1, 0]  --  0  (c=1 so output=y)
-  , [1, 1, 1]  --  1  (c=1 so output=y)
-  ]
-
-mux1Run input = runAllInput input output
-  where
--- Extract input signals  
-    c = getbit input 0
-    x = getbit input 1
-    y = getbit input 2
--- The circuit to be simulated
-    z = mymux1 c x y
--- Format the output
-    output =
-      [string "  c=", bit c,
-       string "  x=", bit x,
-       string "  y=", bit y,
-       string "    output z=", bit z
-      ]
+<div id="outline-container-org7f3ce39" class="outline-4">
+<h4 id="org7f3ce39"><span class="section-number-4">2.2.2</span> Verify that Haskell is working</h4>
+<div class="outline-text-4" id="text-2-2-2">
+<pre class="example" id="org24d9a40">
+$ ghc --version
+The Glorious Glasgow Haskell Compilation System, version 9.2.3
+$ cabal --version
+cabal-install version 3.6.2.0
+compiled using version 3.6.2.0 of the Cabal library
 </pre>
 </div>
-
-<p>
-We can run it with a simulation driver that runs the circuit on all
-possible inputs, so the outputs form a truth table.  It's good
-practice to write the test data with clean indentation, so the inputs
-line up in columns, and to include the expected outputs in comments.
-</p>
-
-<p>
-See examples/mux/Mux1Run.hs')
-</p>
-</div>
 </div>
 
-<div id="outline-container-org4a298e2" class="outline-3">
-<h3 id="org4a298e2">Producing several outputs: halfAdd</h3>
-<div class="outline-text-3" id="text-org4a298e2">
+<div id="outline-container-orgbd985e2" class="outline-4">
+<h4 id="orgbd985e2"><span class="section-number-4">2.2.3</span> Install Hydra</h4>
+<div class="outline-text-4" id="text-2-2-3">
 <p>
-The circuits we have looked at so far have just one output.  We need a
-way to allow circuits to produce any number of outputs.
-</p>
-
-<p>
-Files: <b>examples/adder/HalfAdd.hs</b> and <b>examples/adder/HalfAddRun.hs</b>
-</p>
-
-<p>
-A half adder circuit takes two inputs <b>x</b> and <b>y</b>, and produces a pair
-of outputs, the carry output and the sum output.  The carry is the
-logical <b>and</b> of <b>x</b> and <b>y</b>, while the sum is their exclusive <b>or</b>.
-Here is the circuit specification (file <b>HalfAdd.hs</b>):
-</p>
-
-<p>
-The module statement gives a name to this module, and the import
-statement brings in the essential Hydra library definitions.  The
-circuit definition is a one-line equation which says <b>halfAdd</b> is a
-circuit, gives names <b>x</b> and <b>y</b> to its inputs, and calculates the
-outputs using <b>and2</b> and <b>xor2</b> logic gates.
-</p>
-
-<p>
-To see the circuit working, we can simulate it.  This requires
-three things, all provided in <b>HalfAddRun.hs</b>:
+The Hydra source code is available at
+<a href="https://github.com/jtod/Hydra">https://github.com/jtod/Hydra</a> in both zip and tgz format.  Put the
+file somewhere in your user workspace and unpack it:
 </p>
 
 <ul class="org-ul">
-<li>Suitable test data, expressed as a list of <b>[x,y]</b> inputs</li>
-
-<li>A [Simulation driver](#simulation-drivers), which converts between
-human readable input and output and the internal signal
-representations.  The simulation driver is not part of the
-circuit; it's simply formatting inputs and outputs.</li>
-
-<li>A main program that runs the simulation driver on the test data.</li>
+<li>On Linux: tar -xzf Hydra-i.j.k.tgz</li>
+<li>On Windows use zip, 7zip or tar</li>
 </ul>
 
 <p>
-See `examples/adder/HalfAddRun.hs'
+The directory contains the source code (<code>src</code> directory),
+documentation (<code>docs</code> directory and <code>examples</code> directory), and build
+tools.  Install using these commands:
 </p>
 
-<p>
-Run the simulation using any of the methods given above, e.g. enter
-<b>ghc -e main HalfAddRun</b>.  Here is the result:
-</p>
-
-<pre class="example" id="orgfce8ba2">
-$ ghc -e main HalfAddRun
-Input: x = 0 y = 0  Output: c = 0 s = 0
-Input: x = 0 y = 1  Output: c = 0 s = 1
-Input: x = 1 y = 0  Output: c = 0 s = 1
-Input: x = 1 y = 1  Output: c = 1 s = 0
+<pre class="example" id="org22055a3">
+cabal install --lib
+cabal haddock
 </pre>
-</div>
-</div>
 
-<div id="outline-container-org7ada42c" class="outline-3">
-<h3 id="org7ada42c">Black box with internal signals: add4</h3>
-<div class="outline-text-3" id="text-org7ada42c">
 <p>
-Files: <b>adder/Add4.hs</b> and <b>examples/Add4Run.hs</b>
+<i>Troubleshooting.</i> If the installation fails on Windows, delete this
+directory (using the right version numbers for ghc and hydra) and try
+again:
 </p>
 
-<pre class="example" id="orgbf81755">
-*Main&gt; :main
-  x =  5  y =  8  cin = 0    ==&gt;    cout = 0  s = 13
-  x =  7  y =  3  cin = 0    ==&gt;    cout = 0  s = 10
-  x =  8  y = 12  cin = 0    ==&gt;    cout = 1  s =  4
-  x =  8  y =  1  cin = 0    ==&gt;    cout = 0  s =  9
-  x = 12  y =  1  cin = 1    ==&gt;    cout = 0  s = 14
-  x =  2  y =  3  cin = 1    ==&gt;    cout = 0  s =  6
-  x = 15  y = 15  cin = 1    ==&gt;    cout = 1  s = 15
-(0.00 secs, 252,808 bytes)
-*Main&gt;
+<pre class="example" id="orga20e348">
+C:\Users\johnt\AppData\Roaming\cabal\store\ghc-9.2.3\hydra-3.4.16-hash
 </pre>
+
+<p>
+See the user guides for ghc and cabal for more information.  The
+<code>ghc-pkg list</code> command shows the installed packages.
+</p>
 </div>
 </div>
 
-<div id="outline-container-orgb9c8001" class="outline-3">
-<h3 id="orgb9c8001">Feedback and changing state: BSR4</h3>
-<div class="outline-text-3" id="text-orgb9c8001">
+<div id="outline-container-org6547ddd" class="outline-4">
+<h4 id="org6547ddd"><span class="section-number-4">2.2.4</span> Verify that Hydra is working</h4>
+<div class="outline-text-4" id="text-2-2-4">
 <p>
-Files: <b>BSR4.hs</b> and <b>BSR4Run.hs</b>
+In your shell, go to Hydra/examples/adder and enter:
 </p>
 
-<p>
-A bidirectional shift register
-</p>
-
-<p>
-Define a shift register that takes an operation code op and data
-inputs x, li, ri, and performs an a state change depending on op:
-</p>
-
-<ul class="org-ul">
-<li>op=0 &#x2013; no state change</li>
-<li>op=1 &#x2013; load input word x</li>
-<li>op=2 &#x2013; shift right</li>
-<li>op=3 &#x2013; shift left</li>
-</ul>
-
-<p>
-The circuit uses a building block srb ("shift register block") which
-has an internal state to hold the bit in that position in the word.
-The inputs to an srb are an input from the left (for shifting to the
-right), an input from the right (for shifting to the left), and a bit
-input from the word x (for loading a word).  The circuit outputs a
-triple: the left and right outputs, and the word giving the current
-state of the register.  (Minor point: the left and right outputs
-aren't essential, as they also appear as the most and least
-significant bits of the word output, but this approach makes it easier
-to connect several sr4 circuits together, and it also fits well with
-the definition of the more general sr circuit below.)
-</p>
-
-<p>
-The structure of the 4-bit version comes directly from the data
-dependencies.
-</p>
-
-<p>
-The shift register block uses a dff to hold the state, and it uses a
-mux2 to determine the new value of the state.  This is either the old
-value, the data bit x from a load, or the input from the left or right
-in case of a shift.
-</p>
-
-<p>
-examples/shift/BSR4.hs
-examples/shift/BSR4Run.hs
-</p>
-
-<p>
-The test data and simulation driver are defined in <b>BSR4Run.hs</b>.
-Running the circuit produces this:
-</p>
-
-
-<pre class="example" id="org9e769c9">
-$ ghc -e main BSR4Run
-op=01 l=0 r=0 x=9   Output lo=0 ro=0 y=0
-op=00 l=0 r=0 x=0   Output lo=1 ro=1 y=9
-op=11 l=0 r=0 x=0   Output lo=1 ro=1 y=9
-op=11 l=0 r=1 x=0   Output lo=0 ro=0 y=2
-op=00 l=0 r=0 x=0   Output lo=0 ro=1 y=5
-op=01 l=0 r=0 x=4   Output lo=0 ro=1 y=5
-op=10 l=1 r=0 x=0   Output lo=0 ro=0 y=4
-op=10 l=0 r=0 x=0   Output lo=1 ro=0 y=a
-op=10 l=0 r=0 x=0   Output lo=0 ro=1 y=5
-op=10 l=1 r=0 x=0   Output lo=0 ro=0 y=2
-op=00 l=0 r=0 x=0   Output lo=1 ro=1 y=9
+<pre class="example" id="org35f3f7d">
+$ cd examples/adder
+$ ghc -e main Add4Run
+Batch mode
+----------------------------------------------------------------------
+Cycle 0
+Inputs:   x =  5  y =  8  cin = 0    Outputs: cout = 0  s = 13
+----------------------------------------------------------------------
+Cycle 1
+Inputs:   x =  5  y =  8  cin = 0    Outputs: cout = 0  s = 13
+----------------------------------------------------------------------
+Cycle 2
+Inputs:   x =  5  y =  8  cin = 0    Outputs: cout = 0  s = 13
+----------------------------------------------------------------------
+Cycle 3
+Inputs:   x =  5  y =  8  cin = 0    Outputs: cout = 0  s = 13
+----------------------------------------------------------------------
+Cycle 4
+Inputs:   x =  5  y =  8  cin = 0    Outputs: cout = 0  s = 13
+----------------------------------------------------------------------
+Cycle 5
+Inputs:   x =  5  y =  8  cin = 0    Outputs: cout = 0  s = 13
+----------------------------------------------------------------------
+Cycle 6
+Inputs:   x =  5  y =  8  cin = 0    Outputs: cout = 0  s = 13
+----------------------------------------------------------------------
+Cycle 7
 </pre>
+
+<p>
+This should produce several lines of simulation output showing inputs
+to the adder circuit and the corresponding outputs.
+</p>
+</div>
 </div>
 </div>
 </div>
 
 
-<div id="outline-container-orgd1bedd3" class="outline-2">
-<h2 id="orgd1bedd3">Modules and files</h2>
-</div>
-
-<div id="outline-container-org5ca8a57" class="outline-2">
-<h2 id="org5ca8a57">Connecting components with signals</h2>
-<div class="outline-text-2" id="text-org5ca8a57">
+<div id="outline-container-orgd3835f0" class="outline-2">
+<h2 id="orgd3835f0"><span class="section-number-2">3</span> Connecting components with signals</h2>
+<div class="outline-text-2" id="text-3">
 <p>
 A data value in a circuit is called a <b>signal</b>.  A signal is carried
 by a wire, and it transmits information from one component to another.
@@ -1285,9 +768,9 @@ and T characters &#x2013; they can be hard to tell apart!).
 </p>
 </div>
 
-<div id="outline-container-orgb0308d8" class="outline-3">
-<h3 id="orgb0308d8">Logic gates</h3>
-<div class="outline-text-3" id="text-orgb0308d8">
+<div id="outline-container-orgbd398b3" class="outline-3">
+<h3 id="orgbd398b3"><span class="section-number-3">3.1</span> Logic gates</h3>
+<div class="outline-text-3" id="text-3-1">
 <p>
 To design a new circuit, you need to take a set of existing circuits
 and connect them with signals.  There are several libraries of
@@ -1351,16 +834,16 @@ gates.
 </div>
 </div>
 
-<div id="outline-container-org7b996fd" class="outline-3">
-<h3 id="org7b996fd">Connecting a circuit to inputs</h3>
-<div class="outline-text-3" id="text-org7b996fd">
+<div id="outline-container-orga3b8da3" class="outline-3">
+<h3 id="orga3b8da3"><span class="section-number-3">3.2</span> Connecting a circuit to inputs</h3>
+<div class="outline-text-3" id="text-3-2">
 <p>
 Suppose we have two signals named <b>x</b> and <b>y</b>, and want to connect
 them to the inputs of an <b>or2</b> gate.  This is done by writing the name
 of the component, followed by the names of the input signals:
 </p>
 
-<pre class="example" id="orgda8316d">
+<pre class="example" id="org37daf06">
 or2 x y
 </pre>
 
@@ -1377,7 +860,7 @@ signals.  Here are several applications of logic gates, each with the
 right number of inputs.
 </p>
 
-<pre class="example" id="org1666bdd">
+<pre class="example" id="org87722db">
 inv x
 and2 a one
 xor3 p q r
@@ -1386,9 +869,9 @@ nor4 a zero c d
 </div>
 </div>
 
-<div id="outline-container-org072b203" class="outline-3">
-<h3 id="org072b203">Anonymous signals</h3>
-<div class="outline-text-3" id="text-org072b203">
+<div id="outline-container-orge5e64b6" class="outline-3">
+<h3 id="orge5e64b6"><span class="section-number-3">3.3</span> Anonymous signals</h3>
+<div class="outline-text-3" id="text-3-3">
 <p>
 A signal may be given a name, such as <b>x</b> or <b>y</b>, although this is
 optional.  You can also refer to a signal using an application of a
@@ -1405,7 +888,7 @@ to the output of an inverter whose input is <b>x</b>.  The second input to
 the <b>and2</b> gate should be <b>y</b>.  Here is the correct way to write it:
 </p>
 
-<pre class="example" id="org664677e">
+<pre class="example" id="orgd6bac82">
 and2 (inv x) y
 </pre>
 
@@ -1414,7 +897,7 @@ There are two expressions following <b>and2</b>, denoting its two inputs.
 The following notation would be wrong:
 </p>
 
-<pre class="example" id="org6507c72">
+<pre class="example" id="org6b96a34">
 and2 inv x y   -- Wrong!
 </pre>
 
@@ -1431,7 +914,7 @@ languages requires lots of punctuation to indicate function
 application:
 </p>
 
-<pre class="example" id="org8c69f1f">
+<pre class="example" id="org3138532">
 nand3 (x, and2 (p,q), z);   -- Wrong!
 </pre>
 
@@ -1442,7 +925,7 @@ commas, and they will lead to error messages.  Use parentheses only
 when they are necessary to get the right grouping:
 </p>
 
-<pre class="example" id="orgab31337">
+<pre class="example" id="org779bcd7">
 nand3 x (and2 p q) z
 </pre>
 
@@ -1458,9 +941,9 @@ wires in the diagram correspond to the signals in the text.
 </div>
 </div>
 
-<div id="outline-container-orgaafc81f" class="outline-3">
-<h3 id="orgaafc81f">Named signals and equations</h3>
-<div class="outline-text-3" id="text-orgaafc81f">
+<div id="outline-container-orgf70afed" class="outline-3">
+<h3 id="orgf70afed"><span class="section-number-3">3.4</span> Named signals and equations</h3>
+<div class="outline-text-3" id="text-3-4">
 <p>
 Sometimes it's useful to give a name to a signal, rather than using it
 anonymously.  A named signal can be used as an input to several
@@ -1476,7 +959,7 @@ defines the signal.  The following equation says that the output of
 the <b>and3</b> gate has the name <b>x</b>.
 </p>
 
-<pre class="example" id="orgab0933a">
+<pre class="example" id="orga1ee17b">
 x = and3 a (inv b) c
 </pre>
 
@@ -1486,7 +969,7 @@ matter of style.  Here is a signal defined using three anonymous
 signals:
 </p>
 
-<pre class="example" id="orgfb3bdd8">
+<pre class="example" id="org4df329e">
 x = nand2 (xor2 a b) (inv (nor2 c d))
 </pre>
 
@@ -1495,7 +978,7 @@ This can be rewritten so as to give every signal an explicit name, by
 introducing additional equations:
 </p>
 
-<pre class="example" id="orga5c3da4">
+<pre class="example" id="orga31deca">
 x = nand2 p q
 p = xor2 a b
 q = inv r
@@ -1509,7 +992,7 @@ the right hand side.  It would be wrong, for example, to write
 </p>
 
 
-<pre class="example" id="org2d46176">
+<pre class="example" id="org47d2d52">
 nand2 p q = x   -- Wrong!
 </pre>
 
@@ -1522,9 +1005,9 @@ always a signal name.
 </div>
 </div>
 
-<div id="outline-container-org44082b7" class="outline-3">
-<h3 id="org44082b7">Constant signals</h3>
-<div class="outline-text-3" id="text-org44082b7">
+<div id="outline-container-org6fc8662" class="outline-3">
+<h3 id="org6fc8662"><span class="section-number-3">3.5</span> Constant signals</h3>
+<div class="outline-text-3" id="text-3-5">
 <p>
 A constant signal always carries the same value: either it is always
 0, or always 1.  The names of these two constants are written as
@@ -1535,11 +1018,215 @@ lead to bizarre error messages.
 </p>
 </div>
 </div>
+
+<div id="outline-container-orgfe63655" class="outline-3">
+<h3 id="orgfe63655"><span class="section-number-3">3.6</span> Connecting several logic gates: mux1</h3>
+<div class="outline-text-3" id="text-3-6">
+<p>
+So far we have just looked at a circuit comprising a single logic
+gate.  The next step is to define circuits with several gates and
+wires.
+</p>
+
+<p>
+Files: <b>examples/mux/Mux1.hs</b> and <b>examples/mux/Mux1Run.hs</b>
+</p>
+
+<p>
+The <b>multiplexer</b> is an example of a circuit that can be defined by
+conecting several logic gates together.  It's not just an arbitrary
+example: the multiplexer is one of the most important building blocks
+for larger systems.  There are many varieties of multiplexer; here we
+look at the 1-bit multiplexer, called <b>mux1</b>.
+</p>
+
+<p>
+A multiplexer is a hardware version of the if-then-else expression,
+and is used to perform conditional actions in a circuit.  It takes
+three inputs: a control input <b>c</b>, and two data inputs <b>x</b> and <b>y</b>.
+</p>
+
+<p>
+The idea is that the multiplexer will choose one of the data inputs
+(<b>x</b> or <b>y</b>) and output it.  The data input that is not chosen is
+simply ignored.  The choice is determined by the value of <b>c</b>.
+Informally, the behavior of the multiplexer is:
+</p>
+
+<pre class="example" id="org63488da">
+mux1 c x y = if c is zero then x else y
+</pre>
+
+<p>
+(Aside: Sometimes it's helpful to describe some signals as <b>control
+signals</b> because they affect what the circuit does, and to describe
+others as <b>data signals</b> because they carry variable values.  Since
+the behavior of the mux1 is controlled by <b>c</b>, this is a control
+input.  Since <b>x</b> and <b>y</b> are just arbitrary values, these are called
+data signals.  But it's important to realise that this terminology &#x2013;
+control and data signal &#x2013; is just a way of talking about the signals.
+As far as the actual components and wires are concerned, there is no
+difference between data and control.)
+</p>
+
+<p>
+This if-then-else expression is a programming construct, and it
+doesn't directly correspond to digital hardware.  The multiplexer can
+be implemented with logic gates.
+</p>
+
+<p>
+To connect a circuit to an input, write the circuit followed by the
+input.  Thus <b>inv c</b> says there is an inverter, and its input is
+connected to <b>c</b>, and the entire expression <b>inv c</b> denotes the output
+signal produced by the inverter.  Similarly, <b>and2 (inv c) a</b> denotes
+the output of an and2 gate; its first input is the output of the
+inverter and its second input is <b>a</b>.
+</p>
+
+<pre class="example" id="org25dab54">
+mux1 c x y = or2 (and2 (inv c) x) (and2 c y)
+</pre>
+
+<p>
+Here is the complete module defining the multiplexer:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-hydra" id="org45f5873">module Mux1 where
+import HDL.Hydra.Core.Lib
+
+mux1 is defined in the Hydra circuit libraries, so here the circuit
+is called mymux1 to ensure that we're actually testing this
+definition
+
+mymux1 :: Bit a =&gt; a -&gt; a -&gt; a -&gt; a
+mymux1 c x y = or2 (and2 (inv c) x) (and2 c y)
+</pre>
 </div>
 
-<div id="outline-container-orged09865" class="outline-2">
-<h2 id="orged09865">Defining new circuits</h2>
-<div class="outline-text-2" id="text-orged09865">
+<div class="org-src-container">
+<pre class="src src-hydra" id="org6ffd4f4">module Main where
+-- Mux1Run: test the mux1 circuit
+
+import HDL.Hydra.Core.Lib
+import Mux1
+
+main :: IO ()
+main = mux1Run testdata
+
+testdata :: [[Int]]
+testdata =
+-----------------------------------------
+--   c  x  y       expected result
+-----------------------------------------
+  [ [0, 0, 0]  --  0  (c=0 so output=x)
+  , [0, 0, 1]  --  0  (c=0 so output=x)
+  , [0, 1, 0]  --  1  (c=0 so output=x)
+  , [0, 1, 1]  --  1  (c=0 so output=x)
+  , [1, 0, 0]  --  0  (c=1 so output=y)
+  , [1, 0, 1]  --  1  (c=1 so output=y)
+  , [1, 1, 0]  --  0  (c=1 so output=y)
+  , [1, 1, 1]  --  1  (c=1 so output=y)
+  ]
+
+mux1Run input = runAllInput input output
+  where
+-- Extract input signals  
+    c = getbit input 0
+    x = getbit input 1
+    y = getbit input 2
+-- The circuit to be simulated
+    z = mymux1 c x y
+-- Format the output
+    output =
+      [string "  c=", bit c,
+       string "  x=", bit x,
+       string "  y=", bit y,
+       string "    output z=", bit z
+      ]
+</pre>
+</div>
+
+<p>
+We can run it with a simulation driver that runs the circuit on all
+possible inputs, so the outputs form a truth table.  It's good
+practice to write the test data with clean indentation, so the inputs
+line up in columns, and to include the expected outputs in comments.
+</p>
+
+<p>
+See examples/mux/Mux1Run.hs')
+</p>
+</div>
+</div>
+
+<div id="outline-container-org34fd7c0" class="outline-3">
+<h3 id="org34fd7c0"><span class="section-number-3">3.7</span> Producing several outputs: halfAdd</h3>
+<div class="outline-text-3" id="text-3-7">
+<p>
+The circuits we have looked at so far have just one output.  We need a
+way to allow circuits to produce any number of outputs.
+</p>
+
+<p>
+Files: <b>examples/adder/HalfAdd.hs</b> and <b>examples/adder/HalfAddRun.hs</b>
+</p>
+
+<p>
+A half adder circuit takes two inputs <b>x</b> and <b>y</b>, and produces a pair
+of outputs, the carry output and the sum output.  The carry is the
+logical <b>and</b> of <b>x</b> and <b>y</b>, while the sum is their exclusive <b>or</b>.
+Here is the circuit specification (file <b>HalfAdd.hs</b>):
+</p>
+
+<p>
+The module statement gives a name to this module, and the import
+statement brings in the essential Hydra library definitions.  The
+circuit definition is a one-line equation which says <b>halfAdd</b> is a
+circuit, gives names <b>x</b> and <b>y</b> to its inputs, and calculates the
+outputs using <b>and2</b> and <b>xor2</b> logic gates.
+</p>
+
+<p>
+To see the circuit working, we can simulate it.  This requires
+three things, all provided in <b>HalfAddRun.hs</b>:
+</p>
+
+<ul class="org-ul">
+<li>Suitable test data, expressed as a list of <b>[x,y]</b> inputs</li>
+
+<li>A [Simulation driver](#simulation-drivers), which converts between
+human readable input and output and the internal signal
+representations.  The simulation driver is not part of the
+circuit; it's simply formatting inputs and outputs.</li>
+
+<li>A main program that runs the simulation driver on the test data.</li>
+</ul>
+
+<p>
+See `examples/adder/HalfAddRun.hs'
+</p>
+
+<p>
+Run the simulation using any of the methods given above, e.g. enter
+<b>ghc -e main HalfAddRun</b>.  Here is the result:
+</p>
+
+<pre class="example" id="orgc932d5a">
+$ ghc -e main HalfAddRun
+Input: x = 0 y = 0  Output: c = 0 s = 0
+Input: x = 0 y = 1  Output: c = 0 s = 1
+Input: x = 1 y = 0  Output: c = 0 s = 1
+Input: x = 1 y = 1  Output: c = 1 s = 0
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org2072a11" class="outline-2">
+<h2 id="org2072a11"><span class="section-number-2">4</span> Defining new circuits</h2>
+<div class="outline-text-2" id="text-4">
 <p>
 A new circuit can be designed by connecting together a number of
 existing ones.  The examples given so far consist of logic gates,
@@ -1559,9 +1246,9 @@ computation.  A circuit definition contains up to three parts:
 </ol>
 </div>
 
-<div id="outline-container-org5c683c2" class="outline-3">
-<h3 id="org5c683c2">Circuit type</h3>
-<div class="outline-text-3" id="text-org5c683c2">
+<div id="outline-container-orgf3aaf31" class="outline-3">
+<h3 id="orgf3aaf31"><span class="section-number-3">4.1</span> Circuit type</h3>
+<div class="outline-text-3" id="text-4-1">
 <p>
 The circuit type is covered in a later section.  It's optional,
 although it is generally best to include it.  If present, the type can
@@ -1569,16 +1256,287 @@ be recognized by the :: symbol and a number of right arrow symbols; a
 typical example is
 </p>
 
-<pre class="example" id="org927567f">
+<pre class="example" id="org1343f91">
 halfAdd :: Bit a =&gt; a -&gt; a -&gt; (a,a)
 </pre>
 </div>
 </div>
 
 
-<div id="outline-container-orgb426823" class="outline-3">
-<h3 id="orgb426823">Interface</h3>
-<div class="outline-text-3" id="text-orgb426823">
+<div id="outline-container-org7a4e636" class="outline-3">
+<h3 id="org7a4e636"><span class="section-number-3">4.2</span> Black box with internal signals: add4</h3>
+<div class="outline-text-3" id="text-4-2">
+<p>
+Files: <b>adder/Add4.hs</b> and <b>examples/Add4Run.hs</b>
+</p>
+
+<pre class="example" id="orgd98fffd">
+*Main&gt; :main
+  x =  5  y =  8  cin = 0    ==&gt;    cout = 0  s = 13
+  x =  7  y =  3  cin = 0    ==&gt;    cout = 0  s = 10
+  x =  8  y = 12  cin = 0    ==&gt;    cout = 1  s =  4
+  x =  8  y =  1  cin = 0    ==&gt;    cout = 0  s =  9
+  x = 12  y =  1  cin = 1    ==&gt;    cout = 0  s = 14
+  x =  2  y =  3  cin = 1    ==&gt;    cout = 0  s =  6
+  x = 15  y = 15  cin = 1    ==&gt;    cout = 1  s = 15
+(0.00 secs, 252,808 bytes)
+*Main&gt;
+</pre>
+</div>
+</div>
+
+<div id="outline-container-orgf7d9675" class="outline-3">
+<h3 id="orgf7d9675"><span class="section-number-3">4.3</span> Signal and circuit types</h3>
+<div class="outline-text-3" id="text-4-3">
+<p>
+The <b>type</b> of a value determines what operations you can perform on
+it.  This holds for hardware description just as for programming.  The
+type of a signal determines what kind of information it carries, and
+the type of a circuit specifies the types and organisation of its
+input and output signals.
+</p>
+
+<p>
+A circuit has an interface to the outside world, and an internal
+organization.  To use the circuit, all we need to know about is the
+interface: what inputs need to be provided and what the outputs mean.
+The type expresses a useful portion of this information: it describes
+the number and organization of the inputs and outputs.  The meanings
+of the circuit outputs are not specified by the type; they should be
+described in documentation for the circuit.  Since Hydra models a
+circuit as a function, a circuit type looks just like a function type.
+</p>
+
+<p>
+The type declaration for a circuit is optional, as the compiler can
+work out the type for itself.  If you omit the type, your circuit will
+still run.  However, there are several benefits in writing out the
+type explicitly:
+</p>
+
+<ul class="org-ul">
+<li>The type gives useful information about the interface to the
+circuit.  Later on, if you want to use this circuit in a larger one,
+you will be more interested in the interface than the internal
+components inside the circuit.</li>
+
+<li>There is some redundancy between the type and the defining
+equation.  If there is any inconsistency between the two, the
+compiler will give a type error message.  That may be annoying, but
+at least you know that the error lies somewhere in the (small)
+specification of this one circuit.  If you omit the type
+declaration, but there is an error in the defining equation, you may
+get an error message that says, in effect, ``there is an error
+somewhere in the (large) file'', but it's up to you to figure out
+<b>where</b> the error is.</li>
+
+<li>If you do get a type error message, the compiler will do its
+best to give a helpful and informative message.  In practice,
+though, the error messages will be far more understandable if you
+include type declarations for your circuits.</li>
+</ul>
+
+<p>
+If present, the type of a circuit should come immediately before the
+defining equation.  Type declarations are easily recognizable: they
+always contain the symbol <b>::</b>, and usually contain some arrows <b>=&gt;</b>
+and <b>-&gt;</b>.  A typical example is
+</p>
+
+<pre class="example" id="org7d451f2">
+reg1 :: CBit a =&gt; a -&gt; a
+</pre>
+
+
+<p>
+A type declaration contains several parts:
+</p>
+
+<ul class="org-ul">
+<li>The circuit name (e.g. reg1)</li>
+<li id="The">symbol, read as "has type"</li>
+<li>The signal class ending with =&gt; (e.g. CBit a =&gt;)</li>
+<li>The input and output signal types (e.g. a -&gt; a)</li>
+</ul>
+</div>
+
+<div id="outline-container-org0bf0dcc" class="outline-4">
+<h4 id="org0bf0dcc"><span class="section-number-4">4.3.1</span> Signal types and classes</h4>
+<div class="outline-text-4" id="text-4-3-1">
+<p>
+<b>Short version.</b> If you're writing a routine circuit and just want to
+simulate it, you can just write <b>CBit a =&gt;</b> for the signal class
+constraint and then use <b>a</b> as the type for every bit signal.  In more
+complicated situations, or if you want to know what this means, read
+on.
+</p>
+
+<p>
+When a circuit specification is executed, each signal has a specific
+type.  Many types can be used, for example <b>Bool</b> or <b>Stream Lattice</b>.
+The choice of type determines what happens during execution.  Some
+types lead to combinational simulation, others lead to synchronous
+simulation, others perform a path depth analysis, or generate a
+netlist.
+</p>
+
+<p>
+It's possible to define a circuit with a specific type, and if you do
+this the class constraint (the part before =&gt;) is omitted.  For
+example, we could define a Bool version of the mux1 circuit (call it
+halfAddB) to operate in signals of type Bool:
+</p>
+
+<pre class="example" id="orgf46b634">
+halfAddB :: Bool -&gt; Bool -&gt; (Bool,Bool)
+halfAddB x y = (and2 x y, xor2 x y)
+</pre>
+
+
+<p>
+This is a little simpler than the standard definition halfAdd, which
+(1) uses the type class constraint Bit a =&gt;, and (2) uses <b>a</b> rather
+than <b>Bool</b> as the bit signal type.
+</p>
+</div>
+</div>
+
+<div id="outline-container-org12b63f8" class="outline-4">
+<h4 id="org12b63f8"><span class="section-number-4">4.3.2</span> Combinational signals: Bit a</h4>
+<div class="outline-text-4" id="text-4-3-2">
+<pre class="example" id="orgc47678f">
+halfAdd :: Bit a =&gt; a -&gt; a -&gt; (a,a)
+halfAdd x y = (and2 x y, xor2 x y)
+</pre>
+
+
+<p>
+The main disadvantage of using Bool as the signal type is that
+combinational simulation is the <b>only</b> thing you can do with the
+circuit.  However, Hydra provides many other options.  For example,
+you can perform synchronous simulations over many clock cycles, but to
+do that, the signals must have a different type.  You can do these
+other things with <b>halfAdd</b>, but not with <b>halfAddB</b>.
+</p>
+
+<p>
+There are several different types that can be used to represent a
+signal.  These are organized into two main sets: <b>Bit</b> and <b>CBit</b>.
+<b>Bit</b> is used for combinational circuits, and <b>CBit</b> ("clocked bit")
+is used for sequential circuits.
+</p>
+
+<p>
+signal.  The notation <b>Bit a =&gt;</b> means that <b>a</b> can be any type in the
+set <b>Bit</b>, and therefore all of the Bit operations can be performed on
+a signal of type <b>a</b>.
+</p>
+
+<p>
+The commonest signal class constraints are:
+</p>
+
+<ul class="org-ul">
+<li><b>Bit a =&gt;</b> is used when <b>a</b> is a bit signal in a combinational
+circuit.  The circuit may contain logic gates, but not flip flops.</li>
+
+<li><b>CBit a =&gt;</b> is used when <b>a</b> is a bit signal in a sequential
+circuit, which may contain flip flops and feedback loops as well
+as logic gates.</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-org27a82a8" class="outline-4">
+<h4 id="org27a82a8"><span class="section-number-4">4.3.3</span> Clocked signals: CBit a</h4>
+<div class="outline-text-4" id="text-4-3-3">
+<p>
+The signal class constraint 
+Classes
+</p>
+
+<p>
+Base signal types
+</p>
+
+<ul class="org-ul">
+<li>Bool    (defined in Haskell standard libraries)</li>
+
+<li>Word16  (defined in Haskell standard libraries)</li>
+
+<li>Word32  (defined in Haskell standard libraries)</li>
+
+<li>Lattice (defined in Hydra Core library)</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-org8d9e657" class="outline-4">
+<h4 id="org8d9e657"><span class="section-number-4">4.3.4</span> Inputs and outputs</h4>
+<div class="outline-text-4" id="text-4-3-4">
+<p>
+After the signal class (i.e. after the <b>=&gt;</b> symbol) come the types of
+the inputs and output of the circuit.  In the simplest case, each
+input or output signal is just a bit of type <b>a</b>.  There may be any
+number of input arguments, and there must be one output result.  A
+single arrow <b>-&gt;</b> must follow each input; thus the number of single
+arrows in the type is the same as the number of inputs.
+</p>
+
+<p>
+The inverter has one input of type <b>a</b>, which is followed by <b>-&gt;</b>, and
+the type <b>a</b> of the output appears last.  The type declaration can be
+read as "inv uses signals in the Bit class; it takes one input and
+produces one output":
+Thus the entire type declaration ``*inv :: Bit a =&gt; a -&gt; a*'' says
+``*inv* is a circuit that takes an input bit signal, and produces an
+output bit signal.''
+</p>
+
+<pre class="example" id="org5a25f91">
+inv :: Bit a =&gt; a -&gt; a
+</pre>
+
+
+<p>
+The notation <b>a -&gt; a</b> means "the circuit takes an input signal and
+produces an output signal".  This is similar to conventional
+mathematical notation; for example in mathematics there is a function
+<b>im</b> that is given a complex number (type \(C\)) and returns its
+imaginary part (type \(R\)), and a mathematician might write its type as
+im : C -&gt; R.  (The reason :: is used in Haskell (and Hydra) is that :
+is used for something else.)
+</p>
+
+<p>
+Circuits that take several inputs have a slightly more complicated
+type.  For example, here are the types for the family of and-gates:
+</p>
+
+<pre class="example" id="org31182a6">
+and2 :: Bit a =&gt; a -&gt; a -&gt; a
+and3 :: Bit a =&gt; a -&gt; a -&gt; a -&gt; a
+and4 :: Bit a =&gt; a -&gt; a -&gt; a -&gt; a -&gt; a
+</pre>
+
+<p>
+There is always one output, but any number of inputs, and every input
+is followed by <b>-&gt;</b>.  To find out how many inputs a circuit takes,
+just count the number of times <b>-&gt;</b> appears in its type.
+</p>
+
+<p>
+If a circuit has several outputs, they must be enclosed in a
+container, and this is reflected in the type.  See the section on
+Containers.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgff95f0b" class="outline-3">
+<h3 id="orgff95f0b"><span class="section-number-3">4.4</span> Interface</h3>
+<div class="outline-text-3" id="text-4-4">
 <p>
 The interface gives the name of the circuit and names its inputs and
 outputs.  A circuit is created with a <b>circuit defining equation</b>.
@@ -1589,7 +1547,7 @@ signal:
 </p>
 
 
-<pre class="example" id="orgf120d97">
+<pre class="example" id="org808deba">
 circ_name input1 input2 = expression
 </pre>
 
@@ -1599,7 +1557,7 @@ inputs named <b>input1</b> and <b>input2</b>, and produces an output with the
 specified signal value.  Here is an example:
 </p>
 
-<pre class="example" id="org8c1dcc7">
+<pre class="example" id="org089e7c6">
 mycirc a b c = and3 a (inv b) c
 </pre>
 
@@ -1613,9 +1571,9 @@ at all, to the inputs of <b>mycirc</b>.
 </div>
 </div>
 
-<div id="outline-container-org68b82c6" class="outline-3">
-<h3 id="org68b82c6">Internal signals</h3>
-<div class="outline-text-3" id="text-org68b82c6">
+<div id="outline-container-orgc517e6f" class="outline-3">
+<h3 id="orgc517e6f"><span class="section-number-3">4.5</span> Internal signals</h3>
+<div class="outline-text-3" id="text-4-5">
 <p>
 This part of a definition is optional; if present it follows the
 <b>where</b> keyword.
@@ -1631,7 +1589,7 @@ defining equations.  The general form is:
 </p>
 
 
-<pre class="example" id="orgb9716bf">
+<pre class="example" id="orgad9242c">
 circuit_name input1 input2 = output
   where
     output = ...
@@ -1644,7 +1602,7 @@ Here is an example of a circuit named c22 that takes three inputs and
 produces one output.
 </p>
 
-<pre class="example" id="orga4e3c13">
+<pre class="example" id="org38f25ac">
 c22 a b c = x
   where
     x = xor2 p q
@@ -1663,13 +1621,13 @@ wrong then the specification will be parsed incorrectly.
 </div>
 </div>
 
-<div id="outline-container-orgdafbfcb" class="outline-3">
-<h3 id="orgdafbfcb">Multiple outputs</h3>
+<div id="outline-container-org3c29f65" class="outline-3">
+<h3 id="org3c29f65"><span class="section-number-3">4.6</span> Multiple outputs</h3>
 </div>
 
-<div id="outline-container-org614f290" class="outline-3">
-<h3 id="org614f290">Feedback</h3>
-<div class="outline-text-3" id="text-org614f290">
+<div id="outline-container-org3f62fe4" class="outline-3">
+<h3 id="org3f62fe4"><span class="section-number-3">4.7</span> Feedback</h3>
+<div class="outline-text-3" id="text-4-7">
 <p>
 A register is a circuit with an internal state, and with the ability
 to load an external value into the state and to read out the state.
@@ -1678,7 +1636,7 @@ to load an external value into the state and to read out the state.
 
 
 <div class="org-src-container">
-<pre class="src src-ghci" id="org10e3d71">module Reg1 where
+<pre class="src src-ghci" id="org5ab82ad">module Reg1 where
 import HDL.Hydra.Core.Lib
 import HDL.Hydra.Circuits.Combinational
 
@@ -1748,258 +1706,519 @@ runReg1 input = runAllInput input output
 </div>
 </div>
 
-<div id="outline-container-org0a3963b" class="outline-2">
-<h2 id="org0a3963b">Signal and circuit types</h2>
-<div class="outline-text-2" id="text-org0a3963b">
+<div id="outline-container-org95d2563" class="outline-2">
+<h2 id="org95d2563"><span class="section-number-2">5</span> Circuit simulation</h2>
+<div class="outline-text-2" id="text-5">
 <p>
-The <b>type</b> of a value determines what operations you can perform on
-it.  This holds for hardware description just as for programming.  The
-type of a signal determines what kind of information it carries, and
-the type of a circuit specifies the types and organisation of its
-input and output signals.
+This section shows several examples of circuits of increasing
+complexity.  You should be able to design and simulate some circuits on
+your own by following and modifying these examples.  The various
+design techniques are described in more detail in later sections.  For
+now, just run the examples, and refer back to them as the subsequent
+sections explain the language.  See the examples directory for a
+collection of circuits.
 </p>
 
 <p>
-A circuit has an interface to the outside world, and an internal
-organization.  To use the circuit, all we need to know about is the
-interface: what inputs need to be provided and what the outputs mean.
-The type expresses a useful portion of this information: it describes
-the number and organization of the inputs and outputs.  The meanings
-of the circuit outputs are not specified by the type; they should be
-described in documentation for the circuit.  Since Hydra models a
-circuit as a function, a circuit type looks just like a function type.
+To run a circuit, two definitions are needed: a circuit specification,
+and a simulation driver.  The circuit specification states precisely
+the interface to the circuit, what components it contains, and how
+they are connected.  The simulation driver describes how to provide
+inputs using a readable input format, and how to format the outputs to
+make them readable.  For example, Reg1.hs defines a 1-bit register
+circuit, and Reg1Run.hs is the simulation driver which handles
+conversion between readable notation and internal signals.
 </p>
 
 <p>
-The type declaration for a circuit is optional, as the compiler can
-work out the type for itself.  If you omit the type, your circuit will
-still run.  However, there are several benefits in writing out the
-type explicitly:
+It's good practice to place the circuit definition and its simulation
+driver in separate files.  By convention, the filename of the driver
+ends in "Run".
 </p>
+</div>
 
-<ul class="org-ul">
-<li>The type gives useful information about the interface to the
-circuit.  Later on, if you want to use this circuit in a larger one,
-you will be more interested in the interface than the internal
-components inside the circuit.</li>
-
-<li>There is some redundancy between the type and the defining
-equation.  If there is any inconsistency between the two, the
-compiler will give a type error message.  That may be annoying, but
-at least you know that the error lies somewhere in the (small)
-specification of this one circuit.  If you omit the type
-declaration, but there is an error in the defining equation, you may
-get an error message that says, in effect, ``there is an error
-somewhere in the (large) file'', but it's up to you to figure out
-<b>where</b> the error is.</li>
-
-<li>If you do get a type error message, the compiler will do its
-best to give a helpful and informative message.  In practice,
-though, the error messages will be far more understandable if you
-include type declarations for your circuits.</li>
-</ul>
-
+<div id="outline-container-orgfbc4458" class="outline-3">
+<h3 id="orgfbc4458"><span class="section-number-3">5.1</span> A minimal example: SimpleCirc</h3>
+<div class="outline-text-3" id="text-5-1">
 <p>
-If present, the type of a circuit should come immediately before the
-defining equation.  Type declarations are easily recognizable: they
-always contain the symbol <b>::</b>, and usually contain some arrows <b>=&gt;</b>
-and <b>-&gt;</b>.  A typical example is
-</p>
-
-<pre class="example" id="orgf088d75">
-reg1 :: CBit a =&gt; a -&gt; a
-</pre>
-
-
-<p>
-A type declaration contains several parts:
+To illustrate how to use Hydra, let's start with a very simple
+circuit.  It is just an and2 logic gate, with two 1-bit inputs and a
+1-bit output.  The example is in the directory examples/SimpleCirc,
+and it consists of two files:
 </p>
 
 <ul class="org-ul">
-<li>The circuit name (e.g. reg1)</li>
-<li id="The">symbol, read as "has type"</li>
-<li>The signal class ending with =&gt; (e.g. CBit a =&gt;)</li>
-<li>The input and output signal types (e.g. a -&gt; a)</li>
+<li>SimpleCirc.hs defines a circuit named <code>simpleCirc</code>, which takes two input
+bits and outputs their logical <i>and</i>.  In other words, the <code>simpleCirc</code>
+circuit is just an <code>and2</code> logic gate.</li>
+
+<li>SimpleCircRun.hs defines a simulation driver for the circuit.  The
+file provides a main program named <code>main</code> which runs the simulation
+on test data which is also defined in the file.  In
+SimpleCircRun.hs, the test data runs the circuit on all possible
+inputs 00, 01, 10, 11.  Since the circuit is really just an and2
+gate, the results should be 0, 0, 0, 1.</li>
 </ul>
 </div>
 
-<div id="outline-container-orgeb7624e" class="outline-3">
-<h3 id="orgeb7624e">Signal types and classes</h3>
-<div class="outline-text-3" id="text-orgeb7624e">
+<div id="outline-container-org9348043" class="outline-4">
+<h4 id="org9348043"><span class="section-number-4">5.1.1</span> The circuit specification</h4>
+<div class="outline-text-4" id="text-5-1-1">
 <p>
-<b>Short version.</b> If you're writing a routine circuit and just want to
-simulate it, you can just write <b>CBit a =&gt;</b> for the signal class
-constraint and then use <b>a</b> as the type for every bit signal.  In more
-complicated situations, or if you want to know what this means, read
-on.
+The circuit itself is defined in a module <code>SimpleCirc</code>, which is in the
+file named <code>SimpleCirc.hs</code>.
+</p>
+
+<pre class="example" id="org464922c">
+-- SimpleCirc -- A minimal example of a circuit description
+-- This file is part of Hydra. John O'Donnell, 2021.  See Hydra/README
+
+module SimpleCirc where
+import HDL.Hydra.Core.Lib
+
+-- Define a circuit "simpleCirc" which takes two input bits and outputs
+-- their logical conjunction, using an and2 logic gate
+
+simpleCirc :: Bit a =&gt; a -&gt; a -&gt; a   -- interface: two inputs, one output
+simpleCirc x y = and2 x y            -- implementation uses an and2 logic gate
+</pre>
+
+<p>
+A module begins with a <code>module</code> statement that gives its , followed by
+statements that import other modules.  All Hydra modules must contain
+<code>import HDL.Hydra.Core.Lib</code>, which defines, among other things, the
+<code>and2</code> logic gate.
 </p>
 
 <p>
-When a circuit specification is executed, each signal has a specific
-type.  Many types can be used, for example <b>Bool</b> or <b>Stream Lattice</b>.
-The choice of type determines what happens during execution.  Some
-types lead to combinational simulation, others lead to synchronous
-simulation, others perform a path depth analysis, or generate a
-netlist.
+Following the imports, the module may contain any number of circuit
+definitions.  The definition of the circuit <code>simpleCirc</code> contains two lines
+of code: a <i>type declaration</i> which contains the symbol <code>::</code> and a
+<i>defining equation</i> which contains the symbol =.
 </p>
 
 <p>
-It's possible to define a circuit with a specific type, and if you do
-this the class constraint (the part before =&gt;) is omitted.  For
-example, we could define a Bool version of the mux1 circuit (call it
-halfAddB) to operate in signals of type Bool:
+A type declaration specifies the name of the circuit and its
+interface.  The declaration <i>simpleCirc :: Bit a =&gt; a -&gt; a -&gt; a</i> contains
+several parts:
 </p>
 
-<pre class="example" id="orge029fdd">
+<ul class="org-ul">
+<li>The beginning  means "simpleCirc has type&#x2026;".</li>
+<li>Bit a    means the circuit uses Bit signals, and we will use the
+name <i>a</i> for the type of a bit signal</li>
+<li><i>a -&gt; a -&gt; a</i> says the circuit takes an input of type <i>a</i>, a second
+input also of type <i>a</i>, and it outputs a signal of type <i>a</i></li>
+<li>There may be any number of inputs, and each is followed by <i>-&gt;</i>.
+This means that the number of inputs is the number of <i>-&gt;</i> in the
+type.</li>
+<li>There must be exactly one output.  The last <i>a</i> in the type is the
+type of the output.  Later, we will see how to allow a circuit to
+produce several outputs.</li>
+</ul>
+
+<p>
+The defining equation specifies local names for the circuit's inputs,
+and it gives a circuit that produces its output.  The defining
+equation for this circuit is <code>simpleCirc x y = and2 x y</code>.  This says
+</p>
+<ul class="org-ul">
+<li>We will use the names <code>x</code> and <code>y</code> as local names for the inputs to
+the circuit</li>
+<li>There is an <code>and2</code> logic gate with inputs <code>x</code> and <code>y</code></li>
+<li>The output of that logic gate is the output of the circuit</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-org6a33eeb" class="outline-4">
+<h4 id="org6a33eeb"><span class="section-number-4">5.1.2</span> The simulation driver</h4>
+<div class="outline-text-4" id="text-5-1-2">
+<p>
+To test the circuit, we can simulate it with some inputs.  This
+requires a <i>simulation driver</i> which is defined in a separate module
+in the file SimpleCircRun.hs.  The simulation driver defines the
+interface to the circuit and specifies how to format the inputs and
+outputs, so you don't have to read and write thousands of 0s and 1s.
+</p>
+
+<p>
+The file begins by defining the module and importing some required
+libraries.  Every Hydra file needs to import HDL.Hydra.Core.Lib.  In
+addition, a simulation driver like SimpleCircRun needs to import the
+circuit file, which should be in the same directory.
+</p>
+
+<pre class="example" id="org5ae17a0">
+-- SimpleCircdRun.hs:  simulation driver for SimpleCirc
+-- This file is part of Hydra. John O'Donnell, 2021.  See Hydra/README
+
+module Main where
+import HDL.Hydra.Core.Lib
+import SimpleCirc
+</pre>
+
+<p>
+A simulation driver can define input data, although this is not
+required.  The data is given as a list of strings.  Each string
+corresponds to one clock cycle, and it gives the values of the inputs
+during that cycle.
+</p>
+
+<pre class="example" id="org7410330">
+testdata1 :: [String]
+testdata1=
+------------------------------
+--   x   y     expected output
+------------------------------
+  [ "0  0"   --  0
+  , "0  1"   --  0
+  , "1  0"   --  0
+  , "1  1"   --  1
+  ]
+</pre>
+
+<p>
+The file defines a function <code>main</code> that will run the simulation.
+These two lines are boiler plate and every driver should contain them:
+</p>
+
+<pre class="example" id="org24f9d22">
+main :: IO ()
+main = driver $ do
+</pre>
+
+<p>
+If you want the simulation to use any test data (e.g. testdata1), the
+useData statement specifies which test data to use.  This command is
+optional; if you don't include it (or if you comment it out) the
+simulation will be interactive, and prompt you for the input values
+every clock cycle.  But if the useData statement is present, the
+simulation will run to completion without any intervention by the
+user.
+</p>
+
+<pre class="example" id="org3c52123">
+-- Input data
+  useData testdata1
+</pre>
+
+<p>
+Every driver is required to define an input port for every circuit
+input.  The convention is that in input signal named x has an input
+prt named in<sub>x</sub>.  Each input port is created with a statement of the
+form portname &lt;- inPortBit "signame".  If the inport is a word, rather
+than a bit, you would definit like this: in<sub>w</sub> &lt;- inPortWord "w" 8
+where 8 is the word size.
+</p>
+
+<p>
+There must be an input signal for each port.  These are defined using
+inbsig for bits, and inwsig for words.
+</p>
+
+<p>
+What is the difference between a port and a signal?  A signal is a
+wire, and it can be connected directly to a circuit.  A port is a data
+structure that contains the signal and also some addiitonal metadata
+required by the simulator.
+</p>
+
+<p>
+Notice that ports are defined using &lt;- and signals are defined with
+the let keyword and =.
+</p>
+
+<pre class="example" id="orgad96ccb">
+-- Input ports
+  in_x &lt;- inPortBit "x"
+  in_y &lt;- inPortBit "y"
+
+-- Input signals
+  let x = inbsig in_x
+  let y = inbsig in_y
+</pre>
+
+<p>
+The next piece of the driver is an equation that connects the input
+and output signals to the circuit.  This equation is given in a let
+statement
+</p>
+
+<pre class="example" id="orgece3154">
+-- Circuit
+  let z = simpleCirc x y
+</pre>
+
+<p>
+The simulator will print out the values of all the signals for each
+clock cycle.  You can either have the system do this automatically, or
+you can supply a detailed format that gives precise control over the
+output.
+</p>
+
+<p>
+The easiest approach is to ask for automatic output of all the
+signals.  To do this, you need to define an output port for each
+output signal.  This uses the outPortBit function, which takes the
+name of the signal "z" and the corresponding signal z.
+</p>
+
+<pre class="example" id="orgbce9972">
+-- Output ports
+  out_z &lt;- outPortBit "z" z
+</pre>
+
+<p>
+Alternatively, you can use the format statement which gives precise
+control over the formatting of the simulation output.  The format is a
+list of field specifiers.  The field specifier string "&#x2026;" says that
+the literal string "&#x2026;" should appear in the output.  The field
+specifier bit x says that x is a signal; its value should be printed
+in the output (it will be either 0 or 1).
+</p>
+
+<pre class="example" id="org1129db5">
+-- Formatted output
+  format [string "x=", bit x,
+          string "  y=", bit y,
+          string "   output = ", bit z,
+          string "\n"
+         ]
+</pre>
+
+<p>
+There are several format specifiers, that allow output of words using
+bit strings, decimal, hexadecimal, and both binary and two's
+complement.  See examples/SimDriver for examples of these specifiers.
+</p>
+
+<p>
+The final piece of the driver is the command runSimulation.  If you
+omit this, the simulation won't run and there won't be any output.
+</p>
+
+<pre class="example" id="org4e299cb">
+runSimulation
+</pre>
+</div>
+</div>
+
+<div id="outline-container-orgd4fc5a7" class="outline-4">
+<h4 id="orgd4fc5a7"><span class="section-number-4">5.1.3</span> Running the circuit simulation</h4>
+<div class="outline-text-4" id="text-5-1-3">
+<p>
+To run a circuit you should cd to the directory that
+contains the circuit (Circuit.hs) and its simulation driver
+(CircuitRun.hs) files.
+</p>
+
+<p>
+One way to run the simulation is to use the ghc command, which will
+run the main program in CircuitRun as a single command:
+</p>
+
+<pre class="example" id="orgfd1d4fe">
+ghc -e main CircuitRun
+</pre>
+
+<p>
+An alternative is to use the ghci command, which launches the
+interactive version of ghc.  This offers many useful debugging tools,
+but you need to give it several commands to run the simulation:
+</p>
+
+<pre class="example" id="org4eb6c1f">
+ghci
+:load CircuitRun
+:main
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgf48120b" class="outline-3">
+<h3 id="orgf48120b"><span class="section-number-3">5.2</span> Output mode:  Automatic and Formatted</h3>
+<div class="outline-text-3" id="text-5-2">
+<p>
+You can choose between automatic or manual formatting of the
+simulation results.
+</p>
+
+<ul class="org-ul">
+<li>If a format statement is present, the automatic output is disabled
+and the outport is produced entirely by the format.  However, the
+system will indicate the clock cycles.</li>
+<li>If the format is omitted, then the system will generate output using
+the port definitions.  In this case, outport definitions are
+required.</li>
+</ul>
+
+<p>
+A simulation driver must either define the outports, or it must
+contain a format.  If it contains both, the outports are ignored.  So
+if you wish to provide a format there is no need to define the
+outports.
+</p>
+
+<p>
+For small circuits, it may be easiest to define the outports and use
+the automatic output.  For large circuits, you can make the results
+more compact and more readable by defining a format.
+</p>
+</div>
+</div>
+
+<div id="outline-container-org46f1ee5" class="outline-3">
+<h3 id="org46f1ee5"><span class="section-number-3">5.3</span> Simultation modes:  Batch and Interactive</h3>
+<div class="outline-text-3" id="text-5-3">
+<p>
+You can run a circuit simulation in batch mode, which will run to
+completion with no intervention by the user.  Alternatively, you can
+run it interactively.  The choice between the modes is determined by
+just one line of code: the presence or absence of a useData statement.
+</p>
+
+<p>
+If you run a simulation in interactive mode, the system will prompt
+"hydra&gt;" and wait for you to enter a command.  When it does so, just
+press Enter, which is the command to simulate one clock cycle.  It
+will then prompt you for the value of each signal; enter a decimal
+number.  When all the inputs have been provided, the driver will now
+print out all the signal values and prompt for a command again.  The
+help command will print a list of the available commands.
+</p>
+
+<p>
+You can try out both approaches with the SimpleCircRun driver.  It
+contains a useData, so it will run in batch mode.  But if you comment
+out the useData, the driver will revert to interactive mode.
+</p>
+</div>
+</div>
+
+
+<div id="outline-container-org1073aba" class="outline-3">
+<h3 id="org1073aba"><span class="section-number-3">5.4</span> Feedback and changing state: BSR4</h3>
+<div class="outline-text-3" id="text-5-4">
+<p>
+Files: <b>BSR4.hs</b> and <b>BSR4Run.hs</b>
+</p>
+
+<p>
+A bidirectional shift register
+</p>
+
+<p>
+Define a shift register that takes an operation code op and data
+inputs x, li, ri, and performs an a state change depending on op:
+</p>
+
+<ul class="org-ul">
+<li>op=0 &#x2013; no state change</li>
+<li>op=1 &#x2013; load input word x</li>
+<li>op=2 &#x2013; shift right</li>
+<li>op=3 &#x2013; shift left</li>
+</ul>
+
+<p>
+The circuit uses a building block srb ("shift register block") which
+has an internal state to hold the bit in that position in the word.
+The inputs to an srb are an input from the left (for shifting to the
+right), an input from the right (for shifting to the left), and a bit
+input from the word x (for loading a word).  The circuit outputs a
+triple: the left and right outputs, and the word giving the current
+state of the register.  (Minor point: the left and right outputs
+aren't essential, as they also appear as the most and least
+significant bits of the word output, but this approach makes it easier
+to connect several sr4 circuits together, and it also fits well with
+the definition of the more general sr circuit below.)
+</p>
+
+<p>
+The structure of the 4-bit version comes directly from the data
+dependencies.
+</p>
+
+<p>
+The shift register block uses a dff to hold the state, and it uses a
+mux2 to determine the new value of the state.  This is either the old
+value, the data bit x from a load, or the input from the left or right
+in case of a shift.
+</p>
+
+<p>
+examples/shift/BSR4.hs
+examples/shift/BSR4Run.hs
+</p>
+
+<p>
+The test data and simulation driver are defined in <b>BSR4Run.hs</b>.
+Running the circuit produces this:
+</p>
+
+
+<pre class="example" id="org6e37ebf">
+$ ghc -e main BSR4Run
+op=01 l=0 r=0 x=9   Output lo=0 ro=0 y=0
+op=00 l=0 r=0 x=0   Output lo=1 ro=1 y=9
+op=11 l=0 r=0 x=0   Output lo=1 ro=1 y=9
+op=11 l=0 r=1 x=0   Output lo=0 ro=0 y=2
+op=00 l=0 r=0 x=0   Output lo=0 ro=1 y=5
+op=01 l=0 r=0 x=4   Output lo=0 ro=1 y=5
+op=10 l=1 r=0 x=0   Output lo=0 ro=0 y=4
+op=10 l=0 r=0 x=0   Output lo=1 ro=0 y=a
+op=10 l=0 r=0 x=0   Output lo=0 ro=1 y=5
+op=10 l=1 r=0 x=0   Output lo=0 ro=0 y=2
+op=00 l=0 r=0 x=0   Output lo=1 ro=1 y=9
+</pre>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-org89fa2c8" class="outline-2">
+<h2 id="org89fa2c8"><span class="section-number-2">6</span> Combinational simulation</h2>
+<div class="outline-text-2" id="text-6">
+<p>
+One way to simulate a combinational circuit is to apply it directly to
+its inputs.  This works best if the circuit is defined with Bool as
+the signal type.   Here is an example:
+</p>
+
+<pre class="example" id="org88a6bd6">
+module HalfAddB where
+import HDL.Hydra.Core.Lib
+
+-- Demonstrate a circuit with a concrete type Bool, instead of a type
+-- class constraint Bit a =&gt;.
+
 halfAddB :: Bool -&gt; Bool -&gt; (Bool,Bool)
 halfAddB x y = (and2 x y, xor2 x y)
 </pre>
+</div>
+</div>
 
 
+<div id="outline-container-org41232ba" class="outline-2">
+<h2 id="org41232ba"><span class="section-number-2">7</span> Synchronous sequential simulation</h2>
+<div class="outline-text-2" id="text-7">
 <p>
-This is a little simpler than the standard definition halfAdd, which
-(1) uses the type class constraint Bit a =&gt;, and (2) uses <b>a</b> rather
-than <b>Bool</b> as the bit signal type.
+A sequential circuit may have feedback and state.  A sequential
+circuit is <b>synchronous</b> if it uses a clock to ensure that all flip
+flops change state simultaneously.
 </p>
 </div>
 </div>
 
-<div id="outline-container-org859cbc0" class="outline-3">
-<h3 id="org859cbc0">Combinational signals: Bit a</h3>
-<div class="outline-text-3" id="text-org859cbc0">
-<pre class="example" id="orga4cda9a">
-halfAdd :: Bit a =&gt; a -&gt; a -&gt; (a,a)
-halfAdd x y = (and2 x y, xor2 x y)
-</pre>
 
-
-<p>
-The main disadvantage of using Bool as the signal type is that
-combinational simulation is the <b>only</b> thing you can do with the
-circuit.  However, Hydra provides many other options.  For example,
-you can perform synchronous simulations over many clock cycles, but to
-do that, the signals must have a different type.  You can do these
-other things with <b>halfAdd</b>, but not with <b>halfAddB</b>.
-</p>
-
-<p>
-There are several different types that can be used to represent a
-signal.  These are organized into two main sets: <b>Bit</b> and <b>CBit</b>.
-<b>Bit</b> is used for combinational circuits, and <b>CBit</b> ("clocked bit")
-is used for sequential circuits.
-</p>
-
-<p>
-signal.  The notation <b>Bit a =&gt;</b> means that <b>a</b> can be any type in the
-set <b>Bit</b>, and therefore all of the Bit operations can be performed on
-a signal of type <b>a</b>.
-</p>
-
-<p>
-The commonest signal class constraints are:
-</p>
-
-<ul class="org-ul">
-<li><b>Bit a =&gt;</b> is used when <b>a</b> is a bit signal in a combinational
-circuit.  The circuit may contain logic gates, but not flip flops.</li>
-
-<li><b>CBit a =&gt;</b> is used when <b>a</b> is a bit signal in a sequential
-circuit, which may contain flip flops and feedback loops as well
-as logic gates.</li>
-</ul>
-</div>
+<div id="outline-container-org1c54c49" class="outline-2">
+<h2 id="org1c54c49"><span class="section-number-2">8</span> Modules and files</h2>
 </div>
 
-<div id="outline-container-org1e8734d" class="outline-3">
-<h3 id="org1e8734d">Clocked signals: CBit a</h3>
-<div class="outline-text-3" id="text-org1e8734d">
-<p>
-The signal class constraint 
-Classes
-</p>
-
-<p>
-Base signal types
-</p>
-
-<ul class="org-ul">
-<li>Bool    (defined in Haskell standard libraries)</li>
-
-<li>Word16  (defined in Haskell standard libraries)</li>
-
-<li>Word32  (defined in Haskell standard libraries)</li>
-
-<li>Lattice (defined in Hydra Core library)</li>
-</ul>
-</div>
-</div>
-
-<div id="outline-container-orga230b6c" class="outline-3">
-<h3 id="orga230b6c">Inputs and outputs</h3>
-<div class="outline-text-3" id="text-orga230b6c">
-<p>
-After the signal class (i.e. after the <b>=&gt;</b> symbol) come the types of
-the inputs and output of the circuit.  In the simplest case, each
-input or output signal is just a bit of type <b>a</b>.  There may be any
-number of input arguments, and there must be one output result.  A
-single arrow <b>-&gt;</b> must follow each input; thus the number of single
-arrows in the type is the same as the number of inputs.
-</p>
-
-<p>
-The inverter has one input of type <b>a</b>, which is followed by <b>-&gt;</b>, and
-the type <b>a</b> of the output appears last.  The type declaration can be
-read as "inv uses signals in the Bit class; it takes one input and
-produces one output":
-Thus the entire type declaration ``*inv :: Bit a =&gt; a -&gt; a*'' says
-``*inv* is a circuit that takes an input bit signal, and produces an
-output bit signal.''
-</p>
-
-<pre class="example" id="orgbda0595">
-inv :: Bit a =&gt; a -&gt; a
-</pre>
-
-
-<p>
-The notation <b>a -&gt; a</b> means "the circuit takes an input signal and
-produces an output signal".  This is similar to conventional
-mathematical notation; for example in mathematics there is a function
-<b>im</b> that is given a complex number (type \(C\)) and returns its
-imaginary part (type \(R\)), and a mathematician might write its type as
-im : C -&gt; R.  (The reason :: is used in Haskell (and Hydra) is that :
-is used for something else.)
-</p>
-
-<p>
-Circuits that take several inputs have a slightly more complicated
-type.  For example, here are the types for the family of and-gates:
-</p>
-
-<pre class="example" id="org946d654">
-and2 :: Bit a =&gt; a -&gt; a -&gt; a
-and3 :: Bit a =&gt; a -&gt; a -&gt; a -&gt; a
-and4 :: Bit a =&gt; a -&gt; a -&gt; a -&gt; a -&gt; a
-</pre>
-
-<p>
-There is always one output, but any number of inputs, and every input
-is followed by <b>-&gt;</b>.  To find out how many inputs a circuit takes,
-just count the number of times <b>-&gt;</b> appears in its type.
-</p>
-
-<p>
-If a circuit has several outputs, they must be enclosed in a
-container, and this is reflected in the type.  See the section on
-Containers.
-</p>
-</div>
-</div>
-</div>
-
-<div id="outline-container-orge2a445d" class="outline-2">
-<h2 id="orge2a445d">Containers</h2>
-<div class="outline-text-2" id="text-orge2a445d">
+<div id="outline-container-org54793de" class="outline-2">
+<h2 id="org54793de"><span class="section-number-2">9</span> Containers</h2>
+<div class="outline-text-2" id="text-9">
 <p>
 In a physical circuit, every wire carries one bit, and doesn't have
 any relationship to any other wire (unless it is actually connected to
@@ -2048,9 +2267,9 @@ to write compact and readable descriptions of such large circuits.
 </p>
 </div>
 
-<div id="outline-container-org773e982" class="outline-3">
-<h3 id="org773e982">Tuples</h3>
-<div class="outline-text-3" id="text-org773e982">
+<div id="outline-container-orgc1be2ae" class="outline-3">
+<h3 id="orgc1be2ae"><span class="section-number-3">9.1</span> Tuples</h3>
+<div class="outline-text-3" id="text-9-1">
 <p>
 Tuples provide the simplest way to give a single name to a bundle of
 signals.
@@ -2098,7 +2317,7 @@ outputs, <b>and2 x y</b> as well as <b>or2 x y</b>.  Let's name the circuit
 <b>aor2</b>.  Here is a full definition:
 </p>
 
-<pre class="example" id="org0d9318f">
+<pre class="example" id="org71e6fd8">
 aor :: Bit a =&gt; a -&gt; a -&gt; (a,a)
 aor x y = (and2 x y, or2 x y)
 </pre>
@@ -2133,7 +2352,7 @@ notation is to say that the circuit has just one input, which is a
 cluster containing two elements:
 </p>
 
-<pre class="example" id="org8c9e5f2">
+<pre class="example" id="orga1cfa40">
 aorTup :: Bit a =&gt; (a,a) -&gt; (a,a)
 aorTup (x,y) = (and2 x y, or2 x y)
 </pre>
@@ -2180,7 +2399,7 @@ are needed as inputs to several other building block circuits <b>f1</b>,
 written out explicitly:
 </p>
 
-<pre class="example" id="org25ae588">
+<pre class="example" id="org2086537">
 circ :: Bit a =&gt; a -&gt; a -&gt; a
 circ x y = z
   where
@@ -2195,7 +2414,7 @@ But we might be able to simplify this by changing the types of <b>circ</b>,
 <b>f1</b>, <b>f2</b>, and <b>f3</b> to collect <b>x</b> and <b>y</b> into a tuple.
 </p>
 
-<pre class="example" id="org6f0fb95">
+<pre class="example" id="org269be2d">
 circ :: Bit a =&gt; (a,a) -&gt; a
 circ xy = z
   where
@@ -2223,7 +2442,7 @@ following equation defines <b>alpha</b> and <b>beta</b> to be the names of the
 elements of a tuple named <b>pair</b>:
 </p>
 
-<pre class="example" id="org74dd5d1">
+<pre class="example" id="org470e967">
 (alpha,beta) = pair
 </pre>
 
@@ -2234,7 +2453,7 @@ element is a 3-tuple <b>(x,y,z)</b>.  The type is
 </p>
 
 
-<pre class="example" id="org21179fa">
+<pre class="example" id="org56ce9de">
 (p, (x,y,z)) :: (a, (a,a,a))
 </pre>
 
@@ -2270,9 +2489,9 @@ output type <b>(a,b)</b>.
 </div>
 </div>
 
-<div id="outline-container-org284e499" class="outline-3">
-<h3 id="org284e499">Words</h3>
-<div class="outline-text-3" id="text-org284e499">
+<div id="outline-container-orga8773c3" class="outline-3">
+<h3 id="orga8773c3"><span class="section-number-3">9.2</span> Words</h3>
+<div class="outline-text-3" id="text-9-2">
 <p>
 There are two kinds of cluster that allow several signals to be
 collected together into one entity.  The previous section discussed
@@ -2298,7 +2517,7 @@ Here is an alternative definition of the half adder:
 </p>
 
 
-<pre class="example" id="org360812c">
+<pre class="example" id="orgdae45d6">
 halfAddw :: Bit a -&gt; a -&gt; a -&gt; [a]
 halfAddw x y = [c,s]
   where
@@ -2334,7 +2553,7 @@ we could define a word <b>x</b> of these bits with the equation
 </p>
 
 
-<pre class="example" id="org07c7d7b">
+<pre class="example" id="org76ff1b6">
 w = [x0,x1,x2,x3]
 </pre>
 
@@ -2348,7 +2567,7 @@ as the index of the rightmost element, and the indices count up going
 to the left.
 </p>
 
-<pre class="example" id="org29daf13">
+<pre class="example" id="org090f07b">
 [x0,x1,x2,x3]   -- Big Endian convention
 [x3,x2,x1,x0]   -- Little Endian convention
 </pre>
@@ -2391,7 +2610,7 @@ returns an integer giving its size.
 </p>
 
 
-<pre class="example" id="org2bf35c5">
+<pre class="example" id="org1907e6c">
 length :: [a] -&gt; Int
 </pre>
 
@@ -2415,9 +2634,9 @@ example circuits will be presented.
 </div>
 </div>
 
-<div id="outline-container-orgf1ef5be" class="outline-3">
-<h3 id="orgf1ef5be">A circuit with words and internal signals</h3>
-<div class="outline-text-3" id="text-orgf1ef5be">
+<div id="outline-container-orge44b1bb" class="outline-3">
+<h3 id="orge44b1bb"><span class="section-number-3">9.3</span> A circuit with words and internal signals</h3>
+<div class="outline-text-3" id="text-9-3">
 <p>
 Files: <b>Add4.hs</b> and <b>Add4Run.hs</b>
 </p>
@@ -2432,9 +2651,9 @@ run the simulation, enter <b>ghc -e main Add4Run</b>.  Here is the output:
 </div>
 
 
-<div id="outline-container-org49168c5" class="outline-4">
-<h4 id="org49168c5">Building words</h4>
-<div class="outline-text-4" id="text-org49168c5">
+<div id="outline-container-org29ee008" class="outline-4">
+<h4 id="org29ee008"><span class="section-number-4">9.3.1</span> Building words</h4>
+<div class="outline-text-4" id="text-9-3-1">
 <p>
 If you have expressions that define some signals, a word comprising
 the signals can be constructed by writing the expressions in square
@@ -2442,7 +2661,7 @@ brackets, separated by commas.
 </p>
 
 
-<pre class="example" id="orgd230989">
+<pre class="example" id="org38142e7">
 [p,q,r,s]
 </pre>
 
@@ -2454,7 +2673,7 @@ empty word, <b>[x]</b> is a word containing just one element, and so on.
 </p>
 
 
-<pre class="example" id="org7288d35">
+<pre class="example" id="org44d1575">
 []                          -- length = 0
 [x]                         -- length = 1
 [x,y]                       -- length = 2
@@ -2473,7 +2692,7 @@ operator are summarized as follows:
 </p>
 
 
-<pre class="example" id="orged173ef">
+<pre class="example" id="org8986b4e">
 x :: a
 w :: [a]
 (x:w) :: [a]
@@ -2491,16 +2710,16 @@ examples and properties of append:
 </p>
 
 
-<pre class="example" id="org6ade1e1">
+<pre class="example" id="orgd975ae3">
 [x0,x1,x2,x3] ++ [y0,y1] = [x0,x1,x2,x3,y0,y1]
 length (w1 ++ w2) = length w1 + length w2
 </pre>
 </div>
 </div>
 
-<div id="outline-container-org17df880" class="outline-4">
-<h4 id="org17df880">Accessing parts of a word</h4>
-<div class="outline-text-4" id="text-org17df880">
+<div id="outline-container-org2af935f" class="outline-4">
+<h4 id="org2af935f"><span class="section-number-4">9.3.2</span> Accessing parts of a word</h4>
+<div class="outline-text-4" id="text-9-3-2">
 <p>
 Often we can perform operations on entire words, using word-oriented
 digital circuits, without ever accessing individual elements of a
@@ -2521,7 +2740,7 @@ length\  W\), then <b>w!!i</b> is an error.
 
 
 
-<pre class="example" id="org38d5024">
+<pre class="example" id="orgff6986e">
 w!!i                   i'th bit of word w
 field w i j            bits i..i+j-1 of word w
 </pre>
@@ -2535,7 +2754,7 @@ most significant bit <b>msb w</b> is equivalent to <b>w !! 0</b>.
 </p>
 
 
-<pre class="example" id="org7d8bc2b">
+<pre class="example" id="org0af42bf">
 w !! i                 (!!) :: [a] -&gt; Int -&gt; a
 lsb w                  lsb :: [a] -&gt; a
 msb w                  msb :: [a] -&gt; a
@@ -2563,7 +2782,7 @@ starting position of the field, and <b>s</b> is its size.  Thus <b>field
 
 
 
-<pre class="example" id="orged10547">
+<pre class="example" id="org2197e19">
 type Field = (Int,Int)
 take i w                 take :: Int -&gt; [a] -&gt; [a]
 drop i w                 drop :: Int -&gt; [a] -&gt; [a]
@@ -2580,7 +2799,7 @@ bits don't have to be repeated, but on the other hand the type doesn't
 express the fact that this circuit works only on 4-bit words.
 </p>
 
-<pre class="example" id="org0cc08d8">
+<pre class="example" id="orgbf1055a">
 inv4 :: Bit a =&gt; [a] -&gt; [a]
 inv4 [x0,x1,x2,x3] = [inv x0, inv x1, inv x2, inv x3]
 </pre>
@@ -2599,9 +2818,9 @@ no matter how large.
 </div>
 </div>
 
-<div id="outline-container-org9029402" class="outline-3">
-<h3 id="org9029402">Nested clusters</h3>
-<div class="outline-text-3" id="text-org9029402">
+<div id="outline-container-org2bfe54f" class="outline-3">
+<h3 id="org2bfe54f"><span class="section-number-3">9.4</span> Nested clusters</h3>
+<div class="outline-text-3" id="text-9-4">
 <p>
 The cluster types can be nested.  A tuple may contain words (or deeper
 tuples), and a word may contain tuples (or deeper words, although that
@@ -2686,7 +2905,7 @@ make some changes to the grouping notation for a circuit after you
 start using it extensively!
 </p>
 
-<pre class="example" id="org7a9d7bf">
+<pre class="example" id="orge10981b">
 rippleAdd4 c [(x0,y0), (x1,y1), (x2,y2), (x3,y3)] =
     (c0, [s0,s1,s2,s3])
   where
@@ -2725,49 +2944,15 @@ connect them up appropriately.
 </div>
 </div>
 
-<div id="outline-container-org3543c87" class="outline-2">
-<h2 id="org3543c87">Combinational simulation</h2>
-<div class="outline-text-2" id="text-org3543c87">
-<p>
-One way to simulate a combinational circuit is to apply it directly to
-its inputs.  This works best if the circuit is defined with Bool as
-the signal type.   Here is an example:
-</p>
 
-<pre class="example" id="org96fdca5">
-module HalfAddB where
-import HDL.Hydra.Core.Lib
-
--- Demonstrate a circuit with a concrete type Bool, instead of a type
--- class constraint Bit a =&gt;.
-
-halfAddB :: Bool -&gt; Bool -&gt; (Bool,Bool)
-halfAddB x y = (and2 x y, xor2 x y)
-</pre>
+<div id="outline-container-org0f970a2" class="outline-2">
+<h2 id="org0f970a2"><span class="section-number-2">10</span> Standard library for bits</h2>
+<div class="outline-text-2" id="text-10">
 </div>
-</div>
-
-
-<div id="outline-container-org69d70b0" class="outline-2">
-<h2 id="org69d70b0">Synchronous sequential simulation</h2>
-<div class="outline-text-2" id="text-org69d70b0">
-<p>
-A sequential circuit may have feedback and state.  A sequential
-circuit is <b>synchronous</b> if it uses a clock to ensure that all flip
-flops change state simultaneously.
-</p>
-</div>
-</div>
-
-
-<div id="outline-container-org01ea78c" class="outline-2">
-<h2 id="org01ea78c">Standard library for bits</h2>
-<div class="outline-text-2" id="text-org01ea78c">
-</div>
-<div id="outline-container-org5930e4f" class="outline-3">
-<h3 id="org5930e4f">Constant signals</h3>
-<div class="outline-text-3" id="text-org5930e4f">
-<pre class="example" id="org5607b9d">
+<div id="outline-container-org6d6dc16" class="outline-3">
+<h3 id="org6d6dc16"><span class="section-number-3">10.1</span> Constant signals</h3>
+<div class="outline-text-3" id="text-10-1">
+<pre class="example" id="orgf63781e">
 zero                   signal with constant 0 value
 one                    signal with constant 1 value
 </pre>
@@ -2775,10 +2960,10 @@ one                    signal with constant 1 value
 </div>
 
 
-<div id="outline-container-orgeb0b9e5" class="outline-3">
-<h3 id="orgeb0b9e5">Logic gates</h3>
-<div class="outline-text-3" id="text-orgeb0b9e5">
-<pre class="example" id="orgd2c14db">
+<div id="outline-container-org10bb67a" class="outline-3">
+<h3 id="org10bb67a"><span class="section-number-3">10.2</span> Logic gates</h3>
+<div class="outline-text-3" id="text-10-2">
+<pre class="example" id="org4354d9d">
 inv                    inverter
 and2, and3, and4       and gate with 2, 3, 4 inputs
 nand2, nand3, nand4    and gate with 2, 3, 4 inputs
@@ -2789,14 +2974,14 @@ xor2, xor3, xor4       xor gate with 2, 3, 4 inputs
 </div>
 </div>
 
-<div id="outline-container-org0d8ea77" class="outline-3">
-<h3 id="org0d8ea77">Replicating a signal</h3>
-<div class="outline-text-3" id="text-org0d8ea77">
+<div id="outline-container-org0cfea13" class="outline-3">
+<h3 id="org0cfea13"><span class="section-number-3">10.3</span> Replicating a signal</h3>
+<div class="outline-text-3" id="text-10-3">
 <p>
 Fanout takes a signal and splits it to several outputs.
 </p>
 
-<pre class="example" id="org4647c98">
+<pre class="example" id="orgeee98d6">
 fanout2 :: a -&gt; (a,a)
 fanout2 x = (x,x)
 
@@ -2809,10 +2994,10 @@ fanout4 x = (x,x,x,x)
 </div>
 </div>
 
-<div id="outline-container-org68146f6" class="outline-3">
-<h3 id="org68146f6">Multiplexers and demultiplexers</h3>
-<div class="outline-text-3" id="text-org68146f6">
-<pre class="example" id="orgc59f338">
+<div id="outline-container-org7b80850" class="outline-3">
+<h3 id="org7b80850"><span class="section-number-3">10.4</span> Multiplexers and demultiplexers</h3>
+<div class="outline-text-3" id="text-10-4">
+<pre class="example" id="org1b78c3b">
 mux1 :: Bit a =&gt; a -&gt; a -&gt; a -&gt; a
 mux1 p a b = x
   where x = or2 (and2 (inv p) a) (and2 p b)
@@ -2839,14 +3024,14 @@ mux22 (p0,p1) (a0,a1) (b0,b1) (c0,c1) (d0,d1) = (x,y)
 </pre>
 
 
-<pre class="example" id="orgff7be98">
+<pre class="example" id="org1e83392">
 mux1 :: Bit a =&gt; a -&gt; a -&gt; a -&gt; a
 mux1 p a b = x
   where x = or2 (and2 (inv p) a) (and2 p b)
 </pre>
 
 
-<pre class="example" id="org010720c">
+<pre class="example" id="orga34f980">
 mux2 :: Bit a =&gt; (a,a) -&gt; a -&gt; a -&gt; a -&gt; a -&gt; a
 mux2 (c,d) p q r s =
   mux1 c  (mux1 d p q)
@@ -2855,7 +3040,7 @@ mux2 (c,d) p q r s =
 
 
 
-<pre class="example" id="orgdb62d69">
+<pre class="example" id="org73e2722">
 mux3 :: Bit a =&gt; (a,a,a) -&gt; a -&gt; a -&gt; a -&gt; a -&gt; a-&gt; a -&gt; a -&gt; a -&gt; a
 mux3 (c0,c1,c2) a0 a1 a2 a3 a4 a5 a6 a7 =
   mux1 c0
@@ -2869,7 +3054,7 @@ mux3 (c0,c1,c2) a0 a1 a2 a3 a4 a5 a6 a7 =
 
 
 
-<pre class="example" id="orgbf4b27a">
+<pre class="example" id="org86f1504">
 mux22 :: Bit a =&gt; (a,a) -&gt; (a,a) -&gt; (a,a) -&gt; (a,a) -&gt; (a,a) -&gt; (a,a)
 mux22 (p0,p1) (a0,a1) (b0,b1) (c0,c1) (d0,d1) = (x,y)
   where x = mux2 (p0,p1) a0 b0 c0 d0
@@ -2895,7 +3080,7 @@ provides a good practical example of the use of tuples.
 </p>
 
 
-<pre class="example" id="org865ec5f">
+<pre class="example" id="orgff6fdf6">
 (y0,y1) = demux1 c x
 </pre>
 
@@ -2910,13 +3095,13 @@ to the constant 0.  To summarize, the behavior of the <b>demux1</b> is
 </p>
 
 
-<pre class="example" id="orgd748038">
+<pre class="example" id="org5b4a478">
 y0 = if c==0 then x else 0
 y1 = if c==1 then x else 0
 </pre>
 
 
-<pre class="example" id="org2098d40">
+<pre class="example" id="org00c8426">
  c   x   y0   y1
 --- --- ---- ----
  0   0    0    0
@@ -2932,7 +3117,7 @@ see that the <b>y1</b> has the same truth table as the <b>and2</b> gate, and
 </p>
 
 
-<pre class="example" id="orgf9bc814">
+<pre class="example" id="orgf2ed676">
 demux1 :: Bit a =&gt; a -&gt; a -&gt; (a,a)
 demux1 c x = (y0,y1)
   where  y0 = and2 (inv c) x
@@ -2951,7 +3136,7 @@ circuit and the choice between them is a matter of style.
 </p>
 
 
-<pre class="example" id="orgf78f167">
+<pre class="example" id="org3b58e7a">
 demux1 :: Bit a =&gt; a -&gt; a -&gt; (a,a)
 demux1 c x = (and2 (inv c) x, and2 c x)
 </pre>
@@ -2972,7 +3157,7 @@ outputs.
 </p>
 
 
-<pre class="example" id="orgef66962">
+<pre class="example" id="org0dd3634">
 demux2 :: Bit a =&gt; (a,a) -&gt; a -&gt; (a,a,a,a)
 demux2 (c0,c1) x = (y0,y1,y2,y3)
   where  (p,q) = demux1 c0 x
@@ -2982,9 +3167,9 @@ demux2 (c0,c1) x = (y0,y1,y2,y3)
 </div>
 </div>
 
-<div id="outline-container-orgf523fa8" class="outline-3">
-<h3 id="orgf523fa8">Bit addition</h3>
-<div class="outline-text-3" id="text-orgf523fa8">
+<div id="outline-container-org1e4e1b6" class="outline-3">
+<h3 id="org1e4e1b6"><span class="section-number-3">10.5</span> Bit addition</h3>
+<div class="outline-text-3" id="text-10-5">
 <p>
 When two bits are added together, the result could be 0, 1, or 2.  Two
 bits are needed to represent the result, so a bit adder is an example
@@ -3106,7 +3291,7 @@ and the sum function is <b>xor2</b>.
 </p>
 
 
-<pre class="example" id="orgd944cc7">
+<pre class="example" id="org82ea717">
 halfAdd :: Bit a =&gt; a -&gt; a -&gt; (a,a)
 halfAdd x y = (c,s)
   where
@@ -3122,7 +3307,7 @@ directly in the output tuple:
 </p>
 
 
-<pre class="example" id="org6c487ac">
+<pre class="example" id="org07e9094">
 halfAdd :: Bit a =&gt; a -&gt; a -&gt; (a,a)
 halfAdd x y = (and2 x y, xor2 x y)
 </pre>
@@ -3226,7 +3411,7 @@ choice for handling the three input signals.  They could be treated as
 separate arguments:
 </p>
 
-<pre class="example" id="org58802cd">
+<pre class="example" id="org06d281b">
 fullAdd :: Bit a =&gt; a -&gt; a -&gt; a -&gt; (a,a)   -- version 1
 </pre>
 
@@ -3234,7 +3419,7 @@ fullAdd :: Bit a =&gt; a -&gt; a -&gt; a -&gt; (a,a)   -- version 1
 Alternatively, the three inputs could be collected into a tuple:
 </p>
 
-<pre class="example" id="orgf735fed">
+<pre class="example" id="org9ca9008">
 fullAdd :: Bit a =&gt; (a,a,a) -&gt; (a,a)   -- version 2
 </pre>
 
@@ -3246,7 +3431,7 @@ the inputs:
 </p>
 
 
-<pre class="example" id="org7100b63">
+<pre class="example" id="org9ee8668">
 fullAdd :: Bit a =&gt; (a,a) -&gt; a -&gt; (a,a)   -- version 3
 fullAdd :: Bit a =&gt; a -&gt; (a,a) -&gt; (a,a)   -- version 4
 </pre>
@@ -3279,7 +3464,7 @@ auxiliary circuits, <b>bcarry</b> and <b>bsum</b>.
 </p>
 
 
-<pre class="example" id="org80cd83e">
+<pre class="example" id="org92c3778">
 fullAdd :: Bit a =&gt; (a,a) -&gt; a -&gt; (a,a)
 fullAdd (x,y) c = (bcarry (x,y) c, bsum (x,y) c)
 </pre>
@@ -3294,7 +3479,7 @@ such as <b>xy</b>, to the cluster <b>(x,y)</b>.  This shortens the notation:
 </p>
 
 
-<pre class="example" id="orgde41de5">
+<pre class="example" id="org40c738a">
 fullAdd :: Bit a =&gt; (a,a) -&gt; a -&gt; (a,a)
 fullAdd xy c = (bcarry xy c, bsum xy c)
 </pre>
@@ -3317,7 +3502,7 @@ declare those types in one statement.  Read this as ``*bsum* and
 </p>
 
 
-<pre class="example" id="org16b2c91">
+<pre class="example" id="orge99b761">
 bsum, bcarry :: Bit a =&gt; (a,a) -&gt; a -&gt; a
 bsum (x,y) c = xor3 x y c
 bcarry (x,y) c = or3 (and2 x y) (and2 x c) (and2 y c)
@@ -3326,10 +3511,10 @@ bcarry (x,y) c = or3 (and2 x y) (and2 x c) (and2 y c)
 </div>
 
 
-<div id="outline-container-org3836ed9" class="outline-3">
-<h3 id="org3836ed9">Flip flops and registers</h3>
-<div class="outline-text-3" id="text-org3836ed9">
-<pre class="example" id="orge8392f6">
+<div id="outline-container-org38bd3b6" class="outline-3">
+<h3 id="org38bd3b6"><span class="section-number-3">10.6</span> Flip flops and registers</h3>
+<div class="outline-text-3" id="text-10-6">
+<pre class="example" id="orgbc2a16e">
 dff :: CBit a =&gt; a -&gt; a                  delay flip flop
 reg1 :: CBit a =&gt; a -&gt; a -&gt; a     1-bit register
 </pre>
@@ -3338,10 +3523,10 @@ reg1 :: CBit a =&gt; a -&gt; a -&gt; a     1-bit register
 </div>
 
 
-<div id="outline-container-orgfd616f5" class="outline-2">
-<h2 id="orgfd616f5">Standard library for words</h2>
-<div class="outline-text-2" id="text-orgfd616f5">
-<pre class="example" id="org7065f15">
+<div id="outline-container-org7d0deb4" class="outline-2">
+<h2 id="org7d0deb4"><span class="section-number-2">11</span> Standard library for words</h2>
+<div class="outline-text-2" id="text-11">
+<pre class="example" id="org46d5312">
 winv w                 invert the bits in a word
 mux1w                  use 1-bit control to select between two words
 bitslice2 x y          convert pair of words to word of pairs
@@ -3350,10 +3535,10 @@ mux2                   use two bit control to select one of four inputs
 </div>
 
 
-<div id="outline-container-org5c98f2e" class="outline-3">
-<h3 id="org5c98f2e">Replicating a bit</h3>
-<div class="outline-text-3" id="text-org5c98f2e">
-<pre class="example" id="orgca7a8f7">
+<div id="outline-container-org3d805a8" class="outline-3">
+<h3 id="org3d805a8"><span class="section-number-3">11.1</span> Replicating a bit</h3>
+<div class="outline-text-3" id="text-11-1">
+<pre class="example" id="orgf965cc9">
 fanout :: Bit a =&gt; Int -&gt; a -&gt; [a]
 fanout k x = take k (repeat x)
 </pre>
@@ -3365,7 +3550,7 @@ inserts a buffer to ensure the outputs are strong enough.
 </p>
 
 
-<pre class="example" id="orgcc95400">
+<pre class="example" id="orgfe5f4bf">
 fanoutbuf2 :: Bit a =&gt; a -&gt; (a,a)
 fanoutbuf2 x = (y,y)
   where y = buf x
@@ -3381,7 +3566,7 @@ fanoutbuf4 x = (y,y,y,y)
 
 
 
-<pre class="example" id="org1e4acf6">
+<pre class="example" id="org0cb479a">
 fanout2 :: a -&gt; (a,a)
 fanout2 x = (x,x)
 
@@ -3402,14 +3587,14 @@ word w of size n.
 <p>
 Usage:
 </p>
-<pre class="example" id="org3a41f0a">
+<pre class="example" id="org6cb834b">
 w = fanout n x
 </pre>
 
 <p>
 General form:
 </p>
-<pre class="example" id="org10dc5d3">
+<pre class="example" id="orgc56e7f5">
 fanout :: Bit a =&gt; Int -&gt; a -&gt; [a]
 fanout n b             connect bit b to n outputs, forming a word
 </pre>
@@ -3426,7 +3611,7 @@ others are 0).
 Usage:
 </p>
 
-<pre class="example" id="org3c13a9c">
+<pre class="example" id="org5418adb">
 boolword n b           form an n-bit word, lsb = b, other bits = 0
 </pre>
 
@@ -3434,20 +3619,20 @@ boolword n b           form an n-bit word, lsb = b, other bits = 0
 Definition:
 </p>
 
-<pre class="example" id="org7aad5e4">
+<pre class="example" id="org7c7d2c7">
 boolword :: Bit a =&gt; Int -&gt; a -&gt; [a]
 boolword n x = fanout (n-1) zero ++ [x]
 </pre>
 </div>
 </div>
 
-<div id="outline-container-orga653ab3" class="outline-3">
-<h3 id="orga653ab3">Rearranging bits in a word</h3>
-<div class="outline-text-3" id="text-orga653ab3">
+<div id="outline-container-org36cec50" class="outline-3">
+<h3 id="org36cec50"><span class="section-number-3">11.2</span> Rearranging bits in a word</h3>
+<div class="outline-text-3" id="text-11-2">
 </div>
-<div id="outline-container-orgc3223b3" class="outline-4">
-<h4 id="orgc3223b3">Combinational shifting</h4>
-<div class="outline-text-4" id="text-orgc3223b3">
+<div id="outline-container-org7d8aa54" class="outline-4">
+<h4 id="org7d8aa54"><span class="section-number-4">11.2.1</span> Combinational shifting</h4>
+<div class="outline-text-4" id="text-11-2-1">
 <p>
 Shift a word to the right (shr) or to the left (shl).  In both cases,
 this is just a wiring pattern.  A 0 is brought in on one side, and the
@@ -3456,7 +3641,7 @@ bit on the other side is just thrown away.
 
 
 
-<pre class="example" id="orgae9e727">
+<pre class="example" id="org4cbbc4e">
 shl :: Bit a =&gt; [a] -&gt; [a]
 </pre>
 
@@ -3473,12 +3658,12 @@ Example:
 </p>
 
 
-<pre class="example" id="org8dc2a30">
+<pre class="example" id="orgc58bd86">
 shl [a,b,c,d] = [b,c,d,zero]
 </pre>
 
 
-<pre class="example" id="orgc65232f">
+<pre class="example" id="orgc16e11b">
 shl [a,b,c,d] = [zero,a,b,c]
 </pre>
 
@@ -3491,7 +3676,7 @@ wiring pattern; no logic gates are generated.  Similar to shl.
 </p>
 
 
-<pre class="example" id="org2b8cc04">
+<pre class="example" id="org99ddd81">
 shr :: Bit a =&gt; [a] -&gt; [a]
 </pre>
 
@@ -3501,7 +3686,7 @@ shr :: Bit a =&gt; [a] -&gt; [a]
 Definitions:
 </p>
 
-<pre class="example" id="org853cc85">
+<pre class="example" id="org63e1373">
 shr x = zero : [x!!i | i &lt;- [0..k-2]]
   where k = length x
 shl x = [x!!i | i &lt;- [1..k-1]] ++ [zero]
@@ -3511,15 +3696,15 @@ shl x = [x!!i | i &lt;- [1..k-1]] ++ [zero]
 </div>
 
 
-<div id="outline-container-orgdc2afa8" class="outline-4">
-<h4 id="orgdc2afa8">Bit slice representation</h4>
-<div class="outline-text-4" id="text-orgdc2afa8">
+<div id="outline-container-orgac34e2b" class="outline-4">
+<h4 id="orgac34e2b"><span class="section-number-4">11.2.2</span> Bit slice representation</h4>
+<div class="outline-text-4" id="text-11-2-2">
 <p>
 The bitslice2 wiring pattern takes two words, each of n bits, and
 rearranges the wires into a word of n bit-pairs.
 </p>
 
-<pre class="example" id="org688fc0b">
+<pre class="example" id="org37681fa">
 bitslice2 :: [a] -&gt; [a] -&gt; [(a,a)]
 </pre>
 
@@ -3528,27 +3713,27 @@ The unbitslice2 pattern is the inverse of bitslice2: it takes a word
 of n bit-pairs, and returns a pair of n-bit words.
 </p>
 
-<pre class="example" id="org0fbd666">
+<pre class="example" id="orgfd35a8c">
 unbitslice2 :: [(a,b)] -&gt; ([a], [b])
 </pre>
 </div>
 </div>
 </div>
 
-<div id="outline-container-org46ad4c1" class="outline-3">
-<h3 id="org46ad4c1">Logic on words</h3>
-<div class="outline-text-3" id="text-org46ad4c1">
+<div id="outline-container-org9e8c6d3" class="outline-3">
+<h3 id="org9e8c6d3"><span class="section-number-3">11.3</span> Logic on words</h3>
+<div class="outline-text-3" id="text-11-3">
 <p>
 Calculating a bit from a word
 </p>
 
 
-<pre class="example" id="org22fb6dd">
+<pre class="example" id="orgcb92ac0">
 any1                   or the bits in a word: result is 1 if any 1 bit
 </pre>
 
 
-<pre class="example" id="org31e88e5">
+<pre class="example" id="org1605dee">
 orw :: Bit a -&gt; [a] -&gt; a
 andw :: Bit a -&gt; [a] -&gt; a
 </pre>
@@ -3561,7 +3746,7 @@ time, but for simplicity this is just a linear time fold.
 </p>
 
 
-<pre class="example" id="org147af50">
+<pre class="example" id="org12e14ca">
 orw, andw :: Bit a =&gt; [a] -&gt; a
 orw = foldl or2 zero
 andw = foldl and2 one
@@ -3577,7 +3762,7 @@ Word inverter: winv takes a word and inverts each of its bits
 </p>
 
 
-<pre class="example" id="orgd7bec0a">
+<pre class="example" id="orgc96513f">
 winv :: Bit a =&gt; [a] -&gt; [a]
 winv x = map inv x
 </pre>
@@ -3585,20 +3770,20 @@ winv x = map inv x
 </div>
 
 
-<div id="outline-container-org7654a0f" class="outline-3">
-<h3 id="org7654a0f">Conditionals and addresses</h3>
-<div class="outline-text-3" id="text-org7654a0f">
+<div id="outline-container-org273b6b3" class="outline-3">
+<h3 id="org273b6b3"><span class="section-number-3">11.4</span> Conditionals and addresses</h3>
+<div class="outline-text-3" id="text-11-4">
 </div>
-<div id="outline-container-org8ff3ee9" class="outline-4">
-<h4 id="org8ff3ee9">Multiplexers</h4>
-<div class="outline-text-4" id="text-org8ff3ee9">
-<pre class="example" id="org7bbbacf">
+<div id="outline-container-org9d09267" class="outline-4">
+<h4 id="org9d09267"><span class="section-number-4">11.4.1</span> Multiplexers</h4>
+<div class="outline-text-4" id="text-11-4-1">
+<pre class="example" id="org032fd36">
 mux1w :: Bit a =&gt; a -&gt; [a] -&gt; [a] -&gt; [a]
 </pre>
 
 
 
-<pre class="example" id="org8cc65e8">
+<pre class="example" id="orgea3b3e0">
 z = mux1w c x y
 If c=zero, then z=x, but otherwise z=y
 </pre>
@@ -3615,23 +3800,23 @@ works for any word size.
 
 
 
-<pre class="example" id="orge8fe60d">
+<pre class="example" id="orgc0b7649">
 mux1w c x y = map2 (mux1 c) x y
 </pre>
 
 
 
-<pre class="example" id="org96139fe">
+<pre class="example" id="org05457b6">
 mux2w cc = map4 (mux2 cc)
 </pre>
 </div>
 </div>
 
 
-<div id="outline-container-org03cc2f7" class="outline-4">
-<h4 id="org03cc2f7">Demultiplexers</h4>
-<div class="outline-text-4" id="text-org03cc2f7">
-<pre class="example" id="org75cefdd">
+<div id="outline-container-org159da49" class="outline-4">
+<h4 id="org159da49"><span class="section-number-4">11.4.2</span> Demultiplexers</h4>
+<div class="outline-text-4" id="text-11-4-2">
+<pre class="example" id="org90806be">
 demux1w :: Bit a =&gt; [a] -&gt; a -&gt; [a]
 demux1w [c0] x =
   let (a0,a1) = demux1 c0 x
@@ -3640,7 +3825,7 @@ demux1w [c0] x =
 
 
 
-<pre class="example" id="org36cb653">
+<pre class="example" id="org56fc2a3">
 demux2w :: Bit a =&gt; [a] -&gt; a -&gt; [a]
 demux2w [c0,c1] x =
   let (a0,a1) = demux1 c0 x
@@ -3666,14 +3851,14 @@ demux4w [c0,c1,c2,c3] x =
 </div>
 </div>
 
-<div id="outline-container-org79ba58c" class="outline-3">
-<h3 id="org79ba58c">Arithmetic</h3>
-<div class="outline-text-3" id="text-org79ba58c">
+<div id="outline-container-org3e7deb6" class="outline-3">
+<h3 id="org3e7deb6"><span class="section-number-3">11.5</span> Arithmetic</h3>
+<div class="outline-text-3" id="text-11-5">
 </div>
-<div id="outline-container-org2187ed0" class="outline-4">
-<h4 id="org2187ed0">Binary addition</h4>
-<div class="outline-text-4" id="text-org2187ed0">
-<pre class="example" id="org7a20f6f">
+<div id="outline-container-org36dbe23" class="outline-4">
+<h4 id="org36dbe23"><span class="section-number-4">11.5.1</span> Binary addition</h4>
+<div class="outline-text-4" id="text-11-5-1">
+<pre class="example" id="orgf6c7b37">
 bsum, bcarry :: Bit a =&gt; (a,a) -&gt; a -&gt; a
 bsum (x,y) c = xor3 x y c
 bcarry (x,y) c = or3 (and2 x y) (and2 x c) (and2 y c)
@@ -3681,7 +3866,7 @@ bcarry (x,y) c = or3 (and2 x y) (and2 x c) (and2 y c)
 
 
 
-<pre class="example" id="org6f47ec4">
+<pre class="example" id="org227ee84">
 rippleAdd :: Bit a =&gt; a -&gt; [(a,a)] -&gt; (a,[a])
 </pre>
 
@@ -3695,10 +3880,10 @@ circuit generator, which allows input words of any size.
 </div>
 </div>
 
-<div id="outline-container-org2042033" class="outline-3">
-<h3 id="org2042033">Registers</h3>
-<div class="outline-text-3" id="text-org2042033">
-<pre class="example" id="orgff39a7f">
+<div id="outline-container-orgdf266f3" class="outline-3">
+<h3 id="orgdf266f3"><span class="section-number-3">11.6</span> Registers</h3>
+<div class="outline-text-3" id="text-11-6">
+<pre class="example" id="org10d4c42">
 wlatch :: CBit a =&gt; Int -&gt; [a] -&gt; [a]
 </pre>
 
@@ -3710,7 +3895,7 @@ it with the current value of the input.
 </p>
 
 
-<pre class="example" id="org743bd31">
+<pre class="example" id="org06ddd37">
 r = wlatch n x
 </pre>
 
@@ -3718,7 +3903,7 @@ r = wlatch n x
 reg n ld x is an n-bit register with load control ld, data input x
 </p>
 
-<pre class="example" id="org8621096">
+<pre class="example" id="org4059cc7">
 reg
   :: CBit a =&gt;
   Int             -- ^ k = the word size
@@ -3735,7 +3920,7 @@ wide, load control ld, destination address d,` reads out registers sa
 and sb, data input x
 </p>
 
-<pre class="example" id="org83ba854">
+<pre class="example" id="org326514d">
 regfile n k ld d sa sb x 
 </pre>
 </div>
@@ -3743,9 +3928,9 @@ regfile n k ld d sa sb x
 </div>
 
 
-<div id="outline-container-orge94871b" class="outline-2">
-<h2 id="orge94871b">Combinators</h2>
-<div class="outline-text-2" id="text-orge94871b">
+<div id="outline-container-org002d148" class="outline-2">
+<h2 id="org002d148"><span class="section-number-2">12</span> Circuit generators</h2>
+<div class="outline-text-2" id="text-12">
 <p>
 We will generally specify large circuits using a circuit generator,
 not by drawing every component individually.  There are two kinds of
@@ -3771,15 +3956,15 @@ parameters (with a type like <b>Int</b>).
 </p>
 </div>
 
-<div id="outline-container-org91779b4" class="outline-3">
-<h3 id="org91779b4">Map</h3>
-<div class="outline-text-3" id="text-org91779b4">
+<div id="outline-container-orgb0ba126" class="outline-3">
+<h3 id="orgb0ba126"><span class="section-number-3">12.1</span> Map</h3>
+<div class="outline-text-3" id="text-12-1">
 <p>
 Word inverter: winv takes a word and inverts each of its bits
 </p>
 
 
-<pre class="example" id="org27afd8d">
+<pre class="example" id="org2917302">
 winv :: Bit a =&gt; [a] -&gt; [a]
 winv x = map inv x
 </pre>
@@ -3790,7 +3975,7 @@ Operating on each element of a word of known size: mapn
 </p>
 
 
-<pre class="example" id="org11c4151">
+<pre class="example" id="orgcee5699">
 wlatch :: CBit a =&gt; Int -&gt; [a] -&gt; [a]
 wlatch k x = mapn dff k x
 </pre>
@@ -3801,7 +3986,7 @@ The word register
 </p>
 
 
-<pre class="example" id="orgaaff488">
+<pre class="example" id="orgd53ecc9">
 reg
   :: CBit a =&gt;
   Int             -- ** k = the word size
@@ -3817,22 +4002,22 @@ Mapping a circuit with multiple inputs
 </p>
 
 
-<pre class="example" id="org83c12c7">
+<pre class="example" id="org4597cb8">
 mux1w :: Bit a =&gt; a -&gt; [a] -&gt; [a] -&gt; [a]
 mux1w c x y = map2 (mux1 c) x y
 </pre>
 
 
 
-<pre class="example" id="org3da11df">
+<pre class="example" id="orgfc3893c">
 mux2w cc = map4 (mux2 cc)
 </pre>
 </div>
 
 
-<div id="outline-container-org36c4909" class="outline-4">
-<h4 id="org36c4909">The map combinator</h4>
-<div class="outline-text-4" id="text-org36c4909">
+<div id="outline-container-orgc1662d5" class="outline-4">
+<h4 id="orgc1662d5"><span class="section-number-4">12.1.1</span> The map combinator</h4>
+<div class="outline-text-4" id="text-12-1-1">
 <p>
 Sometimes you have a circuit (it's arbitrary, so call it f) that takes
 an input (say it has type a) and produces an output (call its type
@@ -3843,7 +4028,7 @@ the circuit f.  For example, <b>inv4</b> processes each signal with an
 
 
 
-<pre class="example" id="orgb9f8cc1">
+<pre class="example" id="org926ef92">
 map :: (a-&gt;b) -&gt; [a] -&gt; [b]
 </pre>
 
@@ -3865,7 +4050,7 @@ signals.
 </p>
 
 
-<pre class="example" id="orgf480052">
+<pre class="example" id="orge925955">
 winv :: Bit a =&gt; [a] -&gt; [a]
 winv x = map inv x
 </pre>
@@ -3878,7 +4063,7 @@ sides, giving a slightly shorter form.
 </p>
 
 
-<pre class="example" id="orgdbe679e">
+<pre class="example" id="org58727a9">
 winv :: Bit a =&gt; [a] -&gt; [a]
 winv = map inv
 </pre>
@@ -3888,7 +4073,7 @@ This is attractive because it describes just the pattern.
 </p>
 
 
-<pre class="example" id="org1d7ebf9">
+<pre class="example" id="orgbb3d2f4">
 map :: (a-&gt;b) -&gt; [a] -&gt; [b]
 map f [] = []
 map f (x:xs) = f x : map f xs
@@ -3925,7 +4110,7 @@ separate words.
 </p>
 
 
-<pre class="example" id="orgd286268">
+<pre class="example" id="org8d1959e">
 map2 :: (a-&gt;b-&gt;c) -&gt; [a] -&gt; [b] -&gt; [c]
 </pre>
 
@@ -3935,7 +4120,7 @@ We can extend the basic multiplexor to handle words:
 </p>
 
 
-<pre class="example" id="orgb1f5ace">
+<pre class="example" id="org9628b8c">
 mux1w :: Bit a =&gt; a -&gt; [a] -&gt; [a] -&gt; [a]
 mux1w c x y = map2 (mux1 c) x y
 </pre>
@@ -3943,9 +4128,9 @@ mux1w c x y = map2 (mux1 c) x y
 </div>
 
 
-<div id="outline-container-org0327fc7" class="outline-4">
-<h4 id="org0327fc7">Sized map</h4>
-<div class="outline-text-4" id="text-org0327fc7">
+<div id="outline-container-org16ddda7" class="outline-4">
+<h4 id="org16ddda7"><span class="section-number-4">12.1.2</span> Sized map</h4>
+<div class="outline-text-4" id="text-12-1-2">
 <p>
 The <b>mapn</b> pattern is similar to <b>map</b>, except it
 takes a size parameter, and guarantees to produce an output of that
@@ -3953,7 +4138,7 @@ size.
 </p>
 
 
-<pre class="example" id="org019db24">
+<pre class="example" id="org8762efd">
 mapn :: (a-&gt;b) -&gt; Int -&gt; [a] -&gt; [b]
 </pre>
 
@@ -3969,9 +4154,9 @@ Combinational circuits may be defined using <b>map</b>, so
 </div>
 </div>
 
-<div id="outline-container-orgddf4951" class="outline-3">
-<h3 id="orgddf4951">Fold</h3>
-<div class="outline-text-3" id="text-orgddf4951">
+<div id="outline-container-orgdd213e2" class="outline-3">
+<h3 id="orgdd213e2"><span class="section-number-3">12.2</span> Fold</h3>
+<div class="outline-text-3" id="text-12-2">
 <p>
 The folding patterns define a linear circuit structure.
 </p>
@@ -4008,9 +4193,9 @@ accumulator registers!).
 </p>
 </div>
 
-<div id="outline-container-org28569b8" class="outline-4">
-<h4 id="org28569b8">Fold from the left</h4>
-<div class="outline-text-4" id="text-org28569b8">
+<div id="outline-container-org0afe1ab" class="outline-4">
+<h4 id="org0afe1ab"><span class="section-number-4">12.2.1</span> Fold from the left</h4>
+<div class="outline-text-4" id="text-12-2-1">
 <p>
 In general, a fold can proceed either direction across the word.
 The <b>foldl</b> pattern describes a <b>fold from the left</b>;
@@ -4018,7 +4203,7 @@ i.e. the information flows from left to right across the word.
 </p>
 
 
-<pre class="example" id="org99f4f54">
+<pre class="example" id="orge0883f0">
 foldl :: (a-&gt;b-&gt;a) -&gt; a -&gt; [b] -&gt; a
 </pre>
 
@@ -4028,7 +4213,7 @@ The pattern is defined recursively:
 </p>
 
 
-<pre class="example" id="org6c44162">
+<pre class="example" id="org7239d1e">
 foldl f a [] = a
 foldl f a (x:xs) = foldl f (f a x) xs
 </pre>
@@ -4045,7 +4230,7 @@ word.
 </p>
 
 
-<pre class="example" id="orge86e9ee">
+<pre class="example" id="org3779ca6">
 orw :: Bit a =&gt; [a] -&gt; a
 orw = foldl or2 zero
 </pre>
@@ -4060,7 +4245,7 @@ are 1.
 And/Or over a word
 </p>
 
-<pre class="example" id="org2c6ee44">
+<pre class="example" id="org2c36c1b">
 orw, andw :: Bit a =&gt; [a] -&gt; a
 orw = foldl or2 zero
 andw = foldl and2 one
@@ -4103,9 +4288,9 @@ isn't on the critical path, it makes no difference anyway.</li>
 </div>
 </div>
 
-<div id="outline-container-org0644db0" class="outline-4">
-<h4 id="org0644db0">Binary comparison using foldl</h4>
-<div class="outline-text-4" id="text-org0644db0">
+<div id="outline-container-orgd0a8141" class="outline-4">
+<h4 id="orgd0a8141"><span class="section-number-4">12.2.2</span> Binary comparison using foldl</h4>
+<div class="outline-text-4" id="text-12-2-2">
 <p>
 The problem: input two binary numbers, in bit slice form:
  <b>[(x0,y0), (x1,y1), &#x2026;, (xk,yk)]</b>
@@ -4129,7 +4314,7 @@ A bit comparison building block circuit:
 </p>
 
 
-<pre class="example" id="org608eadc">
+<pre class="example" id="org76f86ab">
 cmp1 :: Bit a =&gt; (a,a,a) -&gt; (a,a) -&gt; (a,a,a)
 cmp1 (lt,eq,gt) (x,y) =
   (or2 lt (and3 eq (inv x) y),
@@ -4144,7 +4329,7 @@ The ripple comparison circuit is defined simply using the pattern:
 </p>
 
 
-<pre class="example" id="org4760408">
+<pre class="example" id="org4cdff70">
 rippleCmp :: Bit a =&gt; [(a,a)] -&gt; (a,a,a)
 rippleCmp = foldl cmp1 (zero,one,zero)
 </pre>
@@ -4152,15 +4337,15 @@ rippleCmp = foldl cmp1 (zero,one,zero)
 </div>
 
 
-<div id="outline-container-org54c6195" class="outline-4">
-<h4 id="org54c6195">Fold from the right: foldr</h4>
-<div class="outline-text-4" id="text-org54c6195">
+<div id="outline-container-org1a7a30b" class="outline-4">
+<h4 id="org1a7a30b"><span class="section-number-4">12.2.3</span> Fold from the right: foldr</h4>
+<div class="outline-text-4" id="text-12-2-3">
 <p>
 You can also run a fold across a word from the right to the left.
 </p>
 
 
-<pre class="example" id="org9a7df8c">
+<pre class="example" id="orgcee7a1a">
 foldr :: (b-&gt;a-&gt;a) -&gt; a -&gt; [b] -&gt; a
 foldr f a [] = a
 foldr f a (x:xs) = f x (foldr f a xs)
@@ -4175,9 +4360,9 @@ This is symmetric with <b>foldl</b>.
 </div>
 </div>
 
-<div id="outline-container-org58aaeca" class="outline-2">
-<h2 id="org58aaeca">Summary of syntax</h2>
-<div class="outline-text-2" id="text-org58aaeca">
+<div id="outline-container-orgbf108f0" class="outline-2">
+<h2 id="orgbf108f0"><span class="section-number-2">13</span> Summary of syntax</h2>
+<div class="outline-text-2" id="text-13">
 <p>
 This section summarises the language syntax.  Hydra is actually
 Haskell with some additional libraries, and it adopts all the syntax
@@ -4196,9 +4381,9 @@ comment</li>
 </ul>
 </div>
 
-<div id="outline-container-org173fb15" class="outline-3">
-<h3 id="org173fb15">Indentation</h3>
-<div class="outline-text-3" id="text-org173fb15">
+<div id="outline-container-org5632aec" class="outline-3">
+<h3 id="org5632aec"><span class="section-number-3">13.1</span> Indentation</h3>
+<div class="outline-text-3" id="text-13-1">
 <p>
 Haskell normally uses indentation, rather than punctuation, to
 determine the structure of a definition.  There are good reasons
@@ -4223,7 +4408,7 @@ Indentation
   The equations in a definition need to be lined up vertically
 </p>
 
-<pre class="example" id="orgd8c8ff8">
+<pre class="example" id="orgefa0cbe">
 circ x y = a   -- a good definition
   where
     p = bla bla...
@@ -4231,7 +4416,7 @@ circ x y = a   -- a good definition
     r = bla...
 </pre>
 
-<pre class="example" id="org232a95d">
+<pre class="example" id="org63a1cc7">
 circ x y = a  -- a bad definition
   where
     p = bla bla...
@@ -4241,9 +4426,9 @@ circ x y = a  -- a bad definition
 </div>
 </div>
 
-<div id="outline-container-orgc9289d4" class="outline-3">
-<h3 id="orgc9289d4">Names</h3>
-<div class="outline-text-3" id="text-orgc9289d4">
+<div id="outline-container-org3414a03" class="outline-3">
+<h3 id="org3414a03"><span class="section-number-3">13.2</span> Names</h3>
+<div class="outline-text-3" id="text-13-2">
 <p>
 Names (also called identifiers) are used for circuits (e.g. logic
 gates) and signals.  A name must begin with a lower case letter, and
@@ -4251,7 +4436,7 @@ may contain letters, digits, underscores, and primes (single quote).
 The following are valid names:
 </p>
 
-<pre class="example" id="org6078c8c">
+<pre class="example" id="org91386dc">
 x
 select
 adder
@@ -4265,7 +4450,7 @@ The following identifiers cannot be used to name a circuit or signal:
 </p>
 
 
-<pre class="example" id="orge28948f">
+<pre class="example" id="org741285b">
 Product    -- begins with upper case letter
 x?3        -- contains invalid character ?
 0          -- use zero to get the constant 0 signal
@@ -4274,9 +4459,9 @@ x?3        -- contains invalid character ?
 </div>
 
 
-<div id="outline-container-org8c15d0a" class="outline-3">
-<h3 id="org8c15d0a">Signal expressions</h3>
-<div class="outline-text-3" id="text-org8c15d0a">
+<div id="outline-container-org457acca" class="outline-3">
+<h3 id="org457acca"><span class="section-number-3">13.3</span> Signal expressions</h3>
+<div class="outline-text-3" id="text-13-3">
 <p>
 A signal is specified in Hydra by an expression.  The simplest form of
 expression is simply the name of a signal.  For example, suppose we
@@ -4286,7 +4471,7 @@ names of the constant signals.
 </p>
 
 
-<pre class="example" id="orga3f801c">
+<pre class="example" id="orgd15bf5f">
 zero
 one
 x
@@ -4322,181 +4507,17 @@ punctuation.
 </p>
 
 
-<pre class="example" id="orgfc22612">
+<pre class="example" id="org37861e3">
 c = and2 a b          -- correct
 d = and2 (a,b);       -- wrong! don't use ( , ) ;
 </pre>
 </div>
 </div>
 </div>
-
-
-<div id="outline-container-orge607622" class="outline-2">
-<h2 id="orge607622">Development notes</h2>
-<div class="outline-text-2" id="text-orge607622">
-</div>
-<div id="outline-container-org0063191" class="outline-3">
-<h3 id="org0063191">Emacs</h3>
-<div class="outline-text-3" id="text-org0063191">
-</div>
-<div id="outline-container-orgeec6eef" class="outline-4">
-<h4 id="orgeec6eef">Export to html</h4>
-<div class="outline-text-4" id="text-orgeec6eef">
-<ul class="org-ul">
-<li>C-c C-e h h  &#x2013;  export to .html file</li>
-<li>C-c C-e h H  &#x2013;  export to buffer</li>
-</ul>
-</div>
-</div>
-
-<div id="outline-container-orgfcfcc5b" class="outline-4">
-<h4 id="orgfcfcc5b">Tangle</h4>
-<div class="outline-text-4" id="text-orgfcfcc5b">
-<ul class="org-ul">
-<li>C-c C-v t       &#x2013; tangle the file</li>
-<li>C-u C-c C-v t   &#x2013; tangle current src code block</li>
-<li>#+BEGIN<sub>SRC</sub> hydra :tangle ../../examples/SimpleCirc/SimpleCirc.hs</li>
-
-<li>#+NAME: SimpleCircRun</li>
-<li>#+BEGIN<sub>SRC</sub> hydra -n :tangle protect/examples/SimpleCirc/SimpleCircRun.hs</li>
-</ul>
-</div>
-</div>
-
-<div id="outline-container-org7c16d80" class="outline-4">
-<h4 id="org7c16d80">Set emacs variables</h4>
-<div class="outline-text-4" id="text-org7c16d80">
-<ul class="org-ul">
-<li>The version and date are defined below</li>
-<li>These meta comments must be near the end of the file</li>
-</ul>
-</div>
-</div>
-
-<div id="outline-container-orged32d73" class="outline-4">
-<h4 id="orged32d73">Figures</h4>
-<div class="outline-text-4" id="text-orged32d73">
-</div>
-<ul class="org-ul">
-<li><a id="org097f39b"></a>Generated svg<br />
-<div class="outline-text-5" id="text-org097f39b">
-<p>
-C-c C-e C-s h h
-</p>
-
-<p>
-Include an svg file; it will be incorporated inso the html.  The
-figure will have the svg code inline.  The figure is not being
-included as an image or object.
-</p>
-
-<p>
-test #+INCLUDE: "./figures/gensvg/defs.svg" export html
-</p>
-
-<hr />
-<p>
-test #+INCLUDE: "./figures/gensvg/fig2.svg" export html
-</p>
-<hr />
-</div>
-</li>
-
-<li><a id="org7362eca"></a>More figure tests<br />
-<div class="outline-text-5" id="text-org7362eca">
-<p>
-Here is simplefig2
-</p>
-
-<hr />
-
-<div id="org5106be8" class="figure">
-<p><object type="image/svg+xml" data="./figures/svg/simplefig2.svg" class="org-svg">
-Sorry, your browser does not support SVG.</object>
-</p>
-</div>
-<hr />
-
-<p>
-That was simplefig2
-</p>
-
-<p>
-Using the double bracket notation produces an object link and there is
-a huge amount of unwanted space after the figure
-</p>
-
-<hr />
-
-<div id="orga34a359" class="figure">
-<p><object type="image/svg+xml" data="./figures/svg/simplefig2.svg" class="org-svg">
-Sorry, your browser does not support SVG.</object>
-</p>
-</div>
-<hr />
-
-<p>
-Here is a figure.
-</p>
-
-<hr />
-
-<div id="org5cee458" class="figure">
-<p><object type="image/svg+xml" data="./figures/svg/logic_gates.svg" class="org-svg">
-Sorry, your browser does not support SVG.</object>
-</p>
-</div>
-<hr />
-
-<p>
-Here is another one
-</p>
-
-<hr />
-
-<div id="org6443718" class="figure">
-<p><object type="image/svg+xml" data="./figures/svg/coordinate-systems-basic.svg" class="org-svg">
-Sorry, your browser does not support SVG.</object>
-</p>
-</div>
-<hr />
-
-<p>
-Here is another one
-</p>
-
-<hr />
-
-<div id="org64e0254" class="figure">
-<p><object type="image/svg+xml" data="./figures/svg/RXformat.svg" class="org-svg">
-Sorry, your browser does not support SVG.</object>
-</p>
-</div>
-<hr />
-<p>
-/Here is another one
-</p>
-
-<hr />
-
-<div id="org5d1a3e1" class="figure">
-<p><img src="./figures/xfig/inv-xor2.png" alt="inv-xor2.png" />
-</p>
-</div>
-<hr />
-</div>
-</li>
-</ul>
-</div>
-
-<div id="outline-container-orgba97e45" class="outline-4">
-<h4 id="orgba97e45">End</h4>
-</div>
-</div>
-</div>
 </div>
 <div id="postamble" class="status">
-<p class="date">Created: 2022-06-26 Sun 17:43</p>
+<p class="author">Author: John T. O'Donnell</p>
+<p class="date">Created: 2022-07-03 Sun 07:16</p>
 <p class="validation"><a href="https://validator.w3.org/check?uri=referer">Validate</a></p>
 </div>
 </body>

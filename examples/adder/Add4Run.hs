@@ -1,4 +1,6 @@
 -- Add4Run: simulation driver for add4 circuit
+-- This file is part of Hydra.  https://github.com/jtod/Hydra
+-- John T. O'Donnell, 2022
 
 module Main where
 import HDL.Hydra.Core.Lib
@@ -8,8 +10,8 @@ import Add4
 -- be 0 or 1) and x and y are integers between 0 and 15.  A number of
 -- such tests are provided; they will run on successive clock cycles.
 
-test1 :: [String]
-test1 =
+testdata1 :: [String]
+testdata1 =
 --------------------------------------------------
 --  c   x   y    -- name of signal
 --------------------------------------------------
@@ -23,28 +25,19 @@ test1 =
 
 main :: IO ()
 main = driver $ do
-  useData test1
+  useData testdata1
 
--- Input ports
-  in_cin <- inPortBit "cin"
-  in_x   <- inPortWord "x" 4
-  in_y   <- inPortWord "y" 4
-
--- Input signals
-  let cin = inbsig in_cin
-  let x   = inwsig in_x
-  let y   = inwsig in_y
+-- Inputs
+  cin <- inPortBit "cin"
+  x <- inPortWord "x" 4
+  y <- inPortWord "y" 4
 
 -- Circuit
   let (cout,s) = add4 cin x y
 
--- Format the output
-  format
-    [string "Inputs: ", string "  x =", bindec 3 x,
-     string "  y =", bindec 3 y,
-     string "  cin = ", bit cin,
-     string "    Outputs: cout = ", bit cout,
-     string "  s =", bindec 3 s,
-     string "\n"]
+-- Outputs
+  out_cout <- outPortBit "cout" cout
+  out_s    <- outPortWord "s" s
 
+-- Run
   runSimulation

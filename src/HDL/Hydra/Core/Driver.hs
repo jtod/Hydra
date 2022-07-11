@@ -18,9 +18,10 @@ module HDL.Hydra.Core.Driver
 
 -- * New from step driver
    call, noContinuation, bitsBin,
-   logFileName,
+--   logFileName,
    intToBits,
-   putLogStr, putLogStrLn, putBufLogStr, putBufLogStrLn, flushBufLog, writeLogStr,
+--    putLogStr, putLogStrLn, DEPRECATED
+   putBufLogStr, putBufLogStrLn, flushBufLog, writeLogStr,
    setStateWsIO,
    testfcn,
    incrementCycleCount, clearCycleCount,
@@ -36,7 +37,8 @@ module HDL.Hydra.Core.Driver
    SysState (..), InPort (..), OutPort (..),
    initState,
    useData,
-   inPortBit, inPortWord,
+   inPortBitOld, inPortBit,
+   inPortWordOld, inPortWord,
    outPortBit, outPortWord,
    cycleCmd,
    readAllInputs, writeBufs, readInput,
@@ -107,19 +109,21 @@ import System.Console.ANSI
 -- Interface to driver
 ------------------------------------------------------------------------
 
-logFileName = "m1output.txt"
+-- logFileName = "m1output.txt"
 
+{-
 -- Write a string to both stdout and a log file
-putLogStr :: String -> IO ()
-putLogStr xs = do
+putLogStr :: String -> String -> IO ()
+putLogStr logFileName xs = do
   putStr xs
   appendFile logFileName xs
 
 putLogStrLn :: String -> IO ()
-putLogStrLn xs = putLogStr (xs ++ "\n")
+putLogStrLn xs = putLogStr logFileName (xs ++ "\n")
 --  let ys = xs ++ "\n"
 --  putStr ys
 --  appendFile logFileName ys
+-}
 
 putBufLogStr :: String -> StateT (SysState b) IO ()
 putBufLogStr x = do
@@ -132,17 +136,17 @@ putBufLogStrLn xs = putBufLogStr (xs ++ "\n")
 flushBufLog :: StateT (SysState b) IO ()
 flushBufLog = do
   s <- get
+  let fileName = logFileName s
   let xs = concat (reverse (bufferedLog s))
   put s {bufferedLog = []}
   lift $ putStr xs
   s <- get
   case writingLogFile s of
     False -> return ()
-    True -> do lift $ appendFile logFileName xs
-  
+    True -> do lift $ appendFile fileName xs
 
-writeLogStr :: String -> IO ()
-writeLogStr xs = do
+writeLogStr :: String -> String -> IO ()
+writeLogStr logFileName xs = do
   putStr xs
   writeFile logFileName xs
 
@@ -245,6 +249,7 @@ data SysState b = SysState
   , mode :: Mode
   , halted :: Bool
   , writingLogFile :: Bool
+  , logFileName :: String
   , bufferedLog :: [String]
   , formatMode :: FormatMode
   , commands :: Commands b
@@ -272,6 +277,7 @@ initState = SysState
   , halted = False
   , bufferedLog = []
   , writingLogFile = False
+  , logFileName = "circuitLogFile.txt"
   , formatMode = FormatNormal
   , commands = Map.empty
   , cycleCount = 0
@@ -403,7 +409,19 @@ data OutPort
 
 -- make a new inport bit
 
-inPortBit :: String -> StateT (SysState a) IO InPort
+inPortBitOld :: String -> StateT (SysState a) IO InPort
+inPortBitOld inPortName = do
+  inbuf <- liftIO $ newIORef False
+  let fetcher = repeat (readIORef inbuf)
+  let inbsig = listeffects fetcher
+  s <- get
+  let inPortIndex = nInPorts s
+--printLine ("inPortBitOld " ++ inPortName ++ " " ++ show inPortIndex)
+  let port = InPortBit { inPortName, inbsig, inbuf, fetcher, inPortIndex }
+  put $ s {inPortList = inPortList s ++ [port], nInPorts = inPortIndex + 1}
+  return port
+
+inPortBit :: String -> StateT (SysState a) IO (Stream Bool)
 inPortBit inPortName = do
   inbuf <- liftIO $ newIORef False
   let fetcher = repeat (readIORef inbuf)
@@ -413,11 +431,31 @@ inPortBit inPortName = do
 --printLine ("inPortBit " ++ inPortName ++ " " ++ show inPortIndex)
   let port = InPortBit { inPortName, inbsig, inbuf, fetcher, inPortIndex }
   put $ s {inPortList = inPortList s ++ [port], nInPorts = inPortIndex + 1}
-  return port
+  return inbsig
+-- return (inbsig port)
+--  let outsig = inbsig port
+--  return outsig
+--  return port
 
 -- make a new inport word
 
-inPortWord :: String -> Int -> StateT (SysState a) IO InPort
+inPortWordOld :: String -> Int -> StateT (SysState a) IO InPort
+inPortWordOld inPortName inwsize = do
+  inwbufs <- liftIO $ mkInBufWord inwsize
+  let wfetchers = map (\x -> repeat (readIORef x)) inwbufs
+  let inwsig = map listeffects wfetchers
+  s <- get
+  let inPortIndex = nInPorts s
+  let port = InPortWord { inPortName, inwsig, inwbufs, wfetchers,
+                          inwsize, inPortIndex }
+  put $ s {inPortList = inPortList s ++ [port], nInPorts = inPortIndex + 1}
+--  return inwsig
+  return port
+--  liftIO $ putStrLn ("inPortWord len inwbufs = " ++ show (length inwbufs))
+--  liftIO $ putStrLn ("inPortWord len wfetchers = " ++ show (length wfetchers))
+--  liftIO $ putStrLn ("inPortWord len inwsig = " ++ show (length inwsig))
+
+inPortWord :: String -> Int -> StateT (SysState a) IO [Stream Bool]
 inPortWord inPortName inwsize = do
   inwbufs <- liftIO $ mkInBufWord inwsize
   let wfetchers = map (\x -> repeat (readIORef x)) inwbufs
@@ -427,10 +465,8 @@ inPortWord inPortName inwsize = do
   let port = InPortWord { inPortName, inwsig, inwbufs, wfetchers,
                           inwsize, inPortIndex }
   put $ s {inPortList = inPortList s ++ [port], nInPorts = inPortIndex + 1}
-  return port
---  liftIO $ putStrLn ("inPortWord len inwbufs = " ++ show (length inwbufs))
---  liftIO $ putStrLn ("inPortWord len wfetchers = " ++ show (length wfetchers))
---  liftIO $ putStrLn ("inPortWord len inwsig = " ++ show (length inwsig))
+  return inwsig
+--  return port
 
 mkInBufWord :: Int -> IO [IORef Bool]
 mkInBufWord n

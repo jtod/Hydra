@@ -2,5 +2,7 @@
 dist*
 cabal.project.local*
 protect*
+temp*
+*.temp
 *.o
 *.hi

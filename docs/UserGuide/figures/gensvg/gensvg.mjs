@@ -156,7 +156,7 @@ export function svgDot (x,y) {
         + ' style="fill: black; stroke: black"/>\n'
 }
 
-export bubbleRadius = 4
+export let bubbleRadius = 4
 
 export function svgBubble (p,direction) {
     let cx = p.x
