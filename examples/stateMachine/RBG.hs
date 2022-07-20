@@ -1,5 +1,6 @@
 -- RBG: state machine circuit
--- This file is part of Hydra, see Hydra/README.md for copyright and license
+-- This file is part of Hydra. See README and https://github.com/jtod/Hydra
+-- Copyright (c) 2022 John T. O'Donnell
 
 module RBG where
 

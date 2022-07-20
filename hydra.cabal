@@ -46,7 +46,8 @@ library
                     HDL.Hydra,
                     HDL.Hydra.Core.Lib,
                     HDL.Hydra.Circuits.Combinational,
-                    HDL.Hydra.Circuits.Register
+                    HDL.Hydra.Circuits.Register,
+                    HDL.Hydra.Circuits.RegFile
   other-modules:    HDL.Hydra.Core.Signal,
                     HDL.Hydra.Core.SigStream,
                     HDL.Hydra.Core.CombTools,

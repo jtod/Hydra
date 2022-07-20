@@ -1,5 +1,8 @@
--- Several: demonstrate how to run simulations of several circuits in one file
--- John O'Donnell, 2021
+-- Several: put several simulations in one file
+-- This file is part of Hydra. See README and https://github.com/jtod/Hydra
+-- Copyright (c) 2022 John T. O'Donnell
+
+-- Usage: ghc -e main Several
 
 module Main where
 import HDL.Hydra.Core.Lib
@@ -67,24 +70,17 @@ xorDriver = driver $ do
 -- Input data
   useData xorTestData
   
--- Input ports
-  in_x  <- inPortBit "x"
-  in_y  <- inPortBit "y"
-
--- Input signals
-  let x  = inbsig in_x
-  let y  = inbsig in_y
+-- Inputs
+  x  <- inputBit "x"
+  y  <- inputBit "y"
 
 -- Circuit
   let z = xor2 x y
 
--- Format the outputs
-  format
-    [string "Input x = ", bit x,
-     string " y = ", bit y,
-     string "   Output z = ", bit z]
+-- Outputs
+  outputBit "z" z
 
--- Run the circuit on the inputs
+-- Run
   runSimulation
 
 ------------------------------------------------------------------------
@@ -118,22 +114,15 @@ reg1Driver = driver $ do
 -- Input data
   useData reg1TestData
   
--- Input ports
-  in_ld <- inPortBit "ld"
-  in_x  <- inPortBit "x"
-
--- Input signals
-  let ld = inbsig in_ld
-  let x  = inbsig in_x
+-- Inputs
+  ld <- inputBit "ld"
+  x  <- inputBit "x"
 
 -- Circuit
   let y = reg1 ld x
 
--- Format the outputs
-  format
-    [string "Input ld = ", bit ld,
-     string " x = ", bit x,
-     string "   Output = ", bit y]
+-- Outputs
+  outputBit "y" y
 
 -- Run the circuit on the inputs  
   runSimulation

@@ -1,36 +1,38 @@
 -- RBGrun: simulation driver for state machine
--- This file is part of Hydra.  John O'Donnell, 2021.  See Hydra/README
+-- This file is part of Hydra. See README and https://github.com/jtod/Hydra
+-- Copyright (c) 2022 John T. O'Donnell
 
 module Main where
 import HDL.Hydra.Core.Lib
 import RBG
 
+main :: IO ()
+main = rbgRun testData1
+
 -- The test data sets reset=1 in the first clock cycle, and then keeps
 -- reset=0 thereafter.
 
-test_data_1 :: [String]
-test_data_1 =
-  ["1 2 ", "0 3 ", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"]
+testData1 :: [String]
+testData1 =
+  ["1 2 ", "0 3 ", "0", "0", "0", "0", "0", "0",
+   "0", "0", "0", "0", "0", "0", "0"]
 
-main :: IO ()
-main = driver $ do
+rbgRun :: [String] -> IO ()
+rbgRun xs = driver $ do
 
 -- Input data  
-  useData test_data_1
+  useData xs
 
--- Input ports
-  in_reset <- inPortBit "reset"
+-- Inputs
+  reset <- inputBit "reset"
 
--- Input signals
-  let reset = inbsig in_reset
-
--- Connect circuit to input and output signals
+-- Circuit
   let (r,b,g) = stateMachine reset
 
--- Format the simulation output
-  format
-    [string "reset = ", bit reset,
-     string "   rbg = ", bit r, bit b, bit g]
+-- Outputs
+  outputBit "r" r
+  outputBit "b" b
+  outputBit "g" g
 
--- Run the circuit
+-- Run
   runSimulation

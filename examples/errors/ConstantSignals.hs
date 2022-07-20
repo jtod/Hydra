@@ -1,9 +1,9 @@
-module ConstSignalErrors where
+-- ConstantSignals: illustrate right and wrong way to define constant
+-- This file is part of Hydra. See README and https://github.com/jtod/Hydra
+-- Copyright (c) 2022 John T. O'Donnell
 
--- Standard imports for typical circuit
+module ConstSignalErrors where
 import HDL.Hydra.Core.Lib
-import HDL.Hydra.Circuits.Combinational
-import HDL.Hydra.Circuits.Register
 
 -- Suppose we want a circuit whose input is a word, and whos output
 -- is that word concatenated with a 4-bit word representing 5.

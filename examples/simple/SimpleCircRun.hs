@@ -1,6 +1,6 @@
--- SimpleCircdRun.hs:  simulation driver for SimpleCirc
--- This file is part of Hydra.  https://github.com/jtod/Hydra
--- John T. O'Donnell, 2022
+-- SimpleCircRun:  simulation driver for SimpleCirc
+-- This file is part of Hydra. See README and https://github.com/jtod/Hydra
+-- Copyright (c) 2022 John T. O'Donnell
 
 -- Usage:  $ ghc -e main SimpleCircRun
 
@@ -25,14 +25,14 @@ main = driver $ do
   useData testdata1
 
 -- Inputs
-  x <- inPortBit "x"
-  y <- inPortBit "y"
+  x <- inputBit "x"
+  y <- inputBit "y"
 
 -- Circuit
   let z = simpleCirc x y
 
 -- Output ports
-  outPortBit "z" z
+  outputBit "z" z
 
 -- Run
   runSimulation

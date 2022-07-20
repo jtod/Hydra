@@ -1,21 +1,15 @@
 {-|
-Module       : HDL.Hydra.Circuits.Register
+Module       : HDL.Hydra.Circuits.RegFile
 Description  : Standard stateful circuits
-Copyright    : (c) John O'Donnell 2020
-License      : GPL-3.0-or-later
+Copyright    : (c) John O'Donnell 2022
+License      : GPL-3.0
 Maintainer   : john.t.odonnell9@gmail.com
 Stability    : experimental
 
 A collection of register circuits. -}
 
-module HDL.Hydra.Circuits.Register
+module HDL.Hydra.Circuits.RegFile
   (
-
--- * Latches
-   latch1, latch,
-
--- * Registers
-   reg1, reg,
 
 -- * Register files
    regfile1, regfile
@@ -25,6 +19,41 @@ import HDL.Hydra.Core.Signal
 import HDL.Hydra.Core.SigStream
 import HDL.Hydra.Core.Pattern
 import HDL.Hydra.Circuits.Combinational
+import HDL.Hydra.Circuits.Register
+
+
+
+------------------------------------------------------------------------
+-- Register files
+
+regfile1 :: CBit a => Int -> a -> [a] -> [a] -> [a] -> a -> (a,a)
+
+regfile1 k ld d sa sb x
+  | k==0 = (r,r)
+  | k>0  = (a,b)
+  where
+    r = reg1 ld x
+    (a0,b0) = regfile1 (k-1) ld0 ds sas sbs x
+    (a1,b1) = regfile1 (k-1) ld1 ds sas sbs x
+    (ld0,ld1) = demux1 d1 ld
+    a = mux1 sa1 a0 a1
+    b = mux1 sb1 b0 b1
+    (d1:ds) = d
+    (sa1:sas) = sa
+    (sb1:sbs) = sb
+
+regfile :: CBit a => Int -> Int
+  -> a -> [a] -> [a] -> [a] -> [a] -> ([a],[a])
+
+regfile n k ld d sa sb x =
+   unbitslice2 [regfile1 k ld d sa sb (x!!i)  | i <- [0..n-1]]
+
+{-
+-- * Latches
+   latch1, latch,
+
+-- * Registers
+   reg1, reg,
 
 ------------------------------------------------------------------------
 -- Latches
@@ -70,29 +99,4 @@ reg
   -> [a]        -- y = output is the register state
 
 reg k ld x = mapn (reg1 ld) k x
-
-
-------------------------------------------------------------------------
--- Register files
-
-regfile1 :: CBit a => Int -> a -> [a] -> [a] -> [a] -> a -> (a,a)
-
-regfile1 k ld d sa sb x
-  | k==0 = (r,r)
-  | k>0  = (a,b)
-  where
-    r = reg1 ld x
-    (a0,b0) = regfile1 (k-1) ld0 ds sas sbs x
-    (a1,b1) = regfile1 (k-1) ld1 ds sas sbs x
-    (ld0,ld1) = demux1 d1 ld
-    a = mux1 sa1 a0 a1
-    b = mux1 sb1 b0 b1
-    (d1:ds) = d
-    (sa1:sas) = sa
-    (sb1:sbs) = sb
-
-regfile :: CBit a => Int -> Int
-  -> a -> [a] -> [a] -> [a] -> [a] -> ([a],[a])
-
-regfile n k ld d sa sb x =
-   unbitslice2 [regfile1 k ld d sa sb (x!!i)  | i <- [0..n-1]]
+-}

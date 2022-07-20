@@ -1,19 +1,16 @@
---Simulation driver for reg1
--- John O'Donnell, 2021
+-- Reg1Run: simulation driver for reg1
+-- This file is part of Hydra. See README and https://github.com/jtod/Hydra
+-- Copyright (c) 2022 John T. O'Donnell
 
-module Main where
+Module Main where
 import HDL.Hydra.Core.Lib
-import HDL.Hydra.Circuits.Register
+import Reg1
 
--- Using the reg1 circuit defined in the ydra libraries.  Here is the
--- definition:
+main :: IO ()
+main = reg1Run testData
 
---   reg1 :: CBit a => a -> a -> a
---   reg1 ld x = r
---     where r = dff (mux1 ld r x)
-
-testdata :: [String]
-testdata =
+testData :: [String]
+testData =
 ------------------------
 --  ld  x       output
 ------------------------
@@ -29,43 +26,20 @@ testdata =
   , "0  0"  -- 0 no change
   ]
 
-main :: IO ()
-main = driver $ do
+reg1Run :: [String] -> IO ()
+reg1Run xs = driver $ do
 
 -- Input data
-  useData testdata
+  useData xs
   
 -- Input ports
-  in_ld <- inPortBit "ld"
-  in_x  <- inPortBit "x"
-
--- Input signals
-  let ld = inbsig in_ld
-  let x  = inbsig in_x
+  ld <- inputBit "ld"
+  x  <- inputBit "x"
 
 -- Circuit
   let y = reg1 ld x
 
--- Format the outputs
-  format
-    [string "Input ld = ", bit ld,
-     string " x = ", bit x,
-     string "   Output = ", bit y]
+  outputBit "y" y
 
--- Run the circuit on the inputs  
+-- Run
   runSimulation
-
-{-
-runReg1 input = runAllInput input outputQ
-  where
--- Input signals
-    ld = getbit input 0
-    x  = getbit input 1
--- Circuit
-    y = reg1 ld x
--- Format the input and output signals
-    output =
-      [string "Input ld = ", bit ld,
-       string " x = ", bit x,
-       string "   Output = ", bit y]
--}

@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2022-07-11 Mon 21:41 -->
+<!-- 2022-07-20 Wed 15:29 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>&lrm;</title>
@@ -221,9 +221,9 @@
 <div id="content">
 <h1>Hydra README</h1>
 
-<div id="outline-container-org513d9c7" class="outline-2">
-<h2 id="org513d9c7">About Hydra</h2>
-<div class="outline-text-2" id="text-org513d9c7">
+<div id="outline-container-org21ed50a" class="outline-2">
+<h2 id="org21ed50a">About Hydra</h2>
+<div class="outline-text-2" id="text-org21ed50a">
 Version 3.4.16
 Copyright (c) 2022 John T. O'Donnell
 
@@ -267,13 +267,13 @@ GPL-3 license.  See LICENSE.txt.</li>
 </div>
 </div>
 
-<div id="outline-container-org136250a" class="outline-2">
-<h2 id="org136250a">Installation</h2>
-<div class="outline-text-2" id="text-org136250a">
+<div id="outline-container-orgc91e2c2" class="outline-2">
+<h2 id="orgc91e2c2">Installation</h2>
+<div class="outline-text-2" id="text-orgc91e2c2">
 </div>
-<div id="outline-container-org154be64" class="outline-3">
-<h3 id="org154be64">Install Haskell</h3>
-<div class="outline-text-3" id="text-org154be64">
+<div id="outline-container-orgc8256a8" class="outline-3">
+<h3 id="orgc8256a8">Install Haskell</h3>
+<div class="outline-text-3" id="text-orgc8256a8">
 <p>
 Hydra requires the ghc toolset for Haskell, including ghc and cabal.
 Haskell installers for Macintosh, Windows, and Linux are available at
@@ -287,7 +287,7 @@ chocolatey installed, you can use it to install Haskell easily.  Run
 these commands in Windows PowerShell with administrator priveleges:
 </p>
 
-<pre class="example" id="org37ca4b0">
+<pre class="example" id="org35bd38e">
 choco install ghc --force -y
 choco install cabal --force -y
 </pre>
@@ -304,7 +304,7 @@ installing after a failed installation attempt.</li>
 <i>Verify that Haskell is working</i>
 </p>
 
-<pre class="example" id="org81fc56d">
+<pre class="example" id="orgf003651">
 $ ghc --version
 The Glorious Glasgow Haskell Compilation System, version 9.2.3
 $ cabal --version
@@ -321,22 +321,22 @@ If you have a previous installation of ghc, and a new installation
 fails, the following might work:
 </p>
 
-<pre class="example" id="org435c56d">
+<pre class="example" id="org05808d9">
 choco upgrade ghc cabal -y
 </pre>
 </div>
 </div>
 
-<div id="outline-container-org783c8d7" class="outline-3">
-<h3 id="org783c8d7">Install Hydra</h3>
-<div class="outline-text-3" id="text-org783c8d7">
+<div id="outline-container-orgcbfe2d2" class="outline-3">
+<h3 id="orgcbfe2d2">Install Hydra</h3>
+<div class="outline-text-3" id="text-orgcbfe2d2">
 <p>
 The Hydra source code is available at <a href="https://github.com/jtod/Hydra">https://github.com/jtod/Hydra</a>.
-See the Releases section on the right side of the page, click on the
-latest release, and download the source code file, which is available
-in both <code>zip</code> and <code>.tar.gz</code> format.  Put the file somewhere in your
-user workspace and unpack it, using the correct version number for
-your download:
+See the Releases section on the right side of the page and click on
+the latest release.  Download the source code file (in the Assets
+section), which is available in both <code>zip</code> and <code>.tar.gz</code> format.  Put
+the file somewhere in your user workspace and unpack it, using the
+correct version number for your download:
 </p>
 
 <ul class="org-ul">
@@ -345,12 +345,14 @@ your download:
 </ul>
 
 <p>
-This will create a directory that contains the source code (<code>src</code>
-directory), documentation (<code>docs</code> directory and <code>examples</code> directory),
-and build tools.  Install using these commands:
+This will create a directory that contains documentation (<code>docs</code>
+directory and <code>examples</code> directory), the source code (<code>src</code>
+directory), and build tools.  Install using these commands (using the
+right version number for Hydra):
 </p>
 
-<pre class="example" id="orgfe3c701">
+<pre class="example" id="orgfa6a673">
+cd Hydra-3.5.1
 cabal install --lib
 cabal haddock
 </pre>
@@ -364,7 +366,7 @@ The following commands should simulate a 4-bit word adder for several
 clock cycles, with different inputs during each cycle.
 </p>
 
-<pre class="example" id="org97db5d8">
+<pre class="example" id="org9e01f44">
 $ cd examples/adder
 $ ghc -e main Add4Run
 </pre>
@@ -374,29 +376,96 @@ $ ghc -e main Add4Run
 </p>
 
 <p>
-If the installation fails on Windows, delete the following directory
-(with your username and the right version numbers for ghc and hydra)
-and try again:
-</p>
-
-<pre class="example" id="orga9e0562">
-C:\Users\username\AppData\Roaming\cabal\store\ghc-9.2.3\hydra-3.5.1-hash
-</pre>
-
-<p>
 See the user guides for ghc and cabal for more information.  The
 <code>ghc-pkg list</code> command shows the installed packages.
 </p>
 
 <p>
-<i>Some alternative ways to run circuit simulations</i>
+Sometimes an installation may fail if there was a previous
+installation.  If this happens, find the ghc environment default file,
+which is located at a path similar to the following (with your
+username and the right version numbers):
+</p>
+
+<p>
+Linux:
+</p>
+<pre class="example" id="org33883c2">
+~/.ghc/x86_64-linux-8.8.3/environments/default 
+</pre>
+
+<p>
+Windows:
+</p>
+<pre class="example" id="orgd437362">
+C:/Users/username/AppData/Roaming/ghc/x86_64-mingw32-9.2.3/environments/default
+</pre>
+
+<p>
+Open this file in a text editor and find the line containing an entry
+for hydra, which should look something like this:
+</p>
+
+<pre class="example" id="org7d4eb37">
+package-id hydra-3.4.5-VeryLongHashKey
+</pre>
+
+<p>
+Delete the lines for hydra, save the <code>default</code> file, and try the
+<code>cabal install --lib</code> command again.
+</p>
+
+<p>
+<i>Alterntative: using ghci</i>
+</p>
+
+<p>
+Instead of using the batch command <code>ghc -e main Add4Run</code> (where
+Add4Run is the name of a simulation driver), an alternative is to use
+the interactive Haskell interpreter:
+</p>
+
+<pre class="example" id="org3e442ca">
+$ ghci
+ghci&gt; :load Add4Run
+ghci&gt; :main
+ghci&gt; :quit
+</pre>
+
+<p>
+The ghci interpreter offers a number of debugging and tracing tools.
+See the GHC User Guide for details.
+</p>
+
+<p>
+If you get a message saying that there are "hidden packages", copy the
+following into a file named <code>.ghci</code>
+</p>
+<pre class="example" id="orgc0074ef">
+:set -package mtl
+:set -package parsec
+:set -package ansi-terminal
+</pre>
+
+<p>
+<i>Alternative: using cabal</i>
+</p>
+
+<p>
+You can turn a directory with a circuit and simulation driver into a
+cabal package by defining some metadata files.  Once this is done, you
+can then execute the driver using the command <code>cabal run driver</code>,
+where <code>driver</code> is replaced by the actual name of the simulation
+driver.  One advantage of this method is that you can put command line
+arguments on the <code>cabal run</code> command, which you cannot do with the
+<code>ghc -e main</code>.  See the M1 processor circuit directory for an example.
 </p>
 </div>
 </div>
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="date">Created: 2022-07-11 Mon 21:41</p>
+<p class="date">Created: 2022-07-20 Wed 15:29</p>
 <p class="validation"><a href="https://validator.w3.org/check?uri=referer">Validate</a></p>
 </div>
 </body>

@@ -4,18 +4,25 @@
 {-|
 Module       : HDL.Hydra.Circuits.SimDriver
 Description  : Tools for writing simulation drivers
-Copyright    : (c) John O'Donnell 2021
+Copyright    : (c) 2022 John T. O'Donnell
 License      : GPL-3
 Maintainer   : john.t.odonnell9@gmail.com
 Stability    : experimental
 
-Tools for writing simulation drivers -}
+Tools for writing simulation drivers for circuits specified in Hydra -}
+
+-- This module supplies a wide variety of data formatting services,
+-- including conversions between number systems, converting input
+-- strings into internal signal representations, and converting
+-- signals to readable strings for output.
 
 module HDL.Hydra.Core.Driver
  (
 -- * re-export so user doesn't hvae to import Control.Monad.State
    StateT (..), execStateT, liftIO,
-
+   B,
+-- * Configuration
+   hydraVersion, printVersion,
 -- * New from step driver
    call, noContinuation, bitsBin,
 --   logFileName,
@@ -23,7 +30,6 @@ module HDL.Hydra.Core.Driver
 --    putLogStr, putLogStrLn, DEPRECATED
    putBufLogStr, putBufLogStrLn, flushBufLog, writeLogStr,
    setStateWsIO,
-   testfcn,
    incrementCycleCount, clearCycleCount,
    bitsHex, setFlagTable, checkFlag, advanceFlagTable, getClockCycle,
    runFormat, getUserState, printError, setHalted, setPeek, advancePeeks,
@@ -37,9 +43,9 @@ module HDL.Hydra.Core.Driver
    SysState (..), InPort (..), OutPort (..),
    initState,
    useData,
-   inPortBitOld, inPortBit,
-   inPortWordOld, inPortWord,
-   outPortBit, outPortWord,
+   inPortBit, inputBit,
+   inPortWord, inputWord,
+   outputBit, outputWord,
    cycleCmd,
    readAllInputs, writeBufs, readInput,
    showBSig, printInPorts, printInPort,
@@ -83,11 +89,6 @@ module HDL.Hydra.Core.Driver
 
 where
 
--- This module supplies a wide variety of data formatting services,
--- including conversions between number systems, converting input
--- strings into internal signal representations, and converting
--- signals to readable strings for output.
-
 import HDL.Hydra.Core.Signal
 import HDL.Hydra.Core.SigStream
 import HDL.Hydra.Core.SigBool
@@ -105,59 +106,199 @@ import System.IO
 import System.IO.Unsafe
 import System.Console.ANSI
 
-------------------------------------------------------------------------
--- Interface to driver
-------------------------------------------------------------------------
+---------------------------------------------------------------------------
+-- Configuration
+---------------------------------------------------------------------------
 
--- logFileName = "m1output.txt"
+hydraVersion :: String
+hydraVersion = "3.4.16.2"
 
-{-
--- Write a string to both stdout and a log file
-putLogStr :: String -> String -> IO ()
-putLogStr logFileName xs = do
-  putStr xs
-  appendFile logFileName xs
+defaultLogFileName :: String
+defaultLogFileName = "logCircuit.txt"
 
-putLogStrLn :: String -> IO ()
-putLogStrLn xs = putLogStr logFileName (xs ++ "\n")
---  let ys = xs ++ "\n"
---  putStr ys
---  appendFile logFileName ys
--}
+printVersion :: IO ()
+printVersion = putStrLn ("Hydra version " ++ hydraVersion)
 
-putBufLogStr :: String -> StateT (SysState b) IO ()
-putBufLogStr x = do
-  s <- get
-  let xs = bufferedLog s
-  put s {bufferedLog = x:xs}
+---------------------------------------------------------------------------
+-- Default signal representation
+---------------------------------------------------------------------------
 
-putBufLogStrLn xs = putBufLogStr (xs ++ "\n")
+type B = Stream Bool
+type CB = Stream Bool
 
-flushBufLog :: StateT (SysState b) IO ()
-flushBufLog = do
-  s <- get
-  let fileName = logFileName s
-  let xs = concat (reverse (bufferedLog s))
-  put s {bufferedLog = []}
-  lift $ putStr xs
-  s <- get
-  case writingLogFile s of
-    False -> return ()
-    True -> do lift $ appendFile fileName xs
-
-writeLogStr :: String -> String -> IO ()
-writeLogStr logFileName xs = do
-  putStr xs
-  writeFile logFileName xs
-
-
-testfcn :: Int -> Int
-testfcn x = x+1
+---------------------------------------------------------------------------
+-- Driver
+---------------------------------------------------------------------------
 
 type Driver a = IO (SysState a)
 
 driver ::  (StateT (SysState a) IO ()) ->IO ()
-driver f = execStateT f initState >> return ()
+driver f = do
+  printVersion
+  execStateT f initState >> return ()
+
+---------------------------------------------------------------------------
+-- System state
+---------------------------------------------------------------------------
+
+-- Simulation mode.  The default is Interactive, but if the driver
+-- performs useData the mode will be changed to Batch.
+
+data Mode = Batch | Interactive deriving (Eq, Read, Show)
+
+noContinuation :: StateT (SysState b) IO ()
+noContinuation = do
+--  lift $ putStrLn "noContinuation"
+  return ()
+
+-- Type b is the optional user driver state; it is used to extend the
+-- basic system state with additional fields. Thus the user state has
+-- type Maybe b.  (obsolete anything that can refer to the user state
+-- incorporates a)
+
+data SysState b = SysState
+  { running :: Bool
+  , mode :: Mode
+  , halted :: Bool
+  , writingLogFile :: Bool
+  , logFileName :: String
+  , bufferedLog :: [String]
+  , formatMode :: FormatMode
+  , commands :: Commands b
+  , cycleCount :: Int
+  , continueOp :: StateT (SysState b) IO ()
+  , writeBuffer :: [Int]
+  , cycleCountSinceClear :: Int
+  , currentInputString :: String
+  , inPortList :: [InPort]
+  , nInPorts :: Int
+  , outPortList :: [OutPort]
+  , formatSpec :: Maybe [Format Bool b]
+  , peekList :: [[Stream Bool]]
+  , flagTable :: [(String, Stream Bool)]
+  , breakpointKey :: String
+  , storedInput :: [String]
+  , selectedKey :: String
+  , userState :: Maybe b
+  }
+
+initState :: SysState a
+initState = SysState
+  { running = True
+  , mode = Interactive
+  , halted = False
+  , bufferedLog = []
+  , writingLogFile = False
+  , logFileName = defaultLogFileName
+  , formatMode = FormatNormal
+  , commands = Map.empty
+  , cycleCount = 0
+  , continueOp = noContinuation
+  , writeBuffer = []
+  , cycleCountSinceClear = 0
+  , currentInputString = ""
+  , inPortList = []
+  , nInPorts = 0
+  , outPortList = []
+  , formatSpec = Nothing
+  , peekList = []
+  , flagTable = []
+  , breakpointKey = ""
+  , storedInput = []
+  , selectedKey = ""
+  , userState = Nothing
+  }
+
+getClockCycle :: StateT (SysState a) IO Int
+getClockCycle = do
+  s <- get
+  return (cycleCount s)
+
+incrementCycleCount :: StateT (SysState a) IO ()
+incrementCycleCount = do
+  s <- get
+  let i = cycleCount s
+  let j = cycleCountSinceClear s
+  put $ s {cycleCount = i+1, cycleCountSinceClear  = j+1}
+
+clearCycleCount :: StateT (SysState a) IO ()
+clearCycleCount = do
+  s <- get
+  put $ s {cycleCountSinceClear = 0}
+
+setHalted :: Format Bool a
+setHalted = FmtSetHalted
+
+----------------------------------------------------------------------
+-- User driver state
+----------------------------------------------------------------------
+
+-- The simulation driver maintains its own state, consisting of a pair
+-- (c,s) where c :: Int is the clock cycle number, and s ::
+-- DriverState contains information the driver saves for its own use
+-- later on.
+
+getUserState :: StateT (SysState a) IO (Maybe a)
+getUserState = do
+  s <- get
+  return (userState s)
+
+putUserState :: a -> StateT (SysState a) IO ()
+putUserState x = do
+  s <- get
+  put (s {userState = Just x})
+  return ()
+
+printError :: String -> StateT (SysState a) IO ()
+printError msg = do
+  liftIO $ putStrLn ("System error: " ++ msg)
+  return ()
+
+---------------------------------------------------------------------------
+-- Interactive command loop
+---------------------------------------------------------------------------
+
+commandLooper :: StateT (SysState a) IO ()
+commandLooper = do
+  s <- get
+--  liftIO $ putStrLn ("cmdlooper" ++ show (running s))
+  case running s of
+    False -> return ()
+    True -> do
+      doCommand
+      commandLooper
+
+runCmd :: [String] -> StateT (SysState a) IO ()
+runCmd _ = runLooper
+
+runLooper :: StateT (SysState a) IO ()
+runLooper = do
+  s <- get
+  case running s of
+    False -> return ()
+    True -> do
+      cycleCmd []
+      runLooper
+
+doCommand :: StateT (SysState a) IO ()
+doCommand = do
+  liftIO $ putStr "hydra> "
+  liftIO $ hFlush stdout
+  xs <- liftIO $ hGetLine stdin
+  let ws = words xs
+--  printLine ("doCommand: ws = " ++ show ws)
+  case ws of
+    [] -> do
+      cycleCmd []
+    (x:_) -> do
+--      printLine ("doCommand c = " ++ c)
+      mcmd <- lookupCommand x
+      case mcmd of
+        Nothing -> do
+          printLine ("Invalid command: " ++ x ++ "enter h for help")
+          doCommand
+        Just (name,cmd,help) -> do
+          cmd ws
 
 ------------------------------------------------------------------------
 -- Interactive commands
@@ -226,101 +367,9 @@ quitCmd args = do
   put $ s {running = False}
   return ()
 
---------------------------------------------------------------------------------
--- System state
---------------------------------------------------------------------------------
-
-type CB = Stream Bool
-
--- The user state has type Maybe b; anything that can refer to the
--- user state incorporates a
-
-data Mode = Batch | Interactive deriving (Eq, Read, Show)
--- If the driver does useData the mode will be changed to Batch; otherwise
--- remains the default Interactive
-
-noContinuation :: StateT (SysState b) IO ()
-noContinuation = do
---  lift $ putStrLn "noContinuation"
-  return ()
-
-data SysState b = SysState
-  { running :: Bool
-  , mode :: Mode
-  , halted :: Bool
-  , writingLogFile :: Bool
-  , logFileName :: String
-  , bufferedLog :: [String]
-  , formatMode :: FormatMode
-  , commands :: Commands b
-  , cycleCount :: Int
-  , continueOp :: StateT (SysState b) IO ()
-  , writeBuffer :: [Int]
-  , cycleCountSinceClear :: Int
-  , currentInputString :: String
-  , inPortList :: [InPort]
-  , nInPorts :: Int
-  , outPortList :: [OutPort]
-  , formatSpec :: Maybe [Format Bool b]
-  , peekList :: [[Stream Bool]]
-  , flagTable :: [(String, Stream Bool)]
-  , breakpointKey :: String
-  , storedInput :: [String]
-  , selectedKey :: String
-  , userState :: Maybe b
-  }
-
-initState :: SysState a
-initState = SysState
-  { running = True
-  , mode = Interactive
-  , halted = False
-  , bufferedLog = []
-  , writingLogFile = False
-  , logFileName = "circuitLogFile.txt"
-  , formatMode = FormatNormal
-  , commands = Map.empty
-  , cycleCount = 0
-  , continueOp = noContinuation
-  , writeBuffer = []
-  , cycleCountSinceClear = 0
-  , currentInputString = ""
-  , inPortList = []
-  , nInPorts = 0
-  , outPortList = []
-  , formatSpec = Nothing
-  , peekList = []
-  , flagTable = []
-  , breakpointKey = ""
-  , storedInput = []
-  , selectedKey = ""
-  , userState = Nothing
-  }
-
-getClockCycle :: StateT (SysState a) IO Int
-getClockCycle = do
-  s <- get
-  return (cycleCount s)
-
-incrementCycleCount :: StateT (SysState a) IO ()
-incrementCycleCount = do
-  s <- get
-  let i = cycleCount s
-  let j = cycleCountSinceClear s
-  put $ s {cycleCount = i+1, cycleCountSinceClear  = j+1}
-
-clearCycleCount :: StateT (SysState a) IO ()
-clearCycleCount = do
-  s <- get
-  put $ s {cycleCountSinceClear = 0}
-
-  
-setHalted :: Format Bool a
-setHalted = FmtSetHalted
-
---------------------------------------------------------------------------------
+---------------------------------------------------------------------------
 -- Breakpoint
---------------------------------------------------------------------------------
+---------------------------------------------------------------------------
 
 setFlagTable :: [(String, Stream Bool)] -> StateT (SysState a) IO ()
 setFlagTable flagTable = do
@@ -344,34 +393,9 @@ advanceFlagTable = do
 advanceFlag :: (String, Stream Bool) -> (String, Stream Bool)
 advanceFlag (key, x) = (key, future x)
 
-----------------------------------------------------------------------
--- Driver state
-----------------------------------------------------------------------
-
--- The simulation driver maintains its own state, consisting of a pair
--- (c,s) where c :: Int is the clock cycle number, and s ::
--- DriverState contains information the driver saves for its own use
--- later on.
-
-getUserState :: StateT (SysState a) IO (Maybe a)
-getUserState = do
-  s <- get
-  return (userState s)
-
-putUserState :: a -> StateT (SysState a) IO ()
-putUserState x = do
-  s <- get
-  put (s {userState = Just x})
-  return ()
-
-printError :: String -> StateT (SysState a) IO ()
-printError msg = do
-  liftIO $ putStrLn ("System error: " ++ msg)
-  return ()
-
---------------------------------------------------------------------------------
+---------------------------------------------------------------------------
 -- Ports
---------------------------------------------------------------------------------
+---------------------------------------------------------------------------
 
 -- An input port must be defined for each input, because it holds the
 -- buffer in which the input data is placed.  The system maintains a
@@ -409,19 +433,7 @@ data OutPort
 
 -- make a new inport bit
 
-inPortBitOld :: String -> StateT (SysState a) IO InPort
-inPortBitOld inPortName = do
-  inbuf <- liftIO $ newIORef False
-  let fetcher = repeat (readIORef inbuf)
-  let inbsig = listeffects fetcher
-  s <- get
-  let inPortIndex = nInPorts s
---printLine ("inPortBitOld " ++ inPortName ++ " " ++ show inPortIndex)
-  let port = InPortBit { inPortName, inbsig, inbuf, fetcher, inPortIndex }
-  put $ s {inPortList = inPortList s ++ [port], nInPorts = inPortIndex + 1}
-  return port
-
-inPortBit :: String -> StateT (SysState a) IO (Stream Bool)
+inPortBit :: String -> StateT (SysState a) IO InPort
 inPortBit inPortName = do
   inbuf <- liftIO $ newIORef False
   let fetcher = repeat (readIORef inbuf)
@@ -429,6 +441,18 @@ inPortBit inPortName = do
   s <- get
   let inPortIndex = nInPorts s
 --printLine ("inPortBit " ++ inPortName ++ " " ++ show inPortIndex)
+  let port = InPortBit { inPortName, inbsig, inbuf, fetcher, inPortIndex }
+  put $ s {inPortList = inPortList s ++ [port], nInPorts = inPortIndex + 1}
+  return port
+
+inputBit :: String -> StateT (SysState a) IO (Stream Bool)
+inputBit inPortName = do
+  inbuf <- liftIO $ newIORef False
+  let fetcher = repeat (readIORef inbuf)
+  let inbsig = listeffects fetcher
+  s <- get
+  let inPortIndex = nInPorts s
+--printLine ("inputBit " ++ inPortName ++ " " ++ show inPortIndex)
   let port = InPortBit { inPortName, inbsig, inbuf, fetcher, inPortIndex }
   put $ s {inPortList = inPortList s ++ [port], nInPorts = inPortIndex + 1}
   return inbsig
@@ -439,8 +463,8 @@ inPortBit inPortName = do
 
 -- make a new inport word
 
-inPortWordOld :: String -> Int -> StateT (SysState a) IO InPort
-inPortWordOld inPortName inwsize = do
+inPortWord :: String -> Int -> StateT (SysState a) IO InPort
+inPortWord inPortName inwsize = do
   inwbufs <- liftIO $ mkInBufWord inwsize
   let wfetchers = map (\x -> repeat (readIORef x)) inwbufs
   let inwsig = map listeffects wfetchers
@@ -455,8 +479,8 @@ inPortWordOld inPortName inwsize = do
 --  liftIO $ putStrLn ("inPortWord len wfetchers = " ++ show (length wfetchers))
 --  liftIO $ putStrLn ("inPortWord len inwsig = " ++ show (length inwsig))
 
-inPortWord :: String -> Int -> StateT (SysState a) IO [Stream Bool]
-inPortWord inPortName inwsize = do
+inputWord :: String -> Int -> StateT (SysState a) IO [Stream Bool]
+inputWord inPortName inwsize = do
   inwbufs <- liftIO $ mkInBufWord inwsize
   let wfetchers = map (\x -> repeat (readIORef x)) inwbufs
   let inwsig = map listeffects wfetchers
@@ -480,8 +504,8 @@ writeBufs rs bs = mapM_ (\(r,b) -> writeIORef r b ) (zip rs bs)
 
 -- make a new outport bit
 
-outPortBit :: String -> CB -> StateT (SysState a) IO OutPort
-outPortBit outPortName outbsig = do
+outputBit :: String -> CB -> StateT (SysState a) IO OutPort
+outputBit outPortName outbsig = do
   s <- get
   let port =  OutPortBit { outPortName, outbsig }
   s <- get
@@ -490,10 +514,10 @@ outPortBit outPortName outbsig = do
 
 -- make a new outport word
 
--- outPortWord :: String -> [CB] -> ([Bool]->String) -> StateT (SysState a) IO OutPort
--- outPortWord outPortName outwsig showw = do
-outPortWord :: String -> [CB] -> StateT (SysState a) IO OutPort
-outPortWord outPortName outwsig = do
+-- outputWord :: String -> [CB] -> ([Bool]->String) -> StateT (SysState a) IO OutPort
+-- outputWord outPortName outwsig showw = do
+outputWord :: String -> [CB] -> StateT (SysState a) IO OutPort
+outputWord outPortName outwsig = do
   s <- get
   let outwsize = length outwsig
 --  let port =  OutPortWord { outPortName, outwsig, outwsize, showw }
@@ -501,9 +525,9 @@ outPortWord outPortName outwsig = do
   put $ s {outPortList = outPortList s ++ [port]}
   return port
 
---------------------------------------------------------------------------------
+---------------------------------------------------------------------------
 -- Clock cycle
---------------------------------------------------------------------------------
+---------------------------------------------------------------------------
 
 -- A clock cycle proceeds in a sequence of phases:
 
@@ -542,9 +566,9 @@ cycleCmd args = do
       s <- get
       put (s {cycleCount = i+1})
 
---------------------------------------------------------------------------------
+---------------------------------------------------------------------------
 -- Phase 1: Establish inputs
---------------------------------------------------------------------------------
+---------------------------------------------------------------------------
 
 -- Decide what the input signal values should be for this clock cycle
 -- and store them into the inport buffers.
@@ -701,9 +725,9 @@ takeInput (p,x) = do
       let bs = intToBits y inwsize
       liftIO $ writeBufs inwbufs bs
 
---------------------------------------------------------------------------------
+---------------------------------------------------------------------------
 -- Phase 3: Observe signals
---------------------------------------------------------------------------------
+---------------------------------------------------------------------------
 
 observeSignals :: StateT (SysState a) IO ()
 observeSignals = do
@@ -758,9 +782,9 @@ opCurrentPorts = do
   printInPorts
   printOutPorts
 
---------------------------------------------------------------------------------
+---------------------------------------------------------------------------
 -- Phase 4: Advance signals
---------------------------------------------------------------------------------
+---------------------------------------------------------------------------
 
 advanceSignals :: StateT (SysState a) IO ()
 advanceSignals = do
@@ -817,135 +841,6 @@ advanceOutPort (OutPortWord {..}) = do
 --		       Simulation Driver Input
 ---------------------------------------------------------------------------
 
--- The input section of a simulation driver is constructed using
--- getbit, getbin, gettc, and ...
-
-------------------------------------------------------------------------
--- Extract input signals from integer lists
-------------------------------------------------------------------------
-
--- | Convert an input number (which should be 0 or 1) into an input
--- | bit signal.
-
-getbit :: (Signal a, Static a) => [[Int]] -> Int -> Stream a
-getbit xs i =
-  Cycle (intSig (head xs !! i)) (getbit (tail xs) i)
-
--- | Convert an input number (which should be between 0 and 3) to a
--- | pair of input bit signals.
-
-getbit2
-  :: (Signal a, StaticBit a)
-  => [[Int]] -> Int -> (Stream a, Stream a)
-getbit2 xs i = (getbini 2 0 xs i, getbini 2 1 xs i)
-
-getbit20, getbit21
-  :: (Signal a, StaticBit a)
-  => [[Int]] -> Int -> Stream a
-getbit20 xs i =
-  Cycle (bit20 (head xs !! i)) (getbit20 (tail xs) i)
-getbit21 xs i =
-  Cycle (bit21 (head xs !! i)) (getbit20 (tail xs) i)
-
-bit20, bit21 :: (Signal a, Static a) => Int -> a
-bit20 x = intSig ((x `mod` 4) `div` 2)
-bit21 x = intSig (x `div` 2)
-
--- Makes a stream consisting of the j'th bit of the k-bit binary
--- representation of the i'th column of the list xs.
-
-getbini k j xs i =
-  Cycle (biti k j (head xs !! i)) (getbini k j (tail xs) i)
-
--- Build a k-bit word (list of streams) which is the binary
--- representation of the i'th column of xs::[[Int]].
-
-getbin :: (Signal a, StaticBit a)
-  => Int -> [[Int]] -> Int -> [Stream a]
-getbin k xs i = [getbini k j xs i | j <- [0..k-1]]
-
--- Build a k-bit word (list of streams) which is the two's complement
--- representation of the i'th column of xs::[[Int]].
-
-gettc k xs i = [getbini k j (map (map (tc k)) xs) i | j <- [0..k-1]]
-
--- The biti function gives the i'th bit of the k-bit binary
--- representation of the integer x. The wordsize is k, i is the bit
--- index, x is the integer input Bits are numbered from the left
--- starting with 0, thus bit 0 is the most significant bit.
-
-biti :: (Signal a, StaticBit a) => Int -> Int -> Int -> a
-biti k i x = boolSig (odd (x `div` (2^(k-(i+1)))))
-
---------------------------------------------------------------------------------
--- Monadic version of run: Produce output cycle by cycle
---------------------------------------------------------------------------------
-
--- (i,st) is state; i is cycle number, st is user's defined state
-
--- | Run a simulation until the end of the list of inputs is reached.
-
-run :: (Signal a, StaticBit a)
-  => b -> [[Int]] -> [Format a b] -> IO ()
-run initst inps outs =
-  do _ <- execStateT (mrun' (length inps) 0 outs) (0,initst)
-     return ()
-
-mrun' :: (Signal a, StaticBit a) =>
-  Int -> Int -> [Format a b] -> StateT (Int,b) IO ()
-mrun' limit i xs =
-  if i<limit
-  then do xs' <- mstep i xs
-          mrun' limit (i+1) xs'
-  else return ()
-
--- | Run a simulation until a termination predicate is satisfied.
-
-runUntil :: (Signal a, StaticBit a) =>
-  b -> ((Int,b)->Bool) -> [[Int]] -> [Format a b] -> IO ()
-runUntil initst p inps outs =
-  do _ <- execStateT (mrunUntil p outs) (0,initst)
-     return ()
-
--- Tools for using runUntil, especially with simple format
-
-termpred :: Int -> (Int,a) -> Bool
-termpred inputSize (c,s) = (c >= inputSize)
-
--- | Run the simulation as long as the input list contains more input
--- | data.
-
-runAllInput :: [[Int]] -> [Format Bool ()] -> IO ()
-runAllInput input format =
-  runUntil () (termpred (length input)) input format
-
-
--- version of mrun' with a termination predicate, rather than simply
--- running for a fixed number of cycles
-
-mrunUntil :: (Signal a, StaticBit a) =>
-  ((Int,b)->Bool) -> [Format a b] -> StateT (Int,b) IO ()
-mrunUntil p xs =
-  do s <- get
-     if p s
-       then return ()
-       else do xs' <- mstep 0 xs  -- 0 is dummy, get rid	
-               mrunUntil p xs'
-
-
-mstep :: (Signal a, StaticBit a) =>
-  Int -> [Format a b] -> StateT (Int,b) IO [Format a b]
-mstep = undefined
-{-
-mstep i xs =
-  do -- lift $ putStr (setlength 4 (show i))
-     -- lift $ putStr ".  "
-     ys <- mdofmts xs
-     lift $ putStr "\n"
-     (cycle,s) <- get
-     put (cycle+1,s)
-     return ys
--}
 
 ---------------------------------------------------------------------------
 --		       Simulation Driver Output
@@ -957,11 +852,9 @@ setPeek xs = do
   let ps = peekList s
   put $ s {peekList = ps ++ [xs]}
 
-
-
---------------------------------------------------------------------------------
+---------------------------------------------------------------------------
 -- Output format specification
---------------------------------------------------------------------------------
+---------------------------------------------------------------------------
 
 -- The output section of a simulation driver uses format specifiers to
 -- control how various signals are printed.  These format specifiers
@@ -988,9 +881,9 @@ data Format a b
   | FmtSetHalted -- deprecated
 --  | FmtCase [Stream a] [(Int, Format a b)] -- not used?
 
---------------------------------------------------------------------------------
+---------------------------------------------------------------------------
 -- User functions for constructing format specifications
---------------------------------------------------------------------------------
+---------------------------------------------------------------------------
 
 call :: StateT (SysState b) IO () -> Format a b
 call op = FmtContinue op
@@ -1089,9 +982,13 @@ format xs = do
 -- if a then carry out action.  if p then produce output.  In any
 -- case, advance the format
 
---------------------------------------------------------------------------------
+---------------------------------------------------------------------------
 -- Run the format
---------------------------------------------------------------------------------
+---------------------------------------------------------------------------
+
+-- Run through the format and perform specified actions, including
+-- performing output.  The signals are not changed; that must be done
+-- separately by performing advanceFormat.
 
 -- use separated execute/advance operations on format
 
@@ -1104,10 +1001,6 @@ runFormat m = do
     Nothing -> return ()
     Just fs -> doFmts m fs
   flushBufLog
-
---------------------------------------------------------------------------------
--- Execute format
---------------------------------------------------------------------------------
 
 -- Configure whether format action will produce output
 
@@ -1215,7 +1108,6 @@ doFmt m FmtSetHalted = do
   put (s {halted = True})
   return ()
 
-
 {- deprecated
 --  fs_then' <- mdofmts (a && b) (p && b) fs_then
 --  fs_else' <- mdofmts (a && not b) (p && not b) fs_else
@@ -1234,9 +1126,9 @@ mdofmt a p FmtSetHalted = do
   return FmtSetHalted
 -}
 
---------------------------------------------------------------------------------
+---------------------------------------------------------------------------
 -- Advance all signals that appear in the format
---------------------------------------------------------------------------------
+---------------------------------------------------------------------------
 
 -- advanceFormat :: (Signal a, StaticBit a) => StateT (SysState b) IO ()
 advanceFormat = do
@@ -1300,7 +1192,97 @@ getAdvFmt (FmtCycle f) = return (FmtCycle f)
 getAdvFmt FmtSetHalted = return FmtSetHalted
 
 ---------------------------------------------------------------------------
---		      Number System Conversions
+-- Running the simulation
+---------------------------------------------------------------------------
+
+runSimulation :: StateT (SysState a) IO ()
+runSimulation = do
+--  liftIO $ putLogStrLn "gamma"
+  defineStandardCommands
+  s <- get
+  let m = mode s
+  liftIO $ putStrLn (show m ++ " mode")
+  case m of
+    Batch -> do
+      runLooper
+      return ()
+    Interactive -> do
+      printLine "Enter command after prompt, h for help"
+      commandLooper
+  
+
+---------------------------------------------------------------------------
+-- Monadic version of run: Produce output cycle by cycle
+---------------------------------------------------------------------------
+
+-- (i,st) is state; i is cycle number, st is user's defined state
+
+-- | Run a simulation until the end of the list of inputs is reached.
+
+run :: (Signal a, StaticBit a)
+  => b -> [[Int]] -> [Format a b] -> IO ()
+run initst inps outs =
+  do _ <- execStateT (mrun' (length inps) 0 outs) (0,initst)
+     return ()
+
+mrun' :: (Signal a, StaticBit a) =>
+  Int -> Int -> [Format a b] -> StateT (Int,b) IO ()
+mrun' limit i xs =
+  if i<limit
+  then do xs' <- mstep i xs
+          mrun' limit (i+1) xs'
+  else return ()
+
+-- | Run a simulation until a termination predicate is satisfied.
+
+runUntil :: (Signal a, StaticBit a) =>
+  b -> ((Int,b)->Bool) -> [[Int]] -> [Format a b] -> IO ()
+runUntil initst p inps outs =
+  do _ <- execStateT (mrunUntil p outs) (0,initst)
+     return ()
+
+-- Tools for using runUntil, especially with simple format
+
+termpred :: Int -> (Int,a) -> Bool
+termpred inputSize (c,s) = (c >= inputSize)
+
+-- | Run the simulation as long as the input list contains more input
+-- | data.
+
+runAllInput :: [[Int]] -> [Format Bool ()] -> IO ()
+runAllInput input format =
+  runUntil () (termpred (length input)) input format
+
+
+-- version of mrun' with a termination predicate, rather than simply
+-- running for a fixed number of cycles
+
+mrunUntil :: (Signal a, StaticBit a) =>
+  ((Int,b)->Bool) -> [Format a b] -> StateT (Int,b) IO ()
+mrunUntil p xs =
+  do s <- get
+     if p s
+       then return ()
+       else do xs' <- mstep 0 xs  -- 0 is dummy, get rid	
+               mrunUntil p xs'
+
+
+mstep :: (Signal a, StaticBit a) =>
+  Int -> [Format a b] -> StateT (Int,b) IO [Format a b]
+mstep = undefined
+{-
+mstep i xs =
+  do -- lift $ putStr (setlength 4 (show i))
+     -- lift $ putStr ".  "
+     ys <- mdofmts xs
+     lift $ putStr "\n"
+     (cycle,s) <- get
+     put (cycle+1,s)
+     return ys
+-}
+
+---------------------------------------------------------------------------
+--  Number System Conversions
 ---------------------------------------------------------------------------
 
 bitsBin :: [Bool] -> Int
@@ -1426,70 +1408,53 @@ tc x =
   in z
 -}
 
---------------------------------------------------------------------------------
--- Command interpreter
---------------------------------------------------------------------------------
+---------------------------------------------------------------------------
+-- I/O for logging
+---------------------------------------------------------------------------
 
-runSimulation :: StateT (SysState a) IO ()
-runSimulation = do
---  liftIO $ putLogStrLn "gamma"
-  defineStandardCommands
+putBufLogStr :: String -> StateT (SysState b) IO ()
+putBufLogStr x = do
   s <- get
-  let m = mode s
-  liftIO $ putStrLn (show m ++ " mode")
-  case m of
-    Batch -> do
-      runLooper
-      return ()
-    Interactive -> do
-      printLine "Enter command after prompt, h for help"
-      commandLooper
-  
-commandLooper :: StateT (SysState a) IO ()
-commandLooper = do
+  let xs = bufferedLog s
+  put s {bufferedLog = x:xs}
+
+putBufLogStrLn xs = putBufLogStr (xs ++ "\n")
+
+flushBufLog :: StateT (SysState b) IO ()
+flushBufLog = do
   s <- get
---  liftIO $ putStrLn ("cmdlooper" ++ show (running s))
-  case running s of
+  let fileName = logFileName s
+  let xs = concat (reverse (bufferedLog s))
+  put s {bufferedLog = []}
+  lift $ putStr xs
+  s <- get
+  case writingLogFile s of
     False -> return ()
-    True -> do
-      doCommand
-      commandLooper
+    True -> do lift $ appendFile fileName xs
 
-runCmd :: [String] -> StateT (SysState a) IO ()
-runCmd _ = runLooper
+writeLogStr :: String -> String -> IO ()
+writeLogStr logFileName xs = do
+  putStr xs
+  writeFile logFileName xs
 
-runLooper :: StateT (SysState a) IO ()
-runLooper = do
-  s <- get
-  case running s of
-    False -> return ()
-    True -> do
-      cycleCmd []
-      runLooper
+{-
+-- Write a string to both stdout and a log file
+putLogStr :: String -> String -> IO ()
+putLogStr logFileName xs = do
+  putStr xs
+  appendFile logFileName xs
 
-doCommand :: StateT (SysState a) IO ()
-doCommand = do
-  liftIO $ putStr "hydra> "
-  liftIO $ hFlush stdout
-  xs <- liftIO $ hGetLine stdin
-  let ws = words xs
---  printLine ("doCommand: ws = " ++ show ws)
-  case ws of
-    [] -> do
-      cycleCmd []
-    (x:_) -> do
---      printLine ("doCommand c = " ++ c)
-      mcmd <- lookupCommand x
-      case mcmd of
-        Nothing -> do
-          printLine ("Invalid command: " ++ x ++ "enter h for help")
-          doCommand
-        Just (name,cmd,help) -> do
-          cmd ws
+putLogStrLn :: String -> IO ()
+putLogStrLn xs = putLogStr logFileName (xs ++ "\n")
+--  let ys = xs ++ "\n"
+--  putStr ys
+--  appendFile logFileName ys
+-}
 
---------------------------------------------------------------------------------
+
+---------------------------------------------------------------------------
 -- Terminal I/O
---------------------------------------------------------------------------------
+---------------------------------------------------------------------------
 
 -- Check whether there is input available.  If so do a blocking line
 -- read, and when the entire line is available read and return it.  If
@@ -1517,9 +1482,9 @@ testTextColors = do
   setSGR [Reset]  -- Reset to default colour scheme
   putStrLn "Back to the default colors"
 
---------------------------------------------------------------------------------
+---------------------------------------------------------------------------
 -- Utilities
---------------------------------------------------------------------------------
+---------------------------------------------------------------------------
 
 -- Text field adjustment
 
@@ -1567,6 +1532,76 @@ doNtimes i f
 
 printLine :: String -> StateT (SysState a) IO ()
 printLine xs = liftIO (putStrLn xs)
+
+---------------------------------------------------------------------------
+-- Probably to be deprecated soon
+-- old style getbit etc for input signals...
+---------------------------------------------------------------------------
+
+---------------------------------------------------------------------------
+--		       Simulation Driver Input
+---------------------------------------------------------------------------
+
+-- The input section of a simulation driver is constructed using
+-- getbit, getbin, gettc, and ...
+
+------------------------------------------------------------------------
+-- Extract input signals from integer lists
+------------------------------------------------------------------------
+
+-- | Convert an input number (which should be 0 or 1) into an input
+-- | bit signal.
+
+getbit :: (Signal a, Static a) => [[Int]] -> Int -> Stream a
+getbit xs i =
+  Cycle (intSig (head xs !! i)) (getbit (tail xs) i)
+
+-- | Convert an input number (which should be between 0 and 3) to a
+-- | pair of input bit signals.
+
+getbit2
+  :: (Signal a, StaticBit a)
+  => [[Int]] -> Int -> (Stream a, Stream a)
+getbit2 xs i = (getbini 2 0 xs i, getbini 2 1 xs i)
+
+getbit20, getbit21
+  :: (Signal a, StaticBit a)
+  => [[Int]] -> Int -> Stream a
+getbit20 xs i =
+  Cycle (bit20 (head xs !! i)) (getbit20 (tail xs) i)
+getbit21 xs i =
+  Cycle (bit21 (head xs !! i)) (getbit20 (tail xs) i)
+
+bit20, bit21 :: (Signal a, Static a) => Int -> a
+bit20 x = intSig ((x `mod` 4) `div` 2)
+bit21 x = intSig (x `div` 2)
+
+-- Makes a stream consisting of the j'th bit of the k-bit binary
+-- representation of the i'th column of the list xs.
+
+getbini k j xs i =
+  Cycle (biti k j (head xs !! i)) (getbini k j (tail xs) i)
+
+-- Build a k-bit word (list of streams) which is the binary
+-- representation of the i'th column of xs::[[Int]].
+
+getbin :: (Signal a, StaticBit a)
+  => Int -> [[Int]] -> Int -> [Stream a]
+getbin k xs i = [getbini k j xs i | j <- [0..k-1]]
+
+-- Build a k-bit word (list of streams) which is the two's complement
+-- representation of the i'th column of xs::[[Int]].
+
+gettc k xs i = [getbini k j (map (map (tc k)) xs) i | j <- [0..k-1]]
+
+-- The biti function gives the i'th bit of the k-bit binary
+-- representation of the integer x. The wordsize is k, i is the bit
+-- index, x is the integer input Bits are numbered from the left
+-- starting with 0, thus bit 0 is the most significant bit.
+
+biti :: (Signal a, StaticBit a) => Int -> Int -> Int -> a
+biti k i x = boolSig (odd (x `div` (2^(k-(i+1)))))
+
 
 ------------------------------------------------------------------------
 -- Deprecated or deleted
@@ -1980,7 +2015,7 @@ doCommand = do
     _ -> return ()
 -}
 
--- ********************************************************************************
+-- ************************************************************************
 -- old format version beginning
 
 ------------------------------------------------------------------------

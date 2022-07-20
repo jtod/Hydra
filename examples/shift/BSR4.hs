@@ -1,5 +1,6 @@
 -- BSR4: 4-bit bidirectional shift register
--- This file is part of Hydra, see Hydra/README.md for copyright and license
+-- This file is part of Hydra. See README and https://github.com/jtod/Hydra
+-- Copyright (c) 2022 John T. O'Donnell
 
 module BSR4 where
 import HDL.Hydra.Core.Lib

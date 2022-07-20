@@ -1,5 +1,8 @@
 -- MultiplyRun: simulation driver for multiply circuit
--- John O'Donnell, 2021
+-- This file is part of Hydra. See README and https://github.com/jtod/Hydra
+-- Copyright (c) 2022 John T. O'Donnell
+
+-- Usage: $ ghc -e main MultiplyRun
 
 -- To run the multiplier:
 --   $ ghci
@@ -10,6 +13,9 @@
 module Main where
 import HDL.Hydra.Core.Lib
 import Multiply
+
+main :: IO ()
+main = multiplyDriver mult_test_data_1
 
 mult_test_data_1 :: [String]
 mult_test_data_1 =
@@ -47,34 +53,29 @@ mult_test_data_1 =
         "0    0     0"]
 
 -- main :: Driver a
-main :: IO ()
-main = driver $ do
-
--- Input data  
-  useData mult_test_data_1
+multiplyDriver :: [String] -> IO ()
+multiplyDriver xs = driver $ do
 
 -- Size parameter
   let k = 8
 
--- Input ports
-  in_start <- inPortBit "start"
-  in_x     <- inPortWord "x" k
-  in_y     <- inPortWord "y" k
+-- Input data  
+  useData xs
 
--- Input signals
-  let start = inbsig in_start
-  let x     = inwsig in_x
-  let y     = inwsig in_y
+-- Inputs
+  start <- inputBit "start"
+  x     <- inputWord "x" k
+  y     <- inputWord "y" k
 
 -- Circuit
   let (rdy,prod,rx,ry,s) = multiply k start x y
 
--- Format the signals
-  format
-    [string "Input: ",
-     bit start, bindec 4 x, bindec 4 y,
-     string "  Output: ",
-     bit rdy, bindec 6 prod, bindec 4 rx, bindec 6 ry,
-     bindec 6 s]
-
+-- Outputs
+  outputBit "rdy" rdy
+  outputWord "prod" prod
+  outputWord "x" x
+  outputWord "y" y
+  outputWord "s" s
+  
+-- Run
   runSimulation

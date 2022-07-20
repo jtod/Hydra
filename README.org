@@ -92,20 +92,22 @@ choco upgrade ghc cabal -y
 ** Install Hydra
 
 The Hydra source code is available at [[https://github.com/jtod/Hydra]].
-See the Releases section on the right side of the page, click on the
-latest release, and download the source code file, which is available
-in both =zip= and =.tar.gz= format.  Put the file somewhere in your
-user workspace and unpack it, using the correct version number for
-your download:
+See the Releases section on the right side of the page and click on
+the latest release.  Download the source code file (in the Assets
+section), which is available in both =zip= and =.tar.gz= format.  Put
+the file somewhere in your user workspace and unpack it, using the
+correct version number for your download:
 
 - On Linux: tar -xzf Hydra-3.5.1.tar.gz
 - On Windows use zip, 7zip or tar
 
-This will create a directory that contains the source code (=src=
-directory), documentation (=docs= directory and =examples= directory),
-and build tools.  Install using these commands:
+This will create a directory that contains documentation (=docs=
+directory and =examples= directory), the source code (=src=
+directory), and build tools.  Install using these commands (using the
+right version number for Hydra):
 
 #+BEGIN_EXAMPLE
+cd Hydra-3.5.1
 cabal install --lib
 cabal haddock
 #+END_EXAMPLE
@@ -122,21 +124,64 @@ $ ghc -e main Add4Run
 
 /In case of difficulty/
 
-If the installation fails on Windows, delete the following directory
-(with your username and the right version numbers for ghc and hydra)
-and try again:
-
-#+BEGIN_EXAMPLE
-C:\Users\username\AppData\Roaming\cabal\store\ghc-9.2.3\hydra-3.5.1-hash
-#+END_EXAMPLE
-
 See the user guides for ghc and cabal for more information.  The
 =ghc-pkg list= command shows the installed packages.
 
-/Some alternative ways to run circuit simulations/
+Sometimes an installation may fail if there was a previous
+installation.  If this happens, find the ghc environment default file,
+which is located at a path similar to the following (with your
+username and the right version numbers):
 
-/Using ghci/
+Linux:
+#+BEGIN_EXAMPLE
+~/.ghc/x86_64-linux-8.8.3/environments/default 
+#+END_EXAMPLE
 
-/Using cabal/
+Windows:
+#+BEGIN_EXAMPLE
+C:/Users/username/AppData/Roaming/ghc/x86_64-mingw32-9.2.3/environments/default
+#+END_EXAMPLE
 
-/Running Hydra without installing it/
+Open this file in a text editor and find the line containing an entry
+for hydra, which should look something like this:
+
+#+BEGIN_EXAMPLE
+package-id hydra-3.4.5-VeryLongHashKey
+#+END_EXAMPLE
+
+Delete the lines for hydra, save the =default= file, and try the
+=cabal install --lib= command again.
+
+/Alterntative: using ghci/
+
+Instead of using the batch command =ghc -e main Add4Run= (where
+Add4Run is the name of a simulation driver), an alternative is to use
+the interactive Haskell interpreter:
+
+#+BEGIN_EXAMPLE
+$ ghci
+ghci> :load Add4Run
+ghci> :main
+ghci> :quit
+#+END_EXAMPLE
+
+The ghci interpreter offers a number of debugging and tracing tools.
+See the GHC User Guide for details.
+
+If you get a message saying that there are "hidden packages", copy the
+following into a file named =.ghci=
+#+BEGIN_EXAMPLE
+:set -package mtl
+:set -package parsec
+:set -package ansi-terminal
+#+END_EXAMPLE
+
+/Alternative: using cabal/
+
+You can turn a directory with a circuit and simulation driver into a
+cabal package by defining some metadata files.  Once this is done, you
+can then execute the driver using the command =cabal run driver=,
+where =driver= is replaced by the actual name of the simulation
+driver.  One advantage of this method is that you can put command line
+arguments on the =cabal run= command, which you cannot do with the
+=ghc -e main=.  See the M1 processor circuit directory for an example.

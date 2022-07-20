@@ -1,5 +1,6 @@
 -- BSR4Run: simulation driver for 4-bit bidirectional shift register
--- This file is part of Hydra.  John O'Donnell, 2021.  See Hydra/README
+-- This file is part of Hydra. See README and https://github.com/jtod/Hydra
+-- Copyright (c) 2022 John T. O'Donnell
 
 module Main where
 import HDL.Hydra.Core.Lib
@@ -13,8 +14,11 @@ import BSR4
 --   10  shift right
 --   11  shift left
 
-testdata :: [String]
-testdata =
+main :: IO ()
+main = runBSR4 testData
+
+testData :: [String]
+testData =
 -------------------------------------
 --  (a,b)  l  r   x      effect    y
 -------------------------------------
@@ -31,38 +35,25 @@ testdata =
   , "0 0   0  0  0"   -- nop       9
   ]
 
-main :: IO ()
-main = driver $ do
+runBSR4 :: [String] ->  IO ()
+runBSR4 xs = driver $ do
   
 -- Input data
-  useData testdata
+  useData xs
 
--- Input ports
-  in_a <- inPortBit "a"
-  in_b <- inPortBit "b"
-  in_l <- inPortBit "l"
-  in_r <- inPortBit "r"
-  in_x <- inPortWord "x" 4
+-- Inputs
+  a <- inputBit "a"
+  b <- inputBit "b"
+  l <- inputBit "l"
+  r <- inputBit "r"
+  x <- inputWord "x" 4
 
--- Input signals
-  let a = inbsig in_a
-  let b = inbsig in_b
-  let l = inbsig in_l
-  let r = inbsig in_r
-  let x = inwsig in_x
-
--- Connect the inputs and output signals to the circuit
+-- Circuit
   let (lo,ro,y) = bsr4 (a,b) l r x
 
--- Format the output signals
-  format
-    [string "op=", bit a, bit b,
-     string " l=", bit l,
-     string " r=", bit r,
-     string " x=", hex x,
-     string "   Output lo=", bit lo,
-     string " ro=", bit ro,
-     string " y=", hex y]
+  outputBit "lo" lo
+  outputBit "ro" ro
+  outputWord "y" y
 
 -- Run the circuit on the inputs
   runSimulation

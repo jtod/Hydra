@@ -1,6 +1,6 @@
 -- Add4Run: simulation driver for add4 circuit
--- This file is part of Hydra.  https://github.com/jtod/Hydra
--- John T. O'Donnell, 2022
+-- This file is part of Hydra.  https://github.com/jtod/Hydra 
+-- Copyright (c) 2022 John T. O'Donnell.  See Hydra/README
 
 module Main where
 import HDL.Hydra.Core.Lib
@@ -28,16 +28,16 @@ main = driver $ do
   useData testdata1
 
 -- Inputs
-  cin <- inPortBit "cin"
-  x <- inPortWord "x" 4
-  y <- inPortWord "y" 4
+  cin <- inputBit "cin"
+  x <- inputWord "x" 4
+  y <- inputWord "y" 4
 
 -- Circuit
   let (cout,s) = add4 cin x y
 
 -- Outputs
-  out_cout <- outPortBit "cout" cout
-  out_s    <- outPortWord "s" s
+  outputBit "cout" cout
+  outputWord "s" s
 
 -- Run
   runSimulation

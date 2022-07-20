@@ -1,5 +1,6 @@
 -- Count4: a 4-bit binary counter circuit
--- John O'Donnell, 2021
+-- This file is part of Hydra.  https://github.com/jtod/Hydra
+-- Copyright (c) 2022 John T. O'Donnell
 
 module Count4 where
 import HDL.Hydra.Core.Lib

@@ -1,4 +1,8 @@
--- Simulation driver for RTM circuit
+-- RTMrun: simulation driver for RTM circuit
+-- This file is part of Hydra. See README and https://github.com/jtod/Hydra
+-- Copyright (c) 2022 John T. O'Donnell
+
+-- Usage: ghc -e main RTMrun
 
 module Main where
 import HDL.Hydra.Core.Lib
@@ -10,9 +14,7 @@ import RTM
 --   n = word size
 --   k = address size, so there are 2^k registers
 
-main =
-  do putStrLn "Register Transfer Machine"
-     sim_rtm 8 3 rtm_testinput_1
+main = rtmRun 8 3 rtm_testinput_1
 
 ----------------------------------------------------------------------------
 -- Test data
@@ -46,29 +48,32 @@ rtm_testinput_1 =
 ----------------------------------------------------------------------------
 -- Simulation driver
 
-sim_rtm n k input = driver $ do
+rtmRun :: Int -> Int -> [String] -> IO ()
+rtmRun n k xs = driver $ do
 --Input data
-  useData rtm_testinput_1
+  useData xs
 
 -- Input ports      
-  in_ld  <- inPortBit "ld"
-  in_add <- inPortBit "add"
-  in_d   <- inPortWord "d"  k
-  in_sa  <- inPortWord "sa" k
-  in_sb  <- inPortWord "sb" k
-  in_x   <- inPortWord "x"  n
-
--- Input signals
-  let ld  = inbsig in_ld
-  let add = inbsig in_add
-  let d   = inwsig in_d
-  let sa  = inwsig in_sa
-  let sb  = inwsig in_sb
-  let x   = inwsig in_x
+  ld  <- inputBit "ld"
+  add <- inputBit "add"
+  d   <- inputWord "d"  k
+  sa  <- inputWord "sa" k
+  sb  <- inputWord "sb" k
+  x   <- inputWord "x"  n
 
 -- Circuit
   let (a,b,y,c,s) = rtm n k ld add d sa sb x
-  
+
+  outputWord "a" a
+  outputWord "b" b
+  outputWord "y" y
+  outputBit  "c" c
+  outputWord "s" s
+
+-- Run
+  runSimulation
+
+{-
 -- Format the signals  
   format      
     [string "Input: ",
@@ -76,6 +81,4 @@ sim_rtm n k input = driver $ do
      bindec 4 x,
      string "  Output: ",
      bindec 4 a, bindec 4 b, bindec 4 s, bindec 4 y]
-
--- Run the simulation
-  runSimulation
+-}

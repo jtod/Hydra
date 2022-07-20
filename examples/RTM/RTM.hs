@@ -1,16 +1,14 @@
-----------------------------------------------------------------------------
--- Register Transfer Machine circuit
-----------------------------------------------------------------------------
+-- RTM: register transfer machine
+-- This file is part of Hydra. See README and https://github.com/jtod/Hydra
+-- Copyright (c) 2022 John T. O'Donnell
 
 module RTM where
 import HDL.Hydra.Core.Lib
 import HDL.Hydra.Circuits.Combinational
 import HDL.Hydra.Circuits.Register
+import HDL.Hydra.Circuits.RegFile
 
--- This module defines the rtm circuit.
-
-----------------------------------------------------------------------------
--- The rtm circuit
+-- Register transfer machine circuit
 
 -- Size parameters
 --   n = word size; each register contains n bits

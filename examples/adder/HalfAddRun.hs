@@ -18,15 +18,15 @@ main = driver $ do
   useData testdata
 
 -- Inputs
-  x <- inPortBit "x"
-  y <- inPortBit "y"
+  x <- inputBit "x"
+  y <- inputBit "y"
 
 -- Circuit
   let (c,s) = myHalfAdd x y
 
 -- Outputs
-  outPortBit "c" c
-  outPortBit "s" s
+  outputBit "c" c
+  outputBit "s" s
 
 -- Run
   runSimulation

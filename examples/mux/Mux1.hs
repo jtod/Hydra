@@ -1,3 +1,7 @@
+-- Mux1: multiplexer
+-- This file is part of Hydra. See README and https://github.com/jtod/Hydra
+-- Copyright (c) 2022 John T. O'Donnell
+
 module Mux1 where
 import HDL.Hydra.Core.Lib
 
