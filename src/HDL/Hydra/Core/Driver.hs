@@ -1,3 +1,7 @@
+-- Driver: simulation drivers for Hydra circuits
+-- This file is part of Hydra.  See README, https://github.com/jtod/Hydra
+-- Copyright (c) 2022 John T. O'Donnell
+
 {-# LANGUAGE NamedFieldPuns #-}
 {-# LANGUAGE RecordWildCards #-}
 
@@ -26,6 +30,8 @@ module HDL.Hydra.Core.Driver
 -- * New from step driver
    call, noContinuation, bitsBin,
 --   logFileName,
+   conditional, cmdLogging,
+   tryRead, maybeRead, mkFullPath,
    intToBits,
 --    putLogStr, putLogStrLn, DEPRECATED
    putBufLogStr, putBufLogStrLn, flushBufLog, writeLogStr,
@@ -97,6 +103,7 @@ import HDL.Hydra.Core.PrimData
 import qualified Data.Map as Map
 import Control.Monad.State
 import Control.Concurrent
+import Control.Exception
 import Data.IORef
 import Data.Maybe
 import Data.List
@@ -118,6 +125,18 @@ defaultLogFileName = "logCircuit.txt"
 
 printVersion :: IO ()
 printVersion = putStrLn ("Hydra version " ++ hydraVersion)
+---------------------------------------------------------------------------
+-- Core simulation driver tools
+---------------------------------------------------------------------------
+
+conditional :: Bool -> StateT (SysState a) IO ()
+  -> StateT (SysState a) IO ()
+conditional b op =
+  case b of
+    True -> do op
+               return ()
+    False -> return ()
+
 
 ---------------------------------------------------------------------------
 -- Default signal representation
@@ -345,6 +364,18 @@ defineStandardCommands = do
 --  defineCommand "select" selInpCmd       "select ARG as current input data"
 --  defineCommand "inputs" showInListsCmd  "display the input lists"
 
+
+cmdLogging :: String -> StateT (SysState b) IO ()
+cmdLogging flag = do
+  if flag == "on"
+    then do s <- get
+            put s {writingLogFile = True}
+  else if flag == "off"
+    then do s <- get
+            put s {writingLogFile = False}
+  else lift $ putStrLn "Usage: logging on or logging off"
+  return ()
+
 helpCmd :: [String] -> StateT (SysState a) IO ()
 helpCmd _ = displayHelpMessage
 
@@ -535,6 +566,27 @@ outputWord outPortName outwsig = do
 -- Phase 2: Observe signals
 -- Phase 3: Advance signals
 
+{-
+doClockCycle :: StateT (SysState DriverState) IO ()
+doClockCycle = do
+  s <- get
+  let i = cycleCount s
+  establishInputs ...  (takeInputsFromList xs)
+-- m1ClockCycle
+-- runM1simulation
+  conditional displayFullSignals $ do
+    printInPorts
+    printOutPorts
+  runFormat FormatNormal
+  advanceInPorts
+  advanceOutPorts
+  advancePeeks -- advanceExtra
+  advanceFlagTable  -- advanceExtra
+  advanceFormat
+  incrementCycleCount
+
+-}
+
 cycleCmd :: [String] -> StateT (SysState a) IO ()
 cycleCmd args = do
 --  printLine "clockCycle..."
@@ -693,9 +745,7 @@ getStoredInput = do
       put $ s {storedInput = xs}
       return (Just x)
 
---------------------------------------------------  
--- Obtain inputs from list
---------------------------------------------------  
+-- This is an older version...
 
 -- The inputs are parsed from SysState.currentInputString and stored
 -- into the signal buffers.  It is essential to ensure that all input
@@ -726,7 +776,7 @@ takeInput (p,x) = do
       liftIO $ writeBufs inwbufs bs
 
 ---------------------------------------------------------------------------
--- Phase 3: Observe signals
+-- Phase 3: Observe and print signals
 ---------------------------------------------------------------------------
 
 observeSignals :: StateT (SysState a) IO ()
@@ -783,7 +833,7 @@ opCurrentPorts = do
   printOutPorts
 
 ---------------------------------------------------------------------------
--- Phase 4: Advance signals
+-- Phase 4: Advance signal steppers
 ---------------------------------------------------------------------------
 
 advanceSignals :: StateT (SysState a) IO ()
@@ -1485,6 +1535,26 @@ testTextColors = do
 ---------------------------------------------------------------------------
 -- Utilities
 ---------------------------------------------------------------------------
+
+---------------------------------------------------------------------------
+-- Utilities
+---------------------------------------------------------------------------
+
+tryRead :: String -> IO (Either IOError String)
+tryRead path = do
+  x <- try (readFile path)
+  return x
+
+maybeRead :: String -> IO (Maybe String)
+maybeRead path = do
+  r <- tryRead path
+  case r of
+    Left e -> return Nothing
+    Right x -> return (Just x)
+
+mkFullPath :: String -> String -> String
+mkFullPath prefix path =
+  prefix ++ path ++ ".obj.txt"
 
 -- Text field adjustment
 

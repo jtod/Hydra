@@ -1,6 +1,6 @@
 -- Add4Run: simulation driver for add4 circuit
--- This file is part of Hydra.  https://github.com/jtod/Hydra 
--- Copyright (c) 2022 John T. O'Donnell.  See Hydra/README
+-- This file is part of Hydra.  See README, https://github.com/jtod/Hydra
+-- Copyright (c) 2022 John T. O'Donnell
 
 module Main where
 import HDL.Hydra.Core.Lib

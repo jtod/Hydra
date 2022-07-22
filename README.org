@@ -152,7 +152,7 @@ package-id hydra-3.4.5-VeryLongHashKey
 Delete the lines for hydra, save the =default= file, and try the
 =cabal install --lib= command again.
 
-/Alterntative: using ghci/
+/Alternative: using ghci/
 
 Instead of using the batch command =ghc -e main Add4Run= (where
 Add4Run is the name of a simulation driver), an alternative is to use

@@ -1,5 +1,6 @@
 -- Add4: circuit add4 adds two 4-bit words with carry
--- This file is part of Hydra, see Hydra/README.md for copyright and license
+-- This file is part of Hydra.  See README, https://github.com/jtod/Hydra
+-- Copyright (c) 2022 John T. O'Donnell
 
 module Add4 where
 import HDL.Hydra.Core.Lib
