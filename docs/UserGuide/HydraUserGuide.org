@@ -134,6 +134,554 @@ best to think of Hydra as a distinct language: designing a circuit is
 not the same as writing a program in Haskell, and some Haskell
 programs don't correspond to circuits.
 
+
+*** The Hydra CHDL
+- A domain-specific language implemented by embedding in Haskell
+- You don't need to know Haskell to use Hydra It's best to think of
+  Hydra as a distinct language
+- Use Hydra to
+  - specify circuits
+  - simulate them
+  - do formal reasoning
+  - generate netlists
+**** RTM as schematic diagram
+
+\begin{center}
+  \includegraphics[angle=0,scale=0.38]
+    {figures/png/rtm42LogicWorks.png}
+\end{center}
+
+***** RTM as Hydra specification
+
+\begin{code}
+rtm n k ld add d sa sb x = (a,b,y,c,s)
+  where
+    (a,b) = regfile n k ld d sa sb y
+    y = mux1w add x s
+    (c,s) = rippleAdd zero (bitslice2 a b)
+\end{code}
+
+- Works for \emph{any} word size |n| and address size |k|
+- We will use |n = 16| and |k = 4|
+  - The Hydra specification remains the same
+  - The schematic diagram would be 16 times larger
+  
+**** Hardware description languages
+- A CHDL (or just HDL) is a textual language for specifying
+  anddesigning digital circuits.
+- Diagram: a schematic is an abstract picture of the circuit, giving
+  geometric information.
+- Text: a CHDL is a text document, like a computer program
+
+***** Specification and Fabrication
+- A \textcolor{Darkred}{specification} of a circuit is a description
+  of it (on paper or a computer file)
+- May be abstract, high level (e.g. a description of behaviour at the
+  level of register transfers)
+- May be detailed enough to build the hardware (e.g. a netlist or VLSI
+  layout)
+- A fabrication of a circuit is a real piece of hardware
+
+***** Schematics and CHDLs
+- Schematic diagrams are probably easier for beginners to understand
+- It is more obvious that a schematic describes hardware, and isn't
+  just a computer program
+- Schematics break down badly for large and complex circuits
+- The diagrams just sit there inertly on paper, and don't do anything
+
+- CHDLs offer programming techniques (abstraction, algorithmic
+  specification, typechecking, simulation)
+- Scale up well to large circuits
+- Support the use of formal methods
+
+
+**** Circuits as functions
+Both a circuit and a function are a black box that
+- takes some inputs
+- performs an internal computation
+- produces some outputs
+
+**** lec06 Types, Containers, and Generators
+***** Interfaces and Types
+
+The \emph{type} of a circuit describes its interface; in particular
+  
+- how a signal is represented: this determines the choice of
+  semantic model;
+- how many inputs it takes, how they are structured;
+- how many outputs it produces, and how they are structured;
+- the size parameters, if any;
+- the building block circuits, if any.
+
+If you try to plug the wrong number of signals into a circuit, you
+will get a type error message.
+
+****** Form of a type declaration
+
+\begin{code}
+circname :: signalClass => inType -> inType -> outType
+\end{code}
+
+- circname is the name of the circuit; starts with lower case letter
+- signalClass gives information about the signal.  We will
+  normally use either {\color{red}Bit a} or {\color{red}CBit a}, but
+  there are many other options we won't be using
+- input and output types: {\color{red}a} for a bit signal,
+  {\color{red}[a]} or {\color{red}(a,a)} for a container holding
+  several bits
+
+****** Type declaration is optional
+
+- You can omit the type declaration; the compiler will work it
+  out automatically
+- There are some advantages for declaring the type:
+  
+    - It provides helpful documentation
+    - It enables the compiler to give better error messages, if
+      there is an error in a circuit
+    - A useful design technique is to specify first the types of
+      your circuits and to go back later to implement them
+  
+****** Signal types and circuit semantics
+
+- There is a close relationship between \emph{how a signal is
+    represented} and \emph{how the circuit is evaluated}.
+  
+  - Example: if you use Bool, then you can do logic simulation
+    but not synchronous simulation.
+  - If you use streams, you can handle timing.
+  - If you want to allow special techniques (tristate drivers,
+    wired or) you need a multiple-value logic.
+  
+- For this reason, it's not a good idea to give circuit types
+  like \texttt{inv :: Bool -> Bool}.
+- Instead, we use a \emph{type variable}, typically \texttt{a},
+  to represent the signal type.
+
+******* The signal class constraint
+
+- When you write \texttt{inv :: Bit a => a -> a}, the \texttt{Bit
+  a =>} part means ``for an arbitrary type \texttt{a}, provided that
+  \texttt{a} is in the set of types that can represent a bit signal''.
+- Similarly, \texttt{reg1 :: CBit a => a -> a -> a}, the
+  constraint \texttt{CBit a =>} means the signal type \texttt{a} has
+  to be capable of representing clocked synchronous bit signals.
+- Hydra offers many signal representations.
+- Normally, the choice of specific signal type will be made by the
+  simulation driver.
+
+****** Naming conventions
+ 
+- By convention, the type of a bit signal is called \texttt{a}.
+- The scope of the type variable \texttt{a} is the type
+  statement.
+- This means you can have a signal named \texttt{a} in the
+  circuit definition, without confusion.
+
+\begin{code}
+circ1 :: Bit a => a -> a -> a
+circ1 a b = and2 a (inv b)
+\end{code}
+
+In the first line, \texttt{a} is the signal type, but in the second
+line \texttt{a} is the name of the first input signal.
+
+****** The usual cases
+
+  - For a combinational circuit, use {\color{red}|Bit a =>|} and the
+    type of a bit signal is {\color{red}|a|}
+  - For a clocked synchronous circuit, use {\color{red}|CBit a =>|}
+    and the type of a bit signal is {\color{red}|a|}
+
+There are many other options for the signal classes, but we won't use
+them in CA4.
+
+****** Input and output types
+
+- A bit signal is indicated by the signal type \texttt{a}.
+- Each input signal group is followed by an arrow \texttt{->}.
+  This means that the number of arrows in the type is the number of
+  inputs.
+- The output signal group follows the last arrow.
+  
+  - \texttt{and2 :: Bit a => a -> a -> a} has two arrows
+    \texttt{->}, so there are two input groups, both with type
+    \texttt{a}.  The output has type \texttt{a}.
+  - \texttt{mux2 :: Bit a => (a,a) -> a -> a -> a -> a -> a}
+    has five input groups: a bit pair (used for control), four bits
+    (for data), and there is one output bit.
+
+***** Containers
+
+- Most circuits (except the simplest ones) have groups of signals
+  that travel together.
+- To keep circuit descriptions concise, we need to be able to put
+  these signals into a container and treat it as a single entity
+- There are two kinds of container:
+  
+  - A \alert{tuple} is a group of several signals that may be
+    unrelated
+  - A \alert{word} is a sequence indexed by a bit position,
+    normally used for binary numbers
+  
+- A container of signals is indicated by a tuple type
+  \texttt{(a,[a])} or by a word type \texttt{[(a,a)]}.
+- Containers aren't part of the hardware!  They are just
+  \emph{notation} used to shorten the description of the hardware.
+- \emph{Any} circuit can be described without groups---but the
+  description could be millions of lines long
+
+****** Tuples
+
+You construct a tuple simply by writing its components in
+parentheses:
+
+\begin{code}
+code = (x,y,z)
+\end{code}
+
+Given a tuple, you can supply names for its components with an
+equation.  The tuple is a \emph{pattern} that defines the elements
+|p|, |q|, |r|
+
+\begin{code}
+(p,q,r) = code
+\end{code}
+
+****** Circuits with several outputs
+
+- Hydra requires every circuit to have \emph{one} output.
+- If there are several output signals, just group them in a tuple.
+
+The half adder and demux1 circuits produce two outputs, which can be
+specified as expressions in a tuple.
+
+\begin{code}
+halfAdd x y = (and2 x y, xor2 x y)
+demux1 c x = (and2 (inv c) x, and2 c x)
+\end{code}
+
+In |demux2| it's necessary to define the output as a tuple of names
+which are defined by equations.
+
+\begin{code}
+demux2 (c0,c1) x = (y0,y1,y2,y3)
+  where  (p,q) = demux1 c0 x
+         (y0,y1) = demux1 c1 p
+         (y2,y3) = demux1 c1 q
+\end{code}
+
+***** Words
+
+- A word $[x_0, x_1, \ldots, x_{k-1}]$ is used to represent
+  binary numbers.
+
+- There are notations to allow you to build words and extract
+  parts of words.
+
+- Some circuits are defined recursively: the definition for a
+  $k+1$ bit word uses a subcircuit of size $k$.
+
+- Sometimes you need to extract a bit or a field from a word,
+  or construct new words.
+
+- Therefore we need operators to add a new bit to a word,
+  extract a bit from a word, etc.
+
+******* Word size
+  
+If \texttt{x} is a word, then \texttt{length x} gives the number of
+elements.
+
+\begin{code}
+n = length x
+\end{code}
+
+- With this definition, \texttt{n} can be used as a size
+  parameter to define other circuits.
+- Important: \texttt{length} is not a circuit!  It is a
+  meta-operator; it is a calculation on the notation.
+
+******* Concatenation
+
+Concatenating two words \texttt{x} and \texttt{y}
+
+\begin{code}
+x++y
+\end{code}
+
+- If |w1 = [a,b,c]| and |w2 = [d,e,f,g]|, then
+- |w1++w2| = |[a,b,c,d,e,f,g]|
+
+You could also write |[a,b,c] ++ [d,e,f]| although that usually isn't
+very useful.
+
+******* Accessing parts of words with a pattern
+
+- The left hand side is defined to have the value of the right
+  hand side.
+- When the lhs is a pattern, it defines the names in the pattern
+  to be the corresponding elements of the rhs.
+- This only works if the number of elements in the pattern matches
+  the number of elements in the word
+
+\begin{code}
+[a,b,c,d] = w
+\end{code}
+
+******* Indexing an element of a word
+
+- The \texttt{(!!)} operator indexes an element in a word, where
+  the leftmost element has index 0.
+- Example: |[a,b,c,d] !! 2| = |c|
+- The most significant element of |w| is |w!!0|.
+- There is also a ``most significant bit'' function; thus |msb w|
+  is equivalent to |w!!0|
+- The least significant element is |w!!(length w - 1)|.  There is
+  also a ``least significant bit'' function; thus |lsb w| is equivalent
+  to |w!!(length w - 1)|.
+
+Examples: the following are equivalent:
+
+\begin{code}
+lt_tc = mux2 (xy!!0) lt zero one lt
+lt_tc = mux2 (msb xy lt zero one lt
+\end{code}
+
+******* Big Endian and Little Endian
+
+- Notations are always somewhat arbitrary!
+- You can number bits in a word increasing from the left, or from
+  the right; starting from 0, or starting from 1.
+- Hydra numbers the bit positions from left to right, starting
+  from 0
+- This convention makes the formula for binary value of a word
+  slightly more complicated---a one-time cost of 3 or 4 characters
+- But it makes many other expressions in a large circuit slightly
+  simpler
+- Another common convention (\emph{not} used in Hydra) is to mix
+  the two notations in the same specification, and to let the reader
+  guess which one is in effect everywhere
+
+******* Fields
+
+- Usually the best way to extract part of a word is to use a
+  \alert{field}, which is a part of a word.
+- Do this with the |field| function; again this is ``meta
+  notation'', not a circuit.
+- |field w i k| gives the word consisting of the portion of |w|
+  starting at index |i| and continuing for |k| elements.
+- It is an error if a field is specified that doesn't lie within
+  the word.
+
+Here is a typical example: |ir| is the instruction register, a 16-bit
+word, and |ir_sa| is a field within an instruction.
+
+\begin{code}
+ir_sa = field ir 8 4
+\end{code}
+
+******* List notation for words
+
+A word can be either
+
+- An \emph{empty word}, written \texttt{[]}, which contains no
+  bits at all.
+- A \emph{nonempty word}, which has to be of the form
+  \texttt{(x:xs)}, where \texttt{x} is the initial bit and
+  \texttt{xs} is a word comprising the rest of the bits.
+- Example: Suppose \texttt{xs = [p,q,r,s]}.  Then \texttt{x:xs
+    = [x,p,q,r,s]}.
+
+Attaching a singleton \texttt{x} onto a word \texttt{xs}
+
+\begin{code}
+(x:xs)
+\end{code}
+
+****** Patterns
+
+- Words are treated as lists, and you can use Haskell's list
+  operations on them.
+- Normally it is better to use |(++)|, |(!!)|, and |field|.
+- The |(:)| operator is useful for defining ``design patterns''
+  tree-structured circuits (later!)
+- Suppose you have a word \texttt{w}, and you want to give a
+  separate name to the first bit, and to all the rest.
+- Example: \texttt{w = [a,b,c,d,e]} and you want to use the
+  name \texttt{x} to refer to the first bit (which is \texttt{a})
+  and \texttt{xs} to refer to the rest (which is
+  \texttt{[b,c,d,e]}).
+
+This is achieved by writing:
+
+\begin{code}
+(x:xs) = w
+\end{code}
+
+******* Using list pattern notation
+
+- The left hand side \texttt{(x:xs)} is a \emph{pattern} giving
+  names to components of a structure
+- Similarly a circuit input can be written as \texttt{(x:xs)}.
+  (This is sometimes done in the recursive case of the definition
+  of a design pattern.)
+
+The parentheses in \texttt{(x:xs)} are just for grouping, so the
+\texttt{:} operator gets the right precedence.
+
+******* Nested containers
+
+- You can have a tuple containing two words |:: ([a], [a])|
+- Or a word of tuples |:: [(a,a,a)]|
+- Or arbitrarily deeply nested containers |:: ([(a,a)], a, ([a],a),
+  [a])|
+- |rippleAdd4 :: Bit a => a -> [(a,a)] -> (a,[a])| has two input
+  groups: a singleton bit (the carry input) and a word of pairs (the
+  numbers to add).  The output contains a singleton (carry output) and
+  a word (the sum).
+  - The type {\color{red}|[(a,a)]|} is an important special case
+    which is called {\color{blue}bit slice format}.  The |rippleAdd4|
+    type is an example of bit slice format.
+
+****** Circuit generators
+
+- Often we won't describe every component ``by hand''
+
+- We can use \emph{circuit generators} --- algorithms that
+  create the circuit
+
+- The simplest kind is a \emph{generic circuit} which works for
+  any word size
+  
+  - For now we'll look at some examples of generic circuits
+    defined using a circuit generator
+
+  - Later we'll look at how to use the generators
+
+  - And even later, we'll see how to define new circuit
+    generators.
+  
+******* Inverting all the bits in a word
+
+Word inverter: |winv4| takes a word and inverts each of its bits
+
+\begin{code}
+winv4 :: Bit a => [a] -> [a]
+winv4 [a,b,c,d] = [inv a, inv b, inv c, inv d]
+\end{code}
+
+- You can use {\color{blue}|winv4 x|} if |x| is a 4-bit word, but
+  not if it's an 8 or 16 bit word.
+- The generic circuit {\color{blue}|winv|} works for any word
+  size.  It's defined using a {\color{red}circuit generator} called
+  {\color{red}map}.
+
+\begin{code}
+winv :: Bit a => [a] -> [a]
+winv = map inv
+\end{code}
+
+******* How does a circuit generator work?
+
+- winv4 is a 4-bit word inverter
+- winv generates an $n$-bit word inverter: it works for
+  \emph{every word size}
+- The circuit generator works by (1) measuring the size of the
+  input word and (2) generating the required number of components
+- {\color{red}This is not software to do the operation --- it is
+  still a real circuit.}
+
+****** Calculating the and/or of many bits
+
+Take a word, and and/or all its bits together
+
+\begin{code}
+andw4 [a,b,c,d] = and2 (and2 a b) (and2 c d)
+\end{code}
+
+For bigger words, it's better to use generic circuits andw, orw that
+are defined using the circuit generator {\color{red}foldl}:
+
+\begin{code}
+andw, orw :: Bit a => [a] -> a
+andw = foldl and2 one
+orw = foldl or2 zero
+\end{code}
+
+The input is a word of bits, and the output is the and/or of all those
+bits.  This is like an $n$-bit or gate with an $n$-bit input word.
+
+****** 4-bit ripple carry adder
+
+\begin{code}
+rippleAdd4 :: Bit a => a -> [(a,a)] -> (a,[a])
+rippleAdd4 cin [(x0,y0),(x1,y1),(x2,y2),(x3,y3)]
+  = (c0, [s0,s1,s2,s3])
+  where
+    (c0,s0) = fullAdd (x0,y0) c1
+    (c1,s1) = fullAdd (x1,y1) c2
+    (c2,s2) = fullAdd (x2,y2) c3
+    (c3,s3) = fullAdd (x3,y3) cin
+\end{code}
+
+In Sigma16 we need a 16-bit adder.  Many current machines contain
+64-bit adders.  This would be painful to write in the style of
+|rippleAdd4|.
+
+****** Ripple carry adder schematic
+
+\begin{center}
+  \includegraphics[angle=0,scale=0.5]{figures/xfig/rippleAdd4.pdf}
+\end{center}
+
+****** Generic $n$-bit ripple carry adder
+
+- The \texttt{rippleAdd} generic circuit is similar to
+  \texttt{rippleAdd4}, except it works on all word sizes.
+
+- It's defined using a very powerful generator called {\color{red}mscanr}
+
+- At circuit generation time, the generator measures the sizes of
+  its input words, and then it constructs a circuit with the right
+  number of full adders, and automatically does all the wiring.
+
+- Notice that |rippleAdd| is equivalent to an infinite set of
+  definitions |rippleAdd0|, |rippleAdd1|, |rippleAdd2|, |rippleAdd3|,
+  |rippleAdd4|, $\ldots$, |rippleAdd64|, $\ldots$,
+
+- Yet the definition of |rippleAdd| is far simpler than
+  e.g. |rippleAdd4|.
+
+- This is due to the power of the generator |mscanr|.
+
+\begin{code}
+rippleAdd :: Bit a => a -> [(a,a)] -> (a,[a])
+rippleAdd = mscanr fullAdd
+\end{code}
+
+****** ``Times''
+
+- Programmers talk about two ``times'' involved in running a
+  program:
+
+  - Compile time
+  - Run time
+
+- This makes a real difference: an error message at compile
+  time is very different from a crash at run time
+- Hydra has four ``times''
+
+  - Model transformation time
+  - Circuit generation time
+  - Circuit compilation time
+  - Runtime (simulator execution time)
+  - And to get real hardware, there is
+    
+    - Netlist and layout generation time
+    - Fabrication time
+    - Running the hardware circuit
+
 * README
 
 #+INCLUDE: "../../README.org"
@@ -520,6 +1068,7 @@ Input: x = 1 y = 0  Output: c = 0 s = 1
 Input: x = 1 y = 1  Output: c = 1 s = 0
 #+END_EXAMPLE
 
+
 * Defining new circuits
 
 A new circuit can be designed by connecting together a number of
@@ -890,6 +1439,7 @@ runReg1 input = runAllInput input output
        string "   Output = ", bit y]
 #+END_SRC
 
+
 * Circuit simulation
 
 This section shows several examples of circuits of increasing
@@ -1147,7 +1697,7 @@ ghci
 :main
 #+END_EXAMPLE
 
-** Output mode:  Automatic and Formatted
+** Automatic output and formatted output
 
 You can choose between automatic or manual formatting of the
 simulation results.
@@ -1168,7 +1718,7 @@ For small circuits, it may be easiest to define the outports and use
 the automatic output.  For large circuits, you can make the results
 more compact and more readable by defining a format.
 
-** Simultation modes:  Batch and Interactive
+** Batch and interactive simulation
 
 You can run a circuit simulation in batch mode, which will run to
 completion with no intervention by the user.  Alternatively, you can

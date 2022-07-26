@@ -48,7 +48,7 @@ license.
 
 * Installation
 
-** Install Haskell
+** Haskell
 
 Hydra requires the ghc toolset for Haskell, including ghc and cabal.
 Haskell installers for Macintosh, Windows, and Linux are available at
@@ -89,7 +89,7 @@ fails, the following might work:
 choco upgrade ghc cabal -y
 #+END_EXAMPLE
 
-** Install Hydra
+** Hydra
 
 The Hydra source code is available at [[https://github.com/jtod/Hydra]].
 See the Releases section on the right side of the page and click on
