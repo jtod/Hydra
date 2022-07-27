@@ -3419,6 +3419,1018 @@ This is symmetric with *foldl*.
 #   \includegraphics[angle=0,scale=0.5]{figures/xfig/foldr4.eps}
 #   \includegraphics[angle=0,scale=0.5]{figures/xfig/foldr4box.eps}
 
+
+
+* Circuit generators 2
+
+** lec18 Circuit Generators
+*** Circuit Generators
+**** Abstraction
+
+We will generally specify large circuits using a circuit generator,
+not by drawing every component individually.
+
+- Design patterns (higher order functions)
+- Special languages for special kinds of circuit (e.g. control
+  algorithms)
+
+**** Design patterns: Circuits as building blocks
+
+- Design patterns are \emph{higher order} functions: they take
+  one or more \emph{circuit specifications} as parameters.
+- The pattern defines how to connect up these given circuits in
+  a regular pattern.
+- A pattern definition looks just like an ordinary circuit
+  specification, except
+  
+  - It uses recursion to decompose groups of signals.
+  - It uses abstract circuits, supplied as parameters, instead
+    of specific circuits.
+  - Its type may include building block circuits (these
+    parameters contain an \texttt{->} in their type) and/or size
+    parameters (with a type like \texttt{Int}).
+  
+**** Map
+***** A circuit with a regular pattern: word inverter
+
+\begin{code}
+winv4 :: Bit a => [a] -> [a]
+winv4 [x0,x1,x2,x3] = [inv x0, inv x1, inv x2, inv x3]
+\end{code}
+
+\begin{center}
+  % FOO includegraphics[angle=-90,scale=0.5]{figures/xfig/map4inv.pdf}
+\end{center}
+
+- Definition is simple
+- But it works only for one word size, and only for inverters
+- Extending it to larger word size is tedious and error-prone
+
+***** Map --- expressing the regular pattern directly
+
+- Sometimes you have a circuit (it's arbitrary, so call it $f$)
+  that takes an input (say it has type $a$) and produces an output
+  (call its type $b$).
+- You need to take a word of signals, and process each one with
+  the circuit $f$.  For example, \texttt{inv4} processes each
+  signal with an \texttt{inv}.
+- The \texttt{map} pattern describes this in general.
+
+#+BEGIN_SRC sigma
+map :: (a->b) -> [a] -> [b]
+#+END_SRC
+
+- The first argument to the pattern is a circuit with type
+  \texttt{a->b}
+- The pattern generates a circuit that takes an input word of type
+  \texttt{[a]} and produces an output word of type \texttt{[b]}.
+
+***** Example of map
+
+We can define a word inverter using the pattern that places an
+inverter on each input signal, to produce the corresponding output
+signals.
+
+#+BEGIN_SRC sigma
+winv :: Bit a => [a] -> [a]
+winv x = map inv x
+#+END_SRC
+
+Technical note: in a defining equation of the form \texttt{f a b c
+  = g c}, you can ``factor out'' the rightmost parameter from both
+sides, giving a slightly shorter form.
+
+#+BEGIN_SRC sigma
+winv :: Bit a => [a] -> [a]
+winv = map inv
+#+END_SRC
+
+This is attractive because it describes just the pattern.
+
+***** Word inverter: ys = map inv xs
+
+\hbox{
+  \hspace{3em}
+  % FOO includegraphics[angle=-90,scale=0.5]{figures/xfig/map4inv.pdf}
+  \hspace{5em}
+  % FOO includegraphics[angle=-90,scale=0.5]{figures/xfig/map4invbox.pdf}
+}
+
+***** Definition of map
+
+#+BEGIN_SRC sigma
+map :: (a->b) -> [a] -> [b]
+map f [] = []
+map f (x:xs) = f x : map f xs
+#+END_SRC
+
+- A recursion, based on the word structure of the input.
+
+- The base case is an empty input word \texttt{[]}.  In this
+  case, the output is also empty.
+
+- The recursion (or induction) case has an input word
+  \texttt{x:xs} consisting of an initial bit \texttt{x} followed by
+  the rest of the word, \texttt{xs}.  The circuit introduces a copy
+  of the \texttt{f} circuit to process \texttt{x}, and handles the
+  rest recursively.
+
+***** Structure of map recursion
+
+\begin{center}
+  % FOO includegraphics[angle=0,scale=0.4]{figures/xfig/map-recursion.pdf}
+\end{center}
+
+***** After the recursion has completed
+
+\hbox{
+  \hspace{3em}
+  % FOO includegraphics[angle=-90,scale=0.5]{figures/xfig/map4.pdf}
+  \hspace{5em}
+  % FOO includegraphics[angle=-90,scale=0.5]{figures/xfig/map4box.pdf}
+}
+
+***** Extending map to multiple inputs
+
+The \texttt{map2} pattern is similar to \texttt{map}, but it uses a
+circuit that takes two inputs (thus its type is \texttt{a->b->c}).
+Note that \texttt{map2} is \emph{not} a bit-slice pattern; it uses
+separate words.
+
+#+BEGIN_SRC sigma
+map2 :: (a->b->c) -> [a] -> [b] -> [c]
+#+END_SRC
+
+We can extend the basic multiplexor to handle words:
+
+#+BEGIN_SRC sigma
+mux1w :: Bit a => a -> [a] -> [a] -> [a]
+mux1w c x y = map2 (mux1 c) x y
+#+END_SRC
+
+***** Forcing a specific word size
+
+The \texttt{mapn} pattern is similar to \texttt{map}, except it
+takes a size parameter, and guarantees to produce an output of that
+size.
+
+#+BEGIN_SRC sigma
+mapn :: (a->b) -> Int -> [a] -> [b]
+#+END_SRC
+
+- Registers are defined using \texttt{mapn}, to ensure that the number
+  of flip flops is defined
+- Combinational circuits may be defined using \texttt{map}, so
+  they inherit the word size of their input
+
+**** Fold
+
+The folding patterns define a linear circuit structure.
+
+- There is an input word of type \texttt{[b]}.
+
+- The elements of the word are combined using a building block
+  \texttt{f}.
+
+- There is a ``horizontal'' signal of some type (call it
+  \texttt{a}), which is goes across the word from left to right.
+
+- An initial horizontal input, of type \texttt{a} is provided.
+
+- The output is the final horizontal output (produced by the
+  rightmost \texttt{f} circuit).
+
+Folding corresponds to a linear computation from one end of the
+word to the other, starting with an initial value a (sometimes
+called an accumulator, but this is not to be confused with
+accumulator registers!).
+
+***** The foldl pattern
+
+\begin{center}
+  % FOO includegraphics[angle=0,scale=0.5]{figures/xfig/foldl4.pdf}
+\end{center}
+
+\begin{center}
+  % FOO includegraphics[angle=0,scale=0.5]{figures/xfig/foldl4box.pdf}
+\end{center}
+
+***** Recursive definition of foldl pattern
+****** Fold from the left
+
+In general, a fold can proceed either direction across the word.  The
+\texttt{foldl} pattern describes a \emph{fold from the left}; i.e. the
+information flows from left to right across the word.
+
+#+BEGIN_SRC sigma
+foldl :: (a->b->a) -> a -> [b] -> a
+#+END_SRC
+
+The pattern is defined recursively:
+
+#+BEGIN_SRC sigma
+foldl f a [] = a
+foldl f a (x:xs) = foldl f (f a x) xs
+#+END_SRC
+
+***** Example of foldl: orw/andw
+
+The \texttt{orw} circuit determines whether there is any 1 bit in a
+word.
+
+#+BEGIN_SRC sigma
+orw :: Bit a => [a] -> a
+orw = foldl or2 zero
+#+END_SRC
+
+The \texttt{andw} circuit determines whether all the bits in a word
+are 1.
+
+#+BEGIN_SRC sigma
+andw :: Bit a => [a] -> a
+andw = foldl and2 one
+#+END_SRC
+
+The time required (the path depth) is linear in the word size.
+There are also tree-structured patterns that can do these
+computations in logarithmic time.
+
+***** Efficiency
+
+- The definitions of \texttt{orw} and \texttt{andw} are not
+  very efficient
+  
+  - If a large number of signals are being combined, a tree
+    structure of logic gates reduces the path depth.  If this
+    circuit is on the critical path, that will help.
+  - If the technology supplies 3 or 4 input gates, it would
+    likely be faster to use some of those, rather than just the 2
+    input gates.
+  - The \texttt{foldl} pattern uses one extra gate to include
+    the ``default'' value of zero or one.  This is overhead.
+  
+- This inefficiency is not a concern, because
+  
+  - There are alternative patterns that generate more efficient
+    circuits
+  - A circuit optimiser can generate optimal results
+  - If the circuit isn't on the critical path, it makes no
+    difference anyway.
+  
+***** Example of foldl: binary comparitor
+
+- The problem: input two binary numbers, in bit slice form:
+  \texttt{[(x0,y0), (x1,y1), ..., (xk,yk)]}
+- Output the result of a comparision: \texttt{(lt,eq,gt)},
+  giving the values of $(x<y, x=y, x>y)$.  Exactly one of the three
+  output bits must be 1.
+- Idea: start from left, assuming the numbers are equal so far:
+  \texttt{(0,1,0)}.
+- Move over the columns from left to right, updating the
+  results of the comparision using a building block circuit
+  \texttt{cmp1}.
+- Going from left to right, once we have established either $<$
+  or $>$, that result will never change.
+- If the current result is $=$ and $x=y$, it's still $=$.
+- If the current result is $=$ but $x$ and $y$ are different,
+  the new result becomes $<$ or $>$.
+
+***** Definition of binary comparitor with foldl
+
+A bit comparison building block circuit:
+
+#+BEGIN_SRC sigma
+cmp1 :: Bit a => (a,a,a) -> (a,a) -> (a,a,a)
+cmp1 (lt,eq,gt) (x,y) =
+  (or2 lt (and3 eq (inv x) y),
+   and2 eq (inv (xor2 x y)),
+   or2 gt (and3 eq x (inv y))
+  )
+#+END_SRC
+
+The ripple comparison circuit is defined simply using the pattern:
+
+#+BEGIN_SRC sigma
+rippleCmp :: Bit a => [(a,a)] -> (a,a,a)
+rippleCmp = foldl cmp1 (zero,one,zero)
+#+END_SRC
+
+***** Fold from the right
+
+You can also run a fold across a word from the right to the left.
+
+#+BEGIN_SRC sigma
+foldr :: (b->a->a) -> a -> [b] -> a
+foldr f a [] = a
+foldr f a (x:xs) = f x (foldr f a xs)
+#+END_SRC
+
+This is symmetric with \texttt{foldl}.
+
+**** The foldr pattern
+
+\begin{center}
+  % FOO includegraphics[angle=0,scale=0.5]{figures/xfig/foldr4.pdf}
+  \vspace{3em}
+  % FOO includegraphics[angle=0,scale=0.5]{figures/xfig/foldr4box.pdf}
+\end{center}
+
+**** Scan
+
+- A fold calculates a sequence of intermediate values, one for
+  every bit position.
+- A more general kind of pattern---a \emph{scan}---outputs this
+  word of intermediate values.
+- For every kind of fold, there is a corresponding scan, and
+  there are also some more general patterns that are based on scan.
+- Scans are important because
+  
+  - many important computations can be expressed via scans, and
+  - a variety of patterns exist that implement scans efficiently.
+  
+***** Scan from the left: the scanl pattern
+
+\begin{center}
+  % FOO includegraphics[angle=0,scale=0.5]{figures/xfig/scanl4.pdf}
+\end{center}
+
+\[ [y_0, y_1, y_2, y_3, y_4] \ =
+  \ \textsf{scanl}\ f\ a\ [x_0, x_1, x_2, x_3]
+\]
+
+\[ \textsf{ys} \ = \ \textsf{scanl}\ f\ a\ \textsf{xs} \]
+
+***** Scan from the right
+
+The \texttt{ascanr} pattern yields the word of intermediate results
+that would occur during a \texttt{foldr}.  Specifically, it gives
+the horizontal \emph{input} to each box in the \texttt{foldr}.
+
+#+BEGIN_SRC sigma
+ascanr :: (b->a->a) -> a -> [b] -> [a]
+#+END_SRC
+
+The value of the output word can be defined directly in terms of
+\texttt{foldr} of portions of the input word.  This is useful for
+intuition and for formal mathematical reasoning.
+
+#+BEGIN_SRC sigma
+ascanr :: (b->a->a) -> a -> [b] -> (a,[a])
+ascanr f a [] = (a,[])
+ascanr f a (x:xs) = (f x a', a':xs')
+  where (a',xs') = ascanr f a xs
+#+END_SRC
+
+***** Scan from the right: The scanr pattern
+
+\begin{center}
+  % FOO includegraphics[angle=0,scale=0.5]{figures/xfig/scanr4.pdf}
+\end{center}
+
+\[ [y_0, y_1, y_2, y_3, y_4] \ =
+  \ \textsf{scanr}\ f\ a\ [x_0, x_1, x_2, x_3]
+\]
+
+\[ \textsf{ys} \ = \ \textsf{scanr}\ f\ a\ \textsf{xs} \]
+
+***** Combining a map with a scan
+
+Many circuits combine a map with a scan: they output a value in each
+bit position that depends on both horizontal input and the value of
+the word in that bit position.
+
+The \texttt{mscanr} pattern is useful for such cases (and there is
+a corresponding \texttt{mscanl}).
+
+#+BEGIN_SRC sigma
+mscanr :: (a->b->(b,c)) -> b -> [a] -> (b,[c])
+mscanr f a [] = (a,[])
+mscanr f a (x:xs) = (a'',y:ys)
+  where
+    (a',ys) = mscanr f a xs
+    (a'',y) = f x a'
+#+END_SRC
+
+***** Mapping scan from the right: the mscanr pattern
+
+\begin{center}
+  % FOO includegraphics[angle=0,scale=0.5]{figures/xfig/mscanr4.pdf}
+\end{center}
+
+\begin{code}
+(a', [y0,y1,y2,y3]) = mscanr f a [x0,x1,x2,x3]
+\end{code}
+
+In general, for words of arbitrary size:
+\begin{code}
+(a',ys) = mscanr f a xs
+\end{code}
+
+***** Mapping scan from the left: the mscanl pattern
+
+\begin{center}
+  % FOO includegraphics[angle=0,scale=0.5]{figures/xfig/mscanl4.pdf}
+\end{center}
+
+\begin{code}
+(a', [y0,y1,y2,y3]) = mscanl f a [x0,x1,x2,x3]
+\end{code}
+
+In general, for words of arbitrary size:
+\begin{code}
+(a',ys) = mscanl f a xs
+\end{code}
+
+***** Example of mscanr: the ripple carry adder
+
+#+BEGIN_SRC sigma
+fullAdd :: Bit a => (a,a) -> a -> (a,a)
+fullAdd (x,y) c = (bcarry (x,y) c, bsum (x,y) c)
+#+END_SRC
+
+Ripple carry addition
+
+#+BEGIN_SRC sigma
+rippleAdd :: Bit a => a -> [(a,a)] -> (a,[a])
+rippleAdd = mscanr fullAdd
+#+END_SRC
+
+***** rippleAdd4
+
+\begin{center}
+  % FOO includegraphics[angle=0,scale=0.4]{figures/xfig/rippleAdd4.pdf}
+\end{center}
+
+***** Order of parameters
+
+- Circuit specifications using patterns can often be simplified
+  if you pay attention to the order of parameters.
+- For example, the ripple carry adder specification would be
+  clunkier if we had defined the full adder as \texttt{fullAddBad
+    :: Bit a => a -> (a,a) -> (a,a)}.
+- How can you make the definitions work out cleanly?
+- Often there are choices that seem arbitrary at first, but
+  later on you realise things would be simpler if the choice had
+  been different.  This is a good time to go back and clean up your
+  specifications.
+
+***** Bidirectional mapping scan
+
+- A very general pattern is the \texttt{mscan} pattern, which
+  takes a word, and \emph{two} horizontal values, one moving from
+  left to right and the other from right to left.  The pattern
+  combines a \texttt{foldl}, a \texttt{foldr}, and a \texttt{map}.
+- ALU circuits often use the \texttt{mscan} pattern.
+
+#+BEGIN_SRC sigma
+mscan :: (a->b->c->(b,a,d)) -> a -> b -> [c] -> (b,a,[d])
+mscan f a b [] = (b,a,[])
+mscan f a b (x:xs) = (b'', a'', y:ys)
+  where
+    (b'',a',y) = f a b' x
+    (b',a'',ys) = mscan f a' b xs
+#+END_SRC
+
+***** Bidirectional mapping scan: the mscan pattern
+
+\begin{center}
+  % FOO includegraphics[angle=0,scale=0.5]{figures/xfig/mscan.pdf}
+\end{center}
+
+\[ (b', a', [y_0, y_1, y_2, y_3]) \ =
+  \ \textsl{mscan}\ f\ a\ b\ [x_0, x_1, x_2, x_3]
+\]
+
+\[ (b', a', \textsl{ys}) \ = \ \textsl{mscan}\ f\ a\ b\ \textsl{xs} \]
+
+*** latex draft chapter patterns
+**** INSERT latex draft chapter patterns
+ \chapter{Design Patterns}
+
+ Abstraction
+
+ We will generally specify large circuits using a circuit generator,
+ not by drawing every component individually.  There are two kinds of
+ circuit generator.  Design patterns (higher order functions) are the
+ focus of this chapter.  Special languages for special kinds of circuit
+ (e.g. control algorithms) are covered later.
+
+ Design patterns use circuits as building blocks
+
+ Design patterns are \emph{higher order} functions: they take one or
+ more \emph{circuit specifications} as parameters.  The pattern defines
+ how to connect up these given circuits in a regular pattern.  A
+ pattern definition looks just like an ordinary circuit specification,
+ except It uses recursion to decompose groups of signals.  It uses
+ abstract circuits, supplied as parameters, instead of specific
+ circuits.  Its type may include building block circuits (these
+ parameters contain an \texttt{->} in their type) and/or size
+ parameters (with a type like \texttt{Int}).
+
+
+ %-----------------------------------------------------------------------
+ \section{Map}
+
+ \begin{itemize}
+ \item Sometimes you have a circuit (it's arbitrary, so call it $f$)
+   that takes an input (say it has type $a$) and produces an output
+   (call its type $b$).
+ \item You need to take a word of signals, and process each one with
+   the circuit $f$.  For example, \texttt{inv4} processes each
+   signal with an \texttt{inv}.
+ \item The \texttt{map} pattern describes this in general.
+ \end{itemize}
+
+ #+BEGIN_SRC sigma
+ map :: (a->b) -> [a] -> [b]
+ #+END_SRC
+
+ \begin{itemize}
+ \item The first argument to the pattern is a circuit with type
+   \texttt{a->b}
+ \item The pattern then generates a circuits, which takes an input
+   word of type \texttt{[a]} and produces an output word of type
+   \texttt{[b]}.
+ \end{itemize}
+
+
+
+ %-----------------------------------------------------------------------
+ \subsection{Example of map}
+
+ We can define a word inverter using the pattern that places an
+ inverter on each input signal, to produce the corresponding output
+ signals.
+
+ #+BEGIN_SRC sigma
+ winv :: Signal a => [a] -> [a]
+ winv x = map inv x
+ #+END_SRC
+
+ Technical note: in a defining equation of the form \texttt{f a b c
+   = g c}, you can ``factor out'' the rightmost parameter from both
+ sides, giving a slightly shorter form.
+
+ #+BEGIN_SRC sigma
+ winv :: Signal a => [a] -> [a]
+ winv = map inv
+ #+END_SRC
+
+ This is attractive because it describes just the pattern.
+
+
+
+ %-----------------------------------------------------------------------
+ \subsection{Word inverter: ys = map inv xs}
+
+ \hbox{
+   \hspace{3em}
+   % FOO includegraphics[angle=-90,scale=0.5]{figures/xfig/map4inv.eps}
+   \hspace{5em}
+   % FOO includegraphics[angle=-90,scale=0.5]{figures/xfig/map4invbox.eps}
+ }
+
+
+
+ %-----------------------------------------------------------------------
+ \subsection{Definition of map}
+
+ #+BEGIN_SRC sigma
+ map :: (a->b) -> [a] -> [b]
+ map f [] = []
+ map f (x:xs) = f x : map f xs
+ #+END_SRC
+
+ \begin{itemize}
+
+ \item A recursion, based on the word structure of the input.
+
+ \item The base case is an empty input word \texttt{[]}.  In this
+   case, the output is also empty.
+
+ \item The recursion (or induction) case has an input word
+   \texttt{x:xs} consisting of an initial bit \texttt{x} followed by
+   the rest of the word, \texttt{xs}.  The circuit introduces a copy
+   of the \texttt{f} circuit to process \texttt{x}, and handles the
+   rest recursively.
+
+ \end{itemize}
+
+
+
+ %-----------------------------------------------------------------------
+ \subsection{Structure of map recursion}
+
+ \begin{center}
+   % FOO includegraphics[angle=0,scale=0.4]{figures/xfig/map-recursion.eps}
+ \end{center}
+
+
+
+ %-----------------------------------------------------------------------
+ \subsection{After the recursion has completed}
+
+ \hbox{
+   \hspace{3em}
+   % FOO includegraphics[angle=-90,scale=0.5]{figures/xfig/map4.eps}
+   \hspace{5em}
+   % FOO includegraphics[angle=-90,scale=0.5]{figures/xfig/map4box.eps}
+ }
+
+
+
+ %-----------------------------------------------------------------------
+ \subsection{Extending map to multiple inputs}
+
+ The \texttt{map2} pattern is similar to \texttt{map}, but it uses a
+ circuit that takes two inputs (thus its type is \texttt{a->b->c}).
+ Note that \texttt{map2} is \emph{not} a bit-slice pattern; it uses
+ separate words.
+
+ #+BEGIN_SRC sigma
+ map2 :: (a->b->c) -> [a] -> [b] -> [c]
+ #+END_SRC
+
+ We can extend the basic multiplexor to handle words:
+
+ #+BEGIN_SRC sigma
+ mux1w :: Signal a => a -> [a] -> [a] -> [a]
+ mux1w c x y = map2 (mux1 c) x y
+ #+END_SRC
+
+
+
+ %-----------------------------------------------------------------------
+ \subsection{Forcing a specific word size}
+
+ The \texttt{mapn} pattern is similar to \texttt{map}, except it
+ takes a size parameter, and guarantees to produce an output of that
+ size.
+
+ #+BEGIN_SRC sigma
+ mapn :: (a->b) -> Int -> [a] -> [b]
+ #+END_SRC
+
+ \begin{itemize}
+ \item Registers are defined using \texttt{mapn}, to ensure that the number
+   of flip flops is defined
+ \item Combinational circuits may be defined using \texttt{map}, so
+   they inherit the word size of their input
+ \end{itemize}
+
+
+
+ %-----------------------------------------------------------------------
+ \section{Fold}
+
+
+ The folding patterns define a linear circuit structure.
+
+ \begin{itemize}
+
+ \item There is an input word of type \texttt{[b]}.
+
+ \item The elements of the word are combined using a building block
+   \texttt{f}.
+
+ \item There is a ``horizontal'' signal of some type (call it
+   \texttt{a}), which is goes across the word from left to right.
+
+ \item An initial horizontal input, of type \texttt{a} is provided.
+
+ \item The output is the final horizontal output (produced by the
+   rightmost \texttt{f} circuit).
+
+ \end{itemize}
+
+ Folding corresponds to a linear computation from one end of the
+ word to the other, starting with an initial value a (sometimes
+ called an accumulator, but this is not to be confused with
+ accumulator registers!).
+
+
+
+ %-----------------------------------------------------------------------
+ \subsection{Fold from the left}
+
+ In general, a fold can proceed either direction across the word.
+ The \texttt{foldl} pattern describes a \emph{fold from the left};
+ i.e. the information flows from left to right across the word.
+
+ #+BEGIN_SRC sigma
+ foldl :: (a->b->a) -> a -> [b] -> a
+ #+END_SRC
+
+ The pattern is defined recursively:
+
+ #+BEGIN_SRC sigma
+ foldl f a [] = a
+ foldl f a (x:xs) = foldl f (f a x) xs
+ #+END_SRC
+
+
+ \begin{center}
+   % FOO includegraphics[angle=0,scale=0.5]{figures/xfig/foldl4.eps}
+ \end{center}
+
+ \begin{center}
+   % FOO includegraphics[angle=0,scale=0.5]{figures/xfig/foldl4box.eps}
+ \end{center}
+
+ \subsection{Examples: orw, andw}
+
+ The \texttt{orw} circuit determines whether there is any 1 bit in a
+ word.
+
+ #+BEGIN_SRC sigma
+ orw :: Signal a => [a] -> a
+ orw = foldl or2 zero
+ #+END_SRC
+
+ The \texttt{andw} circuit determines whether all the bits in a word
+ are 1.
+
+ #+BEGIN_SRC sigma
+ andw :: Signal a => [a] -> a
+ andw = foldl and2 one
+ #+END_SRC
+
+ The time required (the path depth) is linear in the word size.
+ There are also tree-structured patterns that can do these
+ computations in logarithmic time.
+
+
+
+
+ Efficiency
+
+ \begin{itemize}
+ \item The definitions of \texttt{orw} and \texttt{andw} are not
+   very efficient
+   \begin{itemize}
+   \item If a large number of signals are being combined, a tree
+     structure of logic gates reduces the path depth.  If this
+     circuit is on the critical path, that will help.
+   \item If the technology supplies 3 or 4 input gates, it would
+     likely be faster to use some of those, rather than just the 2
+     input gates.
+   \item The \texttt{foldl} pattern uses one extra gate to include
+     the ``default'' value of zero or one.  This is overhead.
+   \end{itemize}
+ \item This inefficiency is not a concern, because
+   \begin{itemize}
+   \item There are alternative patterns that generate more efficient
+     circuits
+   \item A circuit optimiser can generate optimal results
+   \item If the circuit isn't on the critical path, it makes no
+     difference anyway.
+   \end{itemize}
+ \end{itemize}
+
+
+ \subsection{Example: binary comparison}
+
+ \begin{itemize}
+ \item The problem: input two binary numbers, in bit slice form:
+   \texttt{[(x0,y0), (x1,y1), ..., (xk,yk)]}
+ \item Output the result of a comparision: \texttt{(lt,eq,gt)},
+   giving the values of $(x<y, x=y, x>y)$.  Exactly one of the three
+   output bits must be 1.
+ \item Idea: start from left, assuming the numbers are equal so far:
+   \texttt{(0,1,0)}.
+ \item Move over the columns from left to right, updating the
+   results of the comparision using a building block circuit
+   \texttt{cmp1}.
+ \item Going from left to right, once we have established either $<$
+   or $>$, that result will never change.
+ \item If the current result is $=$ and $x=y$, it's still $=$.
+ \item If the current result is $=$ but $x$ and $y$ are different,
+   the new result becomes $<$ or $>$.
+ \end{itemize}
+
+
+ A bit comparison building block circuit:
+
+ #+BEGIN_SRC sigma
+ cmp1 :: Signal a => (a,a,a) -> (a,a) -> (a,a,a)
+ cmp1 (lt,eq,gt) (x,y) =
+   (or2 lt (and3 eq (inv x) y),
+    and2 eq (inv (xor2 x y)),
+    or2 gt (and3 eq x (inv y))
+   )
+ #+END_SRC
+
+ The ripple comparison circuit is defined simply using the pattern:
+
+ #+BEGIN_SRC sigma
+ rippleCmp :: Signal a => [(a,a)] -> (a,a,a)
+ rippleCmp = foldl cmp1 (zero,one,zero)
+ #+END_SRC
+
+
+
+ %-----------------------------------------------------------------------
+ \subsection{Fold from the right}
+
+ You can also run a fold across a word from the right to the left.
+
+ #+BEGIN_SRC sigma
+ foldr :: (b->a->a) -> a -> [b] -> a
+ foldr f a [] = a
+ foldr f a (x:xs) = f x (foldr f a xs)
+ #+END_SRC
+
+ This is symmetric with \texttt{foldl}.
+
+ The foldr pattern
+
+ \begin{center}
+   % FOO includegraphics[angle=0,scale=0.5]{figures/xfig/foldr4.eps}
+   \vspace{3em}
+   % FOO includegraphics[angle=0,scale=0.5]{figures/xfig/foldr4box.eps}
+ \end{center}
+
+
+ %-----------------------------------------------------------------------
+ \section{Scan}
+
+ \begin{itemize}
+ \item A fold calculates a sequence of intermediate values, one for
+   every bit position.
+ \item A more general kind of pattern---a \emph{scan}---outputs this
+   word of intermediate values.
+ \item For every kind of fold, there is a corresponding scan, and
+   there are also some more general patterns that are based on scan.
+ \item Scans are important because many important computations can
+   be expressed via scans, and a variety of patterns exist that
+   implement scans efficiently.
+ \end{itemize}
+
+
+
+ %-----------------------------------------------------------------------
+ \subsection{Scan from the left: scanl}
+
+ \begin{center}
+   % FOO includegraphics[angle=0,scale=0.5]{figures/xfig/scanl4.eps}
+ \end{center}
+
+ \[ [y_0, y_1, y_2, y_3, y_4] \ =
+   \ \textsf{scanl}\ f\ a\ [x_0, x_1, x_2, x_3]
+ \]
+
+ \[ \textsf{ys} \ = \ \textsf{scanl}\ f\ a\ \textsf{xs} \]
+
+
+
+ %-----------------------------------------------------------------------
+ \subsection{Scan from the right: scanr}
+
+ The \texttt{ascanr} pattern yields the word of intermediate results
+ that would occur during a \texttt{foldr}.  Specifically, it gives
+ the horizontal \emph{input} to each box in the \texttt{foldr}.
+
+ #+BEGIN_SRC sigma
+ ascanr :: (b->a->a) -> a -> [b] -> [a]
+ #+END_SRC
+
+ The value of the output word can be defined directly in terms of
+ \texttt{foldr} of portions of the input word.  This is useful for
+ intuition and for formal mathematical reasoning.
+
+ #+BEGIN_SRC sigma
+ ascanr :: (b->a->a) -> a -> [b] -> (a,[a])
+ ascanr f a [] = (a,[])
+ ascanr f a (x:xs) = (f x a', a':xs')
+   where (a',xs') = ascanr f a xs
+ #+END_SRC
+
+
+ \begin{center}
+   % FOO includegraphics[angle=0,scale=0.5]{figures/xfig/scanr4.eps}
+ \end{center}
+
+ \[ [y_0, y_1, y_2, y_3, y_4] \ =
+   \ \textsf{scanr}\ f\ a\ [x_0, x_1, x_2, x_3]
+ \]
+
+ \[ \textsf{ys} \ = \ \textsf{scanr}\ f\ a\ \textsf{xs} \]
+
+
+
+ %-----------------------------------------------------------------------
+ \subsection{Combining a map with a scan}
+
+ Many circuits combine a map with a scan: they output a value in each
+ bit position that depends on both horizontal input and the value of
+ the word in that bit position.
+
+ The \texttt{mscanr} pattern is useful for such cases (and there is
+ a corresponding \texttt{mscanl}).
+
+ #+BEGIN_SRC sigma
+ mscanr :: (a->b->(b,c)) -> b -> [a] -> (b,[c])
+ mscanr f a [] = (a,[])
+ mscanr f a (x:xs) = (a'',y:ys)
+   where
+     (a',ys) = mscanr f a xs
+     (a'',y) = f x a'
+ #+END_SRC
+
+ %-----------------------------------------------------------------------
+ \subsection{Unidirectional mapping scan: mscanl, mscanr}
+
+ \begin{center}
+   % FOO includegraphics[angle=0,scale=0.5]{figures/xfig/mscanl4.eps}
+ \end{center}
+
+ \[ (z, [y_0, y_1, y_2, y_3] \ =
+   \ \textsf{mscanr}\ f\ a\ [x_0, x_1, x_2, x_3]
+ \]
+
+ \[ (z,\textsf{ys}) \ = \ \textsf{mscanr}\ f\ a\ \textsf{xs} \]
+
+ \begin{center}
+   % FOO includegraphics[angle=0,scale=0.5]{figures/xfig/mscanr4.eps}
+ \end{center}
+
+ \[ (z, [y_0, y_1, y_2, y_3] \ =
+   \ \textsf{mscanr}\ f\ a\ [x_0, x_1, x_2, x_3]
+ \]
+
+ \[ (z,\textsf{ys}) \ = \ \textsf{mscanr}\ f\ a\ \textsf{xs} \]
+
+ %-----------------------------------------------------------------------
+ \subsection{Example: the ripple carry adder}
+
+ #+BEGIN_SRC sigma
+ fullAdd :: Signal a => (a,a) -> a -> (a,a)
+ fullAdd (x,y) c = (bcarry (x,y) c, bsum (x,y) c)
+ #+END_SRC
+
+ Ripple carry addition
+
+ #+BEGIN_SRC sigma
+ rippleAdd :: Signal a => a -> [(a,a)] -> (a,[a])
+ rippleAdd = mscanr fullAdd
+ #+END_SRC
+
+ rippleAdd4
+
+ \begin{center}
+   % FOO includegraphics[angle=0,scale=0.4]{figures/xfig/rippleAdd4.eps}
+ \end{center}
+
+ Order of parameters
+
+ \begin{itemize}
+ \item Circuit specifications using patterns can often be simplified
+   if you pay attention to the order of parameters.
+ \item For example, the ripple carry adder specification would be
+   clunkier if we had defined the full adder as \texttt{fullAddBad
+     :: Signal a => a -> (a,a) -> (a,a)}.
+ \item How can you make the definitions work out cleanly?
+ \item Often there are choices that seem arbitrary at first, but
+   later on you realise things would be simpler if the choice had
+   been different.  This is a good time to go back and clean up your
+   specifications.
+ \end{itemize}
+
+
+
+ %-----------------------------------------------------------------------
+ \subsection{Bidirectional mapping scan: mscan}
+
+ \begin{itemize}
+ \item A very general pattern is the \texttt{mscan} pattern, which
+   takes a word, and \emph{two} horizontal values, one moving from
+   left to right and the other from right to left.  The pattern
+   combines a \texttt{foldl}, a \texttt{foldr}, and a \texttt{map}.
+ \item ALU circuits often use the \texttt{mscan} pattern.
+ \end{itemize}
+
+ #+BEGIN_SRC sigma
+ mscan :: (a->b->c->(b,a,d)) -> a -> b -> [c] -> (b,a,[d])
+ mscan f a b [] = (b,a,[])
+ mscan f a b (x:xs) = (b'', a'', y:ys)
+   where
+     (b'',a',y) = f a b' x
+     (b',a'',ys) = mscan f a' b xs
+ #+END_SRC
+
+ \begin{center}
+   % FOO includegraphics[angle=0,scale=0.5]{figures/xfig/mscan.eps}
+ \end{center}
+
+ \[ (b', a', [y_0, y_1, y_2, y_3]) \ =
+   \ \textsl{mscanr}\ f\ a\ b\ [x_0, x_1, x_2, x_3]
+ \]
+
+ \[ (b', a', \textsl{ys}) \ = \ \textsl{mscanr}\ f\ a\ b\ \textsl{xs} \]
+
+**** END latex draft chapter patterns
+
+
 * Summary of syntax
 
 This section summarises the language syntax.  Hydra is actually
