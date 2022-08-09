@@ -1,5 +1,5 @@
 cabal-version: 3.4
-name: hydra
+name: Hydra
 version: 3.4.16
 synopsis: Computer hardware description language
 author: John T. O'Donnell

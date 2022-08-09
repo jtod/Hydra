@@ -93,12 +93,22 @@ it describes hardware rather than software.  Most hardware description
 languages are based on existing programming languages intended for
 software, and they model circuits using the paradigms of programming.
 
+An algorithm can be realised using either software, hardware, or a
+combination of both.  Algorithms may be specified abstractly, without
+referring to either hardware or software.  A common misconception is
+to think "if it's a picture, then it must be hardware; if it's text it
+must be software".  That's doubly wrong: visual programming languages
+use pictures to describe software, and hardware description languages
+like Hydra use text to describe hardware.
+
 Schematic diagrams and hardware description languages each have their
 merits.  A diagram may be easier for a beginner to understand, and
 it's more obvious that a schematic diagram describes hardware and
-isn't just a computer program.  However, hardware description
-languages scale up better to large and complex circuits, and work
-better with software tools that can analyse a circuit and simulate it.
+isn't just a computer program.  However, schematics for large and
+complex circuits are cumbersome, while hardware description languages
+scale up well.  Diagrams just sit there inertly on paper, and don't do
+anything, but CHDLs support useful software tools for simulation,
+fabrication, and testing.
 
 Here is a schematic diagram for a circuit named rtm42:
 
@@ -114,22 +124,6 @@ rtm n k ld add d sa sb x = (a,b,y,c,s)
     y = mux1w add x s
     (c,s) = rippleAdd zero (bitslice2 a b)
 #+END_EXAMPLE
-
-Schematic diagrams may be easier for beginners to understand.  It's
-more obvious that a schematic describes hardware, and isn't just a
-computer program.  However, schematics break down badly for large and
-complex circuits, and the diagrams just sit there inertly on paper,
-and don't do anything In contrast, CHDLs scale up well to large
-circuits, and they support useful software tools for simulation,
-fabrication, and testing.
-
-An algorithm can be realised using either software, hardware, or a
-combination of both.  Algorithms may be specified abstractly, without
-referring to either hardware or software.  A common misconception is
-to think "if it's a picture, then it must be hardware; if it's text it
-must be software".  That's doubly wrong: visual programming languages
-use pictures to describe software, and hardware description languages
-like Hydra use text to describe hardware.
 
 ** Modeling circuits as functions
 
@@ -157,10 +151,22 @@ best to think of Hydra as a distinct language: designing a circuit is
 not the same as writing a program in Haskell, and some Haskell
 programs don't correspond to circuits.
 
+** Examples
+
+The following sections explain the language and show how to write
+circuit specifications.  A collection of examples can be found in
+=hydra/examples=.  If you would like to see a simple circuit before
+going on, look at =examples/simple/SimpleCirc.hs=.  To simulate it,
+enter these commands:
+
+#+BEGIN_EXAMPLE
+cd examples/simple
+ghc -e main SimpleCircRun
+#+END_EXAMPLE
+
 * README
 
 #+INCLUDE: "../../README.org"
-
 
 * Connecting components with signals
 
@@ -182,14 +188,15 @@ False/True, and F/T.  In real hardware a bit signal is represented by
 a voltage, but the precise voltage value is unimportant at the level
 of logic design.  The particular names chosen for the two bit values
 are also unimportant, although they can affect the readability of a
-table showing the behavior of a circuit.  When Hydra prints out the
-values of bit signals, it will normally use 0 and 1, but you can tell
-it to use False and True, or any other names you prefer.  One
-advantage of 0/1 is that they are consistent with treating a bit as a
-binary digit (False/True suggest treating a bit as a Boolean).
-Another advantage of 0 and 1 is that they take up only one character
-and they look different.  (Try reading a table showing thousands of F
-and T characters -- they can be hard to tell apart!).
+table showing the behavior of a circuit.
+
+When Hydra prints out the values of bit signals, it will normally use
+0 and 1, but you can tell it to use False and True, or any other names
+you prefer.  One advantage of 0/1 is that they are consistent with
+treating a bit as a binary digit (False/True suggest treating a bit as
+a Boolean).  Another advantage of 0 and 1 is that they take up only
+one character and they look different.  Try reading a table showing
+thousands of F and T characters -- they can be hard to tell apart!.
 
 ** Logic gates
 
@@ -200,68 +207,68 @@ libraries of your own circuits for further use.  The Hydra libraries
 provide as primitives the standard logic gates, summarised in the
 following table.
 
-The buffer simply produces an output that is the same as the input; it
-is the identify function.  The inverter outputs 0 if its input is 1,
-and outputs 1 if its input is 0.
+| Gate          | Description       |
+|---------------+-------------------|
+| buf a         | buffer            |
+| inv a         | inverter          |
+| and2 a b      | 2-input and gate  |
+| and3 a b c    | 3-input and gate  |
+| and4 a b c d  | 4-input and gate  |
+| or2 a b       | 2-input or gate   |
+| or3 a b c     | 3-input or gate   |
+| or4 a b c d   | 4-input or gate   |
+| xor2 a b      | 2-input xor gate  |
+| xor3 a b c    | 3-input xor gate  |
+| xor4 a b c d  | 4-input xor gate  |
+| nand2 a b     | 2-input nand gate |
+| nand3 a b c   | 3-input nand gate |
+| nand4 a b c d | 4-input nand gate |
+| nor2 a b      | 2-input nor gate  |
+| nor3 a b c    | 3-input nor gate  |
+| nor4 a b c d  | 4-input nor gate  |
+| xnor2 a b     | 2-input xnor gate |
+| xnor3 a b c   | 3-input xnor gate |
+| xnor4 a b c d | 4-input xnor gate |
+ 
+The buffer produces an output that is the same as the input; it is the
+identify function.  The inverter outputs 0 if its input is 1, and
+outputs 1 if its input is 0.
 
 Many of the logical operations can be performed on any number of
-inputs.  For example, there is the logical conjunction (*and*) of two,
+inputs.  For example, there is the logical conjunction (=and=) of two,
 three, or four inputs.  These correspond to distinct logic gates: the
-*and2* gate has two input ports and there is no way to connect three
-inputs to it.  Therefore Hydra doesn't have an *and* gate; it has
-distinct *and2*, *and3*, *and4* gates.  This doesn't go on
-indefinitely; Hydra does not define the *and5* gate or the *and73*
-gate!  (A convenient way to *and* together large number of inputs is
-to use *andw*.)
+=and2= gate has two input ports and there is no way to connect three
+inputs to it.  Therefore Hydra doesn't have an =and= gate; it has
+distinct =and2=, =and3=, =and4= gates.  This doesn't go on
+indefinitely; Hydra does not define the =and5= gate or the =and73=
+gate!  (A convenient way to =and= together large number of inputs is
+to use =andw=.)
 
-Component          Description
-----------------   -----------------------
-buf a              buffer
-inv a              inverter
-and2 a b           2-input and gate
-and3 a b c         3-input and gate
-and4 a b c d       4-input and gate
-or2 a b            2-input or gate
-or3 a b c          3-input or gate
-or4 a b c d        4-input or gate
-xor2 a b           2-input xor gate
-xor3 a b c         3-input xor gate
-xor4 a b c d       4-input xor gate
-nand2 a b          2-input nand gate
-nand3 a b c        3-input nand gate
-nand4 a b c d      4-input nand gate
-nor2 a b           2-input nor gate
-nor3 a b c         3-input nor gate
-nor4 a b c d       4-input nor gate
-xnor2 a b          2-input xnor gate
-xnor3 a b c        3-input xnor gate
-xnor4 a b c d      4-input xnor gate
-
-Most of these logic gates are provided for convenience, but only a few
-of them are necessary.  For example, you can replace *and3 a b c* by
-*and2 a (and2 b c)*.  However, logic gates with several inputs can be
+Most of these logic gates are provided for convenience; only a few of
+them are necessary.  For example, you can replace =and3 a b c= by
+=and2 a (and2 b c)=.  However, logic gates with several inputs can be
 fabricated on chips, they are slightly more efficient, and most
-importantly, it's more readable to use *and3* rather than two *and2*
+importantly, it's more readable to use =and3= rather than two =and2=
 gates.
 
 ** Connecting a circuit to inputs
 
-Suppose we have two signals named *x* and *y*, and want to connect
-them to the inputs of an *or2* gate.  This is done by writing the name
+Suppose we have two signals named =x= and =y=, and want to connect
+them to the inputs of an =or2= gate.  This is done by writing the name
 of the component, followed by the names of the input signals:
 
 #+BEGIN_EXAMPLE
 or2 x y
 #+END_EXAMPLE
 
-The value of this expression is the output of the *or2* gate.  Such an
-expression is called an *application* because the component is applied
-to its input signals.
+The value of this expression is the signal which is the output of the
+=or2= gate.  Such an expression is called an *application* because the
+component is applied to its input signals.
 
 Each circuit takes a specific number of inputs, and an application
 using that circuit must supply the corresponding number of input
 signals.  Here are several applications of logic gates, each with the
-right number of inputs.
+right number of inputs:
 
 #+BEGIN_EXAMPLE
 inv x
@@ -272,60 +279,70 @@ nor4 a zero c d
 
 ** Anonymous signals
 
-A signal may be given a name, such as *x* or *y*, although this is
+A signal may be given a name, such as =x= or =y=, although this is
 optional.  You can also refer to a signal using an application of a
-component to its inputs, such as *inv x*; the output of the inverter
-is an anonymous signal as it has no name.
+component to its inputs, such as =inv x=; the output of the inverter
+is an /anonymous/ signal as it has no name.
 
-An anonymous signal is described by an expression with several tokens.
-When you use it as an input to a circuit, this expression must be
-enclosed by parentheses, to turn it into a single object.  For
-example, suppose we want to connect the first input to an *and2* gate
-to the output of an inverter whose input is *x*.  The second input to
-the *and2* gate should be *y*.  Here is the correct way to write it:
+An anonymous signal is described by an expression, and that expression
+is written with several tokens.  When you use it as an input to a
+circuit, this expression must be enclosed by parentheses, to turn it
+into a single object.  For example, suppose we want to connect the
+first input to an =and2= gate to the output of an inverter whose input
+is =x=.  The second input to the =and2= gate should be =y=.  Here is
+the correct way to write it:
 
 #+BEGIN_EXAMPLE
 and2 (inv x) y
 #+END_EXAMPLE
 
-There are two expressions following *and2*, denoting its two inputs.
-The following notation would be wrong:
+There are two expressions following =and2=, denoting its two inputs.
+The first expression is =(inv x= and it denotes an anonymous signal.
+The second expression is =y=, which of course is a named signal.  The
+following notation would be wrong:
 
 #+BEGIN_EXAMPLE
 and2 inv x y   -- Wrong!
 #+END_EXAMPLE
 
-Here, it looks like the *and2* gate is being given three inputs, and
-the first one isn't even a signal.
+This says that the =and2= gate is being given three inputs, and the
+first input (=inv=) isn't even a signal.
 
-Parentheses are used in Hydra for grouping, just as in mathematics.
-You don't need to use parentheses just to specify the arguments to a
-function (that is, the inputs to a circuit).  Some programming
-languages requires lots of punctuation to indicate function
-application:
+Parentheses are used for grouping, just as in mathematics.  You don't
+need to use parentheses just to specify the arguments to a function
+(that is, the inputs to a circuit).  Some programming languages
+requires lots of punctuation to indicate function application:
 
 #+BEGIN_EXAMPLE
+inv (x)                     -- Wrong!
+and2 (a,b)                  -- Wrong!
 nand3 (x, and2 (p,q), z);   -- Wrong!
 #+END_EXAMPLE
-
 
 In Hydra (as in Haskell) you don't need the extra parentheses and
 commas, and they will lead to error messages.  Use parentheses only
 when they are necessary to get the right grouping:
 
 #+BEGIN_EXAMPLE
+inv x
+and2 a b
 nand3 x (and2 p q) z
 #+END_EXAMPLE
 
+** Text and schematic
+
 It can be helpful to give both a schematic diagram and a textual
 specification for a circuit.  Each form of description provides
-insight, and having both together is often worthwhile.  It's important
-to check that the two descriptions of the circuit are consistent with
-each other.  To do this, check that every box in the diagram
-corresponds to a circuit (function) in the text, and check that the
-wires in the diagram correspond to the signals in the text.
+insight, and having both together is often worthwhile.
 
-** Signal defining equations
+It's important to check that the two descriptions of the circuit are
+consistent with each other.  To do this,
+- Check that every box in the diagram corresponds to a circuit
+  (function) in the text
+- Check that each wire in the diagram corresponds to a signal in the
+  text.
+
+** A defining equation names a signal
 
 Sometimes it's useful to give a name to a signal, rather than using it
 anonymously.  A named signal can be used as an input to several
@@ -336,11 +353,52 @@ document the purpose of a signal.
 A signal can be named using an equation.  The left hand side of the
 equation is the name, and the right hand side is an expression that
 defines the signal.  The following equation says that the output of
-the *and3* gate has the name *x*.
+the =and3= gate has the name =x=.
 
 #+BEGIN_EXAMPLE
 x = and3 a (inv b) c
 #+END_EXAMPLE
+
+With that equation, =x= can be used as the input to any component:
+
+#+BEGIN_EXAMPLE
+x = and3 a (inv b) c
+y = or2 a x
+#+END_EXAMPLE
+
+A /defining equation/ defines the name on the left hand side to have
+the same value as the signal expression on the right hand side. The
+order of equations is immaterial, just as with equations in
+mathematics.  It's fine to use a signal name before the equation that
+defines it.  The example above could be written like this, and it
+would specify exactly the same circuit:
+
+#+BEGIN_EXAMPLE
+x = and3 a (inv b) c
+y = or2 a x
+#+END_EXAMPLE
+
+However, in mathematics you can swap the left and right hand sides,
+but a Hydra equation /must/ have the name on the left side and its
+value on the right side.  That's why it is called a /defining
+equation/.  If you reverse the two sides, you'll get an error:
+
+#+BEGIN_EXAMPLE
+a = inv b      -- Correct, defines the name a
+inv c = d      -- Error, need a name (not application) on left
+#+END_EXAMPLE
+
+Later we will see a technique called /equational reasoning/, which is
+useful for analysing circuits.  This uses equations with a more
+general form.  But to give a name to a signal, you need to use a
+/defining equation/, where the left hand side is always a signal name.
+
+It's a good idea to write the equations in an order that makes the
+circuit more readable.  If most of the signals are defined before they
+are used, a person reading the text will get a bottom-up
+understanding.  Using signals before they are defined gives a top-down
+presentation.  Both styles are useful, and we will see examples of
+both.
 
 Sometimes the choice between anonymous and named signals is just a
 matter of style.  Here is a signal defined using three anonymous
@@ -360,53 +418,47 @@ q = inv r
 r = nor2 c d
 #+END_EXAMPLE
 
-An equation like this is called a *defining equation*, because the
-left hand side has to be a signal name whose value is defined to be
-the right hand side.  It would be wrong, for example, to write
-
-
-#+BEGIN_EXAMPLE
-nand2 p q = x   -- Wrong!
-#+END_EXAMPLE
-
-
-When using *equational reasoning* you will encounter equations with a
-more general form, but in defining signals, the left hand side is
-always a signal name.
-
 ** Constant signals
 
 A constant signal always carries the same value: either it is always
 0, or always 1.  The names of these two constants are written as
-*zero* and *one*.  Names in Hydra always begin with a lower case
+=zero= and =one=.  Names in Hydra always begin with a lower case
 letter, never with a digit.  Don't use 0/1, or T/F, or True/False in a
 circuit specification; those notations have other meanings and will
 lead to bizarre error messages.
 
-** Connecting several logic gates: mux1
+#+BEGIN_EXAMPLE
+x = and2 a one   -- Correct, x is same as a
+y = and2 a 1     -- Error, 1 isn't a signal
+#+END_EXAMPLE
 
-So far we have just looked at a circuit comprising a single logic
-gate.  The next step is to define circuits with several gates and
-wires.
+** Example: multiplexer
 
-Files: *examples/mux/Mux1.hs* and *examples/mux/Mux1Run.hs*
+The /multiplexer/ is an example of a circuit that can be defined by
+conecting several logic gates together. The multiplexer is one of the
+most important building blocks for larger systems.  There are many
+varieties of multiplexer; here we look at the 1-bit multiplexer,
+called =mux1=.
 
-The *multiplexer* is an example of a circuit that can be defined by
-conecting several logic gates together.  It's not just an arbitrary
-example: the multiplexer is one of the most important building blocks
-for larger systems.  There are many varieties of multiplexer; here we
-look at the 1-bit multiplexer, called *mux1*.
+Files:
+- =examples/mux/Mux1.hs=
+- =examples/mux/Mux1Run.hs=
 
 A multiplexer is a hardware version of the if-then-else expression,
 and is used to perform conditional actions in a circuit.  It takes
-three inputs: a control input *c*, and two data inputs *x* and *y*.
+three inputs: a control input =c=, and two data inputs =x= and =y=.
 
-The idea is that the multiplexer will choose one of the data inputs
-(*x* or *y*) and output it.  The data input that is not chosen is
-simply ignored.  The choice is determined by the value of *c*.
-Informally, the behavior of the multiplexer is:
+The idea is that the multiplexer will choose one of the data inputs --
+either =x= or =y= -- and output it.  The data input that is not chosen is
+simply ignored.  The choice is determined by the value of =c=.
+
+The behavior of the multiplexer can be described informally using an
+if--then--else expression.  This is just an English description, not a
+circuit, because *if* is not a circuit: it's programming language
+notation.
 
 #+BEGIN_EXAMPLE
+-- informal specification
 mux1 c x y = if c is zero then x else y
 #+END_EXAMPLE
 
@@ -545,260 +597,6 @@ Input: x = 1 y = 1  Output: c = 1 s = 0
 
 
 
-* Circuit simulation
-
-To illustrate how to use Hydra, let's start with a very simple
-circuit.  It is just an and2 logic gate, with two 1-bit inputs and a
-1-bit output.  The example is in the directory examples/SimpleCirc,
-and it consists of two files:
-
-- SimpleCirc.hs defines a circuit named =simpleCirc=, which takes two input
-  bits and outputs their logical /and/.  In other words, the =simpleCirc=
-  circuit is just an =and2= logic gate.
-  
-- SimpleCircRun.hs defines a simulation driver for the circuit.  The
-  file provides a main program named =main= which runs the simulation
-  on test data which is also defined in the file.  In
-  SimpleCircRun.hs, the test data runs the circuit on all possible
-  inputs 00, 01, 10, 11.  Since the circuit is really just an and2
-  gate, the results should be 0, 0, 0, 1.
-
-** The circuit specification
-
-The circuit itself is defined in a module =SimpleCirc=, which is in the
-file named =SimpleCirc.hs=.
-
-#+BEGIN_EXAMPLE
--- SimpleCirc -- A minimal example of a circuit description
--- This file is part of Hydra. John O'Donnell, 2021.  See Hydra/README
-
-module SimpleCirc where
-import HDL.Hydra.Core.Lib
-
--- Define a circuit "simpleCirc" which takes two input bits and outputs
--- their logical conjunction, using an and2 logic gate
-
-simpleCirc :: Bit a => a -> a -> a   -- interface: two inputs, one output
-simpleCirc x y = and2 x y            -- implementation uses an and2 logic gate
-#+END_EXAMPLE
-
-A module begins with a =module= statement that gives its , followed by
-statements that import other modules.  All Hydra modules must contain
-=import HDL.Hydra.Core.Lib=, which defines, among other things, the
-=and2= logic gate.
-
-Following the imports, the module may contain any number of circuit
-definitions.  The definition of the circuit =simpleCirc= contains two lines
-of code: a /type declaration/ which contains the symbol =::= and a
-/defining equation/ which contains the symbol =.
-
-A type declaration specifies the name of the circuit and its
-interface.  The declaration /simpleCirc :: Bit a => a -> a -> a/ contains
-several parts:
-
-- The beginning  means "simpleCirc has type...".
-- Bit a    means the circuit uses Bit signals, and we will use the
-  name /a/ for the type of a bit signal
-- /a -> a -> a/ says the circuit takes an input of type /a/, a second
-  input also of type /a/, and it outputs a signal of type /a/
-- There may be any number of inputs, and each is followed by /->/.
-  This means that the number of inputs is the number of /->/ in the
-  type.
-- There must be exactly one output.  The last /a/ in the type is the
-  type of the output.  Later, we will see how to allow a circuit to
-  produce several outputs.
-
-The defining equation specifies local names for the circuit's inputs,
-and it gives a circuit that produces its output.  The defining
-equation for this circuit is =simpleCirc x y = and2 x y=.  This says
-- We will use the names =x= and =y= as local names for the inputs to
-  the circuit
-- There is an =and2= logic gate with inputs =x= and =y=
-- The output of that logic gate is the output of the circuit
-
-** The simulation driver
-
-To test the circuit, we can simulate it with some inputs.  This
-requires a /simulation driver/ which is defined in a separate module
-in the file SimpleCircRun.hs.  The simulation driver defines the
-interface to the circuit and specifies how to format the inputs and
-outputs, so you don't have to read and write thousands of 0s and 1s.
-
-The file begins by defining the module and importing some required
-libraries.  Every Hydra file needs to import HDL.Hydra.Core.Lib.  In
-addition, a simulation driver like SimpleCircRun needs to import the
-circuit file, which should be in the same directory.
-
-#+BEGIN_EXAMPLE
--- SimpleCircdRun.hs:  simulation driver for SimpleCirc
--- This file is part of Hydra. John O'Donnell, 2021.  See Hydra/README
-
-module Main where
-import HDL.Hydra.Core.Lib
-import SimpleCirc
-#+END_EXAMPLE
-
-A simulation driver can define input data, although this is not
-required.  The data is given as a list of strings.  Each string
-corresponds to one clock cycle, and it gives the values of the inputs
-during that cycle.
-
-#+BEGIN_EXAMPLE
-testdata1 :: [String]
-testdata1=
-------------------------------
---   x   y     expected output
-------------------------------
-  [ "0  0"   --  0
-  , "0  1"   --  0
-  , "1  0"   --  0
-  , "1  1"   --  1
-  ]
-#+END_EXAMPLE
-
-The file defines a function =main= that will run the simulation.
-These two lines are boiler plate and every driver should contain them:
-
-#+BEGIN_EXAMPLE
-main :: IO ()
-main = driver $ do
-#+END_EXAMPLE
-
-If you want the simulation to use any test data (e.g. testdata1), the
-useData statement specifies which test data to use.  This command is
-optional; if you don't include it (or if you comment it out) the
-simulation will be interactive, and prompt you for the input values
-every clock cycle.  But if the useData statement is present, the
-simulation will run to completion without any intervention by the
-user.
-
-#+BEGIN_EXAMPLE
--- Input data
-  useData testdata1
-#+END_EXAMPLE
-
-Every driver is required to define an input port for every circuit
-input.  The convention is that in input signal named x has an input
-prt named in_x.  Each input port is created with a statement of the
-form portname <- inPortBit "signame".  If the inport is a word, rather
-than a bit, you would definit like this: in_w <- inPortWord "w" 8
-where 8 is the word size.
-
-There must be an input signal for each port.  These are defined using
-inbsig for bits, and inwsig for words.
-
-What is the difference between a port and a signal?  A signal is a
-wire, and it can be connected directly to a circuit.  A port is a data
-structure that contains the signal and also some addiitonal metadata
-required by the simulator.
-
-Notice that ports are defined using <- and signals are defined with
-the let keyword and =.
-
-#+BEGIN_EXAMPLE
--- Input ports
-  in_x <- inPortBit "x"
-  in_y <- inPortBit "y"
-
--- Input signals
-  let x = inbsig in_x
-  let y = inbsig in_y
-#+END_EXAMPLE
-
-The next piece of the driver is an equation that connects the input
-and output signals to the circuit.  This equation is given in a let
-statement
-
-#+BEGIN_EXAMPLE
--- Circuit
-  let z = simpleCirc x y
-#+END_EXAMPLE
-
-The simulator will print out the values of all the signals for each
-clock cycle.  You can either have the system do this automatically, or
-you can supply a detailed format that gives precise control over the
-output.
-
-The easiest approach is to ask for automatic output of all the
-signals.  To do this, you need to define an output port for each
-output signal.  This uses the outPortBit function, which takes the
-name of the signal "z" and the corresponding signal z.
-
-#+BEGIN_EXAMPLE
--- Output ports
-  out_z <- outPortBit "z" z
-#+END_EXAMPLE
-
-Alternatively, you can use the format statement which gives precise
-control over the formatting of the simulation output.  The format is a
-list of field specifiers.  The field specifier string "..." says that
-the literal string "..." should appear in the output.  The field
-specifier bit x says that x is a signal; its value should be printed
-in the output (it will be either 0 or 1).
-
-#+BEGIN_EXAMPLE
--- Formatted output
-  format [string "x=", bit x,
-          string "  y=", bit y,
-          string "   output = ", bit z,
-          string "\n"
-         ]
-#+END_EXAMPLE
-
-There are several format specifiers, that allow output of words using
-bit strings, decimal, hexadecimal, and both binary and two's
-complement.  See examples/SimDriver for examples of these specifiers.
-
-The final piece of the driver is the command runSimulation.  If you
-omit this, the simulation won't run and there won't be any output.
-
-#+BEGIN_EXAMPLE
-  runSimulation
-#+END_EXAMPLE
-
-** Running the circuit simulation
-
-To run a circuit you should cd to the directory that
-contains the circuit (Circuit.hs) and its simulation driver
-(CircuitRun.hs) files.
-
-One way to run the simulation is to use the ghc command, which will
-run the main program in CircuitRun as a single command:
-
-#+BEGIN_EXAMPLE
-ghc -e main CircuitRun
-#+END_EXAMPLE
-
-An alternative is to use the ghci command, which launches the
-interactive version of ghc.  This offers many useful debugging tools,
-but you need to give it several commands to run the simulation:
-
-#+BEGIN_EXAMPLE
-ghci
-:load CircuitRun
-:main
-#+END_EXAMPLE
-
-** Batch and interactive simulation
-
-You can run a circuit simulation in batch mode, which will run to
-completion with no intervention by the user.  Alternatively, you can
-run it interactively.  The choice between the modes is determined by
-just one line of code: the presence or absence of a useData statement.
-
-If you run a simulation in interactive mode, the system will prompt
-"hydra>" and wait for you to enter a command.  When it does so, just
-press Enter, which is the command to simulate one clock cycle.  It
-will then prompt you for the value of each signal; enter a decimal
-number.  When all the inputs have been provided, the driver will now
-print out all the signal values and prompt for a command again.  The
-help command will print a list of the available commands.
-
-You can try out both approaches with the SimpleCircRun driver.  It
-contains a useData, so it will run in batch mode.  But if you comment
-out the useData, the driver will revert to interactive mode.
-
-
 * Defining new circuits
 
 A new circuit can be designed by connecting together a number of
@@ -815,6 +613,7 @@ computation.  A circuit definition contains up to three parts:
 
   3. Internal signals (optional)
 
+** Interface: circuit defining equaiton
 ** Black boxes with internal signals
 
 Files: *adder/Add4.hs* and *examples/Add4Run.hs*
@@ -942,6 +741,304 @@ runReg1 input = runAllInput input output
        string " x = ", bit x,
        string "   Output = ", bit y]
 #+END_SRC
+
+
+* Modules and files
+
+We start with an example in the directory =examples/simple=,
+consisting of three files.  We will normally keep circuit definitions
+and their simulation drivers in separate files, although that isn't
+required.  For a circuit named =MyCirc.hs=, the naming convention is
+to call the driver =MyCircRun.hs=.
+
+- =SimpleCirc.hs= defines a circuit named =simpleCirc=, which takes
+  two input bits and outputs their logical /and/.  The circuit is just
+  an =and2= logic gate.
+
+** The circuit specification
+
+The circuit is defined in a module =SimpleCirc=, which is in the file
+named =SimpleCirc.hs=.
+
+#+BEGIN_EXAMPLE
+-- SimpleCirc: minimal example of a circuit specification
+-- This file is part of Hydra. See README and https://github.com/jtod/Hydra
+-- Copyright (c) 2022 John T. O'Donnell
+
+module SimpleCirc where
+import HDL.Hydra.Core.Lib
+
+-- Define a circuit "simpleCirc" which takes two input bits and
+-- outputs their logical conjunction, using an and2 logic gate.
+
+-- To run the circuit simulation, see SimpleCircRun and
+-- SimpleCircRunInteractive.
+
+simpleCirc :: Bit a => a -> a -> a   -- interface: two inputs, one output
+simpleCirc x y = and2 x y            -- circuit is just an and2 logic gate
+#+END_EXAMPLE
+
+A module begins with a =module= statement that gives its , followed by
+statements that import other modules.  All Hydra modules must contain
+=import HDL.Hydra.Core.Lib=, which defines, among other things, the
+=and2= logic gate.
+
+Following the imports, the module may contain any number of circuit
+definitions.  The definition of the circuit =simpleCirc= contains two lines
+of code: a /type declaration/ which contains the symbol =::= and a
+/defining equation/ which contains the symbol =.
+
+A type declaration specifies the name of the circuit and its
+interface.  The declaration /simpleCirc :: Bit a => a -> a -> a/ contains
+several parts:
+
+- The beginning  means "simpleCirc has type...".
+- Bit a    means the circuit uses Bit signals, and we will use the
+  name /a/ for the type of a bit signal
+- /a -> a -> a/ says the circuit takes an input of type /a/, a second
+  input also of type /a/, and it outputs a signal of type /a/
+- There may be any number of inputs, and each is followed by /->/.
+  This means that the number of inputs is the number of /->/ in the
+  type.
+- There must be exactly one output.  The last /a/ in the type is the
+  type of the output.  Later, we will see how to allow a circuit to
+  produce several outputs.
+
+The defining equation specifies local names for the circuit's inputs,
+and it gives a circuit that produces its output.  The defining
+equation for this circuit is =simpleCirc x y = and2 x y=.  This says
+- We will use the names =x= and =y= as local names for the inputs to
+  the circuit
+- There is an =and2= logic gate with inputs =x= and =y=
+- The output of that logic gate is the output of the circuit
+
+
+* Circuit simulation
+
+Running a circuit is necessary for testing, and observing its behavior
+also helps in understanding.  One way to run a circuit is to fabricate
+it in hardware, connect it to I/O devices, and observe its behavior.
+That takes a lot of time.  It's easier and faster to /simulate/ the
+circuit, which allows you to run it in software.
+
+This section shows how to simulate circuits using automated tools.
+These techniques are well suited for small circuits, such as registers
+and adders.  Section ??  introduces more powerful tools which are
+valuable for larger and more complex circuits, such as processors.
+
+We start with an example in the directory =examples/simple=,
+consisting of three files.  We will normally keep circuit definitions
+and their simulation drivers in separate files, although that isn't
+required.  For a circuit named =MyCirc.hs=, the naming convention is
+to call the driver =MyCircRun.hs=.
+
+- =SimpleCirc.hs= defines a circuit named =simpleCirc=, which takes
+  two input bits and outputs their logical /and/.  The circuit is just
+  an =and2= logic gate.
+  
+- =SimpleCircRun.hs= defines a simulation driver for the circuit.  The
+  file provides a main program named =main= which runs the simulation
+  on test data which is also defined in the file.
+
+- =SimpleCircRunInteractive.hs= is the same as =SimpleCircRun=, except
+  it runs interactively.  On each clock cycle it prompts the user to
+  enter the input values, and then displays the outputs.
+
+To run the simulation, go to =examples/simple= and enter this on the
+command line: =ghc -e main SimpleCircRun=.  The driver runs the
+circuit on all possible inputs: 00, 01, 10, 11.  Since the circuit is
+really just an =and2= gate, the output should be 0, 0, 0, 1.
+
+** The simulation driver
+
+To test the circuit, we can simulate it with some inputs.  This
+requires a /simulation driver/ which is defined in a separate module
+in the file SimpleCircRun.hs.  The simulation driver defines the
+interface to the circuit and specifies how to format the inputs and
+outputs, so you don't have to read and write thousands of 0s and 1s.
+
+The file begins by defining the module and importing some required
+libraries.  Every Hydra file needs to import HDL.Hydra.Core.Lib.  In
+addition, a simulation driver like SimpleCircRun needs to import the
+circuit file, which should be in the same directory.
+
+#+BEGIN_EXAMPLE
+-- SimpleCircRun:  simulation driver for SimpleCirc
+-- This file is part of Hydra. See README and https://github.com/jtod/Hydra
+-- Copyright (c) 2022 John T. O'Donnell
+
+-- Usage:  $ ghc -e main SimpleCircRun
+
+module Main where
+import HDL.Hydra.Core.Lib
+import SimpleCirc
+
+
+#+END_EXAMPLE
+
+A simulation driver can define input data, although this is not
+required.  The data is given as a list of strings.  Each string
+corresponds to one clock cycle, and it gives the values of the inputs
+during that cycle.
+
+#+BEGIN_EXAMPLE
+testdata1 :: [String]
+testdata1=
+------------------------------
+--   x   y     expected output
+------------------------------
+  [ "0  0"   --  0
+  , "0  1"   --  0
+  , "1  0"   --  0
+  , "1  1"   --  1
+  ]
+#+END_EXAMPLE
+
+The file defines a function =main= that will run the simulation.
+These two lines are boiler plate and every driver should contain them:
+
+#+BEGIN_EXAMPLE
+main :: IO ()
+main = driver $ do
+-- Input data
+  useData testdata1
+
+-- Inputs
+  x <- inputBit "x"
+  y <- inputBit "y"
+
+-- Circuit
+  let z = simpleCirc x y
+
+-- Output ports
+  outputBit "z" z
+
+-- Run
+  runSimulation
+#+END_EXAMPLE
+
+If you want the simulation to use any test data (e.g. testdata1), the
+useData statement specifies which test data to use.  This command is
+optional; if you don't include it (or if you comment it out) the
+simulation will be interactive, and prompt you for the input values
+every clock cycle.  But if the useData statement is present, the
+simulation will run to completion without any intervention by the
+user.
+
+#+BEGIN_EXAMPLE
+  useData testdata1
+#+END_EXAMPLE
+
+Every driver is required to define an input port for every circuit
+input.  The convention is that in input signal named x has an input
+prt named in_x.  Each input port is created with a statement of the
+form portname <- inPortBit "signame".  If the inport is a word, rather
+than a bit, you would definit like this: in_w <- inPortWord "w" 8
+where 8 is the word size.
+
+There must be an input signal for each port.  These are defined using
+inbsig for bits, and inwsig for words.
+
+What is the difference between a port and a signal?  A signal is a
+wire, and it can be connected directly to a circuit.  A port is a data
+structure that contains the signal and also some addiitonal metadata
+required by the simulator.
+
+Notice that ports are defined using <- and signals are defined with
+the let keyword and =.
+
+#+BEGIN_EXAMPLE
+#+END_EXAMPLE
+
+The next piece of the driver is an equation that connects the input
+and output signals to the circuit.  This equation is given in a let
+statement
+
+#+BEGIN_EXAMPLE
+#+END_EXAMPLE
+
+The simulator will print out the values of all the signals for each
+clock cycle.  You can either have the system do this automatically, or
+you can supply a detailed format that gives precise control over the
+output.
+
+The easiest approach is to ask for automatic output of all the
+signals.  To do this, you need to define an output port for each
+output signal.  This uses the outPortBit function, which takes the
+name of the signal "z" and the corresponding signal z.
+
+#+BEGIN_EXAMPLE
+#+END_EXAMPLE
+
+
+The final piece of the driver is the command runSimulation.  If you
+omit this, the simulation won't run and there won't be any output.
+
+#+BEGIN_EXAMPLE
+  runSimulation
+#+END_EXAMPLE
+
+Alternatively, you can use the format statement which gives precise
+control over the formatting of the simulation output.  The format is a
+list of field specifiers.  The field specifier string "..." says that
+the literal string "..." should appear in the output.  The field
+specifier bit x says that x is a signal; its value should be printed
+in the output (it will be either 0 or 1).
+
+#+BEGIN_EXAMPLE
+-- Formatted output
+  format [string "x=", bit x,
+          string "  y=", bit y,
+          string "   output = ", bit z,
+          string "\n"
+         ]
+#+END_EXAMPLE
+
+There are several format specifiers, that allow output of words using
+bit strings, decimal, hexadecimal, and both binary and two's
+complement.  See examples/SimDriver for examples of these specifiers.
+
+** Running the circuit simulation
+
+To run a circuit you should cd to the directory that
+contains the circuit (Circuit.hs) and its simulation driver
+(CircuitRun.hs) files.
+
+One way to run the simulation is to use the ghc command, which will
+run the main program in CircuitRun as a single command:
+
+#+BEGIN_EXAMPLE
+ghc -e main CircuitRun
+#+END_EXAMPLE
+
+An alternative is to use the ghci command, which launches the
+interactive version of ghc.  This offers many useful debugging tools,
+but you need to give it several commands to run the simulation:
+
+#+BEGIN_EXAMPLE
+ghci
+:load CircuitRun
+:main
+#+END_EXAMPLE
+
+** Batch and interactive simulation
+
+You can run a circuit simulation in batch mode, which will run to
+completion with no intervention by the user.  Alternatively, you can
+run it interactively.  The choice between the modes is determined by
+just one line of code: the presence or absence of a useData statement.
+
+If you run a simulation in interactive mode, the system will prompt
+"hydra>" and wait for you to enter a command.  When it does so, just
+press Enter, which is the command to simulate one clock cycle.  It
+will then prompt you for the value of each signal; enter a decimal
+number.  When all the inputs have been provided, the driver will now
+print out all the signal values and prompt for a command again.  The
+help command will print a list of the available commands.
+
+You can try out both approaches with the SimpleCircRun driver.  It
+contains a useData, so it will run in batch mode.  But if you comment
+out the useData, the driver will revert to interactive mode.
 
 
 * Syntax
