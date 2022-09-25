@@ -57,10 +57,11 @@ Hydra requires the ghc toolset for Haskell, including ghc and cabal.
 Haskell installers for Macintosh, Windows, and Linux are available at
 [[https://www.haskell.org/ghcup/]].
 
-For Windows, an alternative approach is to use chocolatey; see
-[[https://hub.zhox.com/posts/introducing-haskell-dev/]].  If you have
-chocolatey installed, you can use it to install Haskell easily.  Run
-these commands in Windows PowerShell with administrator privileges:
+For Windows, an alternative way to install Haskell is to use
+chocolatey; see [[https://hub.zhox.com/posts/introducing-haskell-dev/]].
+If you have chocolatey installed, you can use it to install Haskell
+easily.  Run these commands in Windows PowerShell with administrator
+privileges:
 
 #+BEGIN_EXAMPLE
 choco install ghc --force -y
