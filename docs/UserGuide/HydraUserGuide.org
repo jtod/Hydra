@@ -149,11 +149,9 @@ cd examples/simple
 ghc -e main SimpleCircRun
 #+END_EXAMPLE
 
-
 * README
 
 #+INCLUDE: "../../README.org"
-
 
 * Connecting components with signals
 
@@ -196,6 +194,33 @@ The simplest logic gate is the inverter, which takes one input and
 produces one output.  The inverter outputs 0 if its input is 1, and
 outputs 1 if its input is 0.  The name of the inverter is =inv=.
 
+| Gate          | Description       |
+|---------------+-------------------|
+| buf a         | buffer            |
+| inv a         | inverter          |
+| and2 a b      | 2-input and gate  |
+| and3 a b c    | 3-input and gate  |
+| and4 a b c d  | 4-input and gate  |
+| or2 a b       | 2-input or gate   |
+| or3 a b c     | 3-input or gate   |
+| or4 a b c d   | 4-input or gate   |
+| xor2 a b      | 2-input xor gate  |
+| xor3 a b c    | 3-input xor gate  |
+| xor4 a b c d  | 4-input xor gate  |
+| nand2 a b     | 2-input nand gate |
+| nand3 a b c   | 3-input nand gate |
+| nand4 a b c d | 4-input nand gate |
+| nor2 a b      | 2-input nor gate  |
+| nor3 a b c    | 3-input nor gate  |
+| nor4 a b c d  | 4-input nor gate  |
+| xnor2 a b     | 2-input xnor gate |
+| xnor3 a b c   | 3-input xnor gate |
+| xnor4 a b c d | 4-input xnor gate |
+ 
+The buffer produces an output that is the same as the input; it is the
+identify function.  The inverter outputs 0 if its input is 1, and
+outputs 1 if its input is 0.
+
 Many of the logical operations can be performed on any number of
 inputs.  For example, there is the logical conjunction (=and=) of two,
 three, or four inputs.  These correspond to distinct logic gates: the
@@ -203,8 +228,14 @@ three, or four inputs.  These correspond to distinct logic gates: the
 inputs to it.  Therefore Hydra doesn't have an =and= gate; it has
 distinct =and2=, =and3=, =and4= gates.  This doesn't go on
 indefinitely; Hydra does not define the =and5= gate or the =and73=
-gate!  A convenient way to =and= together large number of inputs is
 to use =andw=.
+
+Most of these logic gates are provided for convenience; only a few of
+them are necessary.  For example, you can replace =and3 a b c= by
+=and2 a (and2 b c)=.  However, logic gates with several inputs can be
+fabricated on chips, they are slightly more efficient, and most
+importantly, it's more readable to use =and3= rather than two =and2=
+gates.
 
 ** Connecting a circuit to inputs
 
@@ -297,11 +328,13 @@ consistent with each other.  To do this,
   (function) in the text
 - Check that each wire in the diagram corresponds to a signal in the
   text.
-  - The wire should be connected to exactly one component output,
-    which places a logic value on the wire.
-  - The wire may be connected to one or more component inputs.
+- The wire should be connected to exactly one component output, which
+  places a logic value on the wire.
+- The wire may be connected to one or more component inputs.
 
 ** Defining equation names a signal
+
+** A defining equation names a signal
 
 Sometimes it's useful to give a name to a signal, rather than using it
 anonymously.  A named signal can be used as an input to several
@@ -351,7 +384,7 @@ inv c = d      -- Error, need a name (not application) on left
 Later we will see a technique called /equational reasoning/, which is
 useful for analysing circuits.  This uses equations with a more
 general form.  But to give a name to a signal, you need to use a
-defining equation, where the left hand side is always a signal name.
+/defining equation/, where the left hand side is always a signal name.
 
 It's a good idea to write the equations in an order that makes the
 circuit more readable.  If most of the signals are defined before they
@@ -398,7 +431,6 @@ To design a new circuit, you need to take a set of existing circuits
 and connect them with signals.  A logic gate is a primitive
 combinational component (combinational means that the output depends
 on the current values of the inputs).  Some of the most commonly used
-
 
 There are several libraries of
 existing circuits that you can start with, and you can also define
@@ -490,13 +522,25 @@ most important building blocks for larger systems.  There are many
 varieties of multiplexer; here we look at the 1-bit multiplexer,
 called =mux1=.
 
+** Example: multiplexer
+
+The /multiplexer/ is an example of a circuit that can be defined by
+conecting several logic gates together. The multiplexer is one of the
+most important building blocks for larger systems.  There are many
+varieties of multiplexer; here we look at the 1-bit multiplexer,
+called =mux1=.
+
+Files:
+- =examples/mux/Mux1.hs=
+- =examples/mux/Mux1Run.hs=
+
 A multiplexer is a hardware version of the if-then-else expression,
 and is used to perform conditional actions in a circuit.  It takes
 three inputs: a control input =c=, and two data inputs =x= and =y=.
 
 The idea is that the multiplexer will choose one of the data inputs --
-either =x= or =y= -- and output it.  The data input that is not chosen
-is simply ignored.  The choice is determined by the value of =c=.
+either =x= or =y= -- and output it.  The data input that is not chosen is
+simply ignored.  The choice is determined by the value of =c=.
 
 The behavior of the multiplexer can be described informally using an
 if--then--else expression.  This is just an English description, not a
@@ -617,6 +661,48 @@ line up in columns, and to include the expected outputs in comments.
 
 See examples/mux/Mux1Run.hs')
 
+** Producing several outputs: halfAdd
+
+The circuits we have looked at so far have just one output.  We need a
+way to allow circuits to produce any number of outputs.
+
+Files: *examples/adder/HalfAdd.hs* and *examples/adder/HalfAddRun.hs*
+
+A half adder circuit takes two inputs *x* and *y*, and produces a pair
+of outputs, the carry output and the sum output.  The carry is the
+logical *and* of *x* and *y*, while the sum is their exclusive *or*.
+Here is the circuit specification (file *HalfAdd.hs*):
+
+The module statement gives a name to this module, and the import
+statement brings in the essential Hydra library definitions.  The
+circuit definition is a one-line equation which says *halfAdd* is a
+circuit, gives names *x* and *y* to its inputs, and calculates the
+outputs using *and2* and *xor2* logic gates.
+
+To see the circuit working, we can simulate it.  This requires
+three things, all provided in *HalfAddRun.hs*:
+
+  * Suitable test data, expressed as a list of *[x,y]* inputs
+
+  * A [Simulation driver](#simulation-drivers), which converts between
+    human readable input and output and the internal signal
+    representations.  The simulation driver is not part of the
+    circuit; it's simply formatting inputs and outputs.
+
+  * A main program that runs the simulation driver on the test data.
+
+See `examples/adder/HalfAddRun.hs'
+
+Run the simulation using any of the methods given above, e.g. enter
+*ghc -e main HalfAddRun*.  Here is the result:
+
+#+BEGIN_EXAMPLE
+$ ghc -e main HalfAddRun
+Input: x = 0 y = 0  Output: c = 0 s = 0
+Input: x = 0 y = 1  Output: c = 0 s = 1
+Input: x = 1 y = 0  Output: c = 0 s = 1
+Input: x = 1 y = 1  Output: c = 1 s = 0
+#+END_EXAMPLE
 
 * Defining new circuits
 
@@ -635,6 +721,7 @@ computation.  A circuit definition contains up to three parts:
   3. Internal signals (optional)
 
 ** Circuit defining equation
+
 ** Black boxes with internal signals
 
 Files: *adder/Add4.hs* and *examples/Add4Run.hs*
@@ -831,7 +918,6 @@ equation for this circuit is =simpleCirc x y = and2 x y=.  This says
 - The output of that logic gate is the output of the circuit
 
 ** Modules and files
-
 
 * Circuit simulation
 
