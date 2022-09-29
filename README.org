@@ -104,18 +104,20 @@ See the Releases section on the right side of the page and click on
 the latest release.  Download the source code file (in the Assets
 section), which is available in both =zip= and =.tar.gz= format.  The
 installation file is Hydra-i.j.k.zip (or .tgz), where i.j.k is the
-version number.  Put the file somewhere in your user workspace and
-unpack it, using the correct version number for your download:
+version number (for example, Hydra-3.5.1.zip).  Put the file somewhere
+in your user workspace and unpack it, using the correct version
+number:
 
 - On Linux: tar -xzf Hydra-3.5.1.tar.gz
 - On Windows use zip, 7zip or tar
 
-This will create a directory named Hydra that contains documentation
-(=docs= directory and =examples= directory), the source code (=src=
-directory), and build tools.  Install using these commands:
+This will create a directory named Hydra-3.5.1 that contains
+documentation (=docs= directory and =examples= directory), the source
+code (=src= directory), and build tools.  Install using these commands
+(but use the right version number for Hydra):
 
 #+BEGIN_EXAMPLE
-cd Hydra
+cd Hydra-3.5.1
 cabal install --lib
 cabal haddock
 #+END_EXAMPLE
