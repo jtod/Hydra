@@ -26,7 +26,7 @@ description: Hydra is a functional computer hardware description
              examples.
 
 extra-doc-files: docs/UserGuide/HydraUserGuide.html,
-                 docs/doc.css
+                 docs/UserGuide/ugstyle.css
              
 source-repository head
   type:     git
