@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2022-09-29 Thu 13:58 -->
+<!-- 2022-09-29 Thu 14:23 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>&lrm;</title>
@@ -221,9 +221,9 @@
 <div id="content">
 <h1>Hydra README</h1>
 
-<div id="outline-container-org39e62ae" class="outline-2">
-<h2 id="org39e62ae">About Hydra</h2>
-<div class="outline-text-2" id="text-org39e62ae">
+<div id="outline-container-orgd70353a" class="outline-2">
+<h2 id="orgd70353a">About Hydra</h2>
+<div class="outline-text-2" id="text-orgd70353a">
 version: 3.5.1
 Copyright (c) 2022 John T. O'Donnell
 
@@ -271,18 +271,18 @@ GPL-3 license.  See LICENSE.txt.</li>
 </div>
 </div>
 
-<div id="outline-container-org9262be2" class="outline-2">
-<h2 id="org9262be2">Installation</h2>
-<div class="outline-text-2" id="text-org9262be2">
+<div id="outline-container-org7141dad" class="outline-2">
+<h2 id="org7141dad">Installation</h2>
+<div class="outline-text-2" id="text-org7141dad">
 <p>
 Hydra runs in a shell using a command line interface.  Any shell can
 be used; the examples use the bash shell.
 </p>
 </div>
 
-<div id="outline-container-org68ce4a4" class="outline-3">
-<h3 id="org68ce4a4">Haskell</h3>
-<div class="outline-text-3" id="text-org68ce4a4">
+<div id="outline-container-org6a81e10" class="outline-3">
+<h3 id="org6a81e10">Haskell</h3>
+<div class="outline-text-3" id="text-org6a81e10">
 <p>
 Hydra requires the ghc toolset for Haskell, including ghc and cabal.
 Haskell installers for Macintosh, Windows, and Linux are available at
@@ -297,7 +297,7 @@ easily.  Run these commands in Windows PowerShell with administrator
 privileges:
 </p>
 
-<pre class="example" id="org1d4127c">
+<pre class="example" id="org9403b79">
 choco install ghc --force -y
 choco install cabal --force -y
 </pre>
@@ -314,7 +314,7 @@ installing after a failed installation attempt.</li>
 <i>Verify that Haskell is working</i>
 </p>
 
-<pre class="example" id="org5e355cb">
+<pre class="example" id="orgc3b8aa4">
 $ ghc --version
 The Glorious Glasgow Haskell Compilation System, version 9.2.3
 $ cabal --version
@@ -331,15 +331,15 @@ If you have a previous installation of ghc, and a new installation
 fails, the following might work:
 </p>
 
-<pre class="example" id="orgc6e339d">
+<pre class="example" id="org11cfa81">
 choco upgrade ghc cabal -y
 </pre>
 </div>
 </div>
 
-<div id="outline-container-org54ebdef" class="outline-3">
-<h3 id="org54ebdef">Hydra</h3>
-<div class="outline-text-3" id="text-org54ebdef">
+<div id="outline-container-org74f9e43" class="outline-3">
+<h3 id="org74f9e43">Hydra</h3>
+<div class="outline-text-3" id="text-org74f9e43">
 <p>
 The Hydra source code is available at <a href="https://github.com/jtod/Hydra">https://github.com/jtod/Hydra</a>.
 See the Releases section on the right side of the page and click on
@@ -362,7 +362,7 @@ directory), and build tools.  Install using these commands (using the
 right version number for Hydra):
 </p>
 
-<pre class="example" id="org0bf798e">
+<pre class="example" id="org94c0591">
 cd Hydra-3.5.1
 cabal install --lib
 cabal haddock
@@ -377,7 +377,7 @@ The following commands should simulate a 4-bit word adder for several
 clock cycles, with different inputs during each cycle.
 </p>
 
-<pre class="example" id="org058d06a">
+<pre class="example" id="org339f747">
 $ cd examples/adder
 $ ghc -e main Add4Run
 </pre>
@@ -401,14 +401,14 @@ username and the right version numbers):
 <p>
 Linux:
 </p>
-<pre class="example" id="org84e856a">
+<pre class="example" id="orgf220677">
 ~/.ghc/x86_64-linux-8.8.3/environments/default 
 </pre>
 
 <p>
 Windows:
 </p>
-<pre class="example" id="org5387952">
+<pre class="example" id="org702bcf9">
 C:/Users/username/AppData/Roaming/ghc/x86_64-mingw32-9.2.3/environments/default
 </pre>
 
@@ -417,7 +417,7 @@ Open this file in a text editor and find the line containing an entry
 for hydra, which should look something like this:
 </p>
 
-<pre class="example" id="org181b6ba">
+<pre class="example" id="orge360626">
 package-id hydra-3.4.5-VeryLongHashKey
 </pre>
 
@@ -436,7 +436,7 @@ Add4Run is the name of a simulation driver), an alternative is to use
 the interactive Haskell interpreter:
 </p>
 
-<pre class="example" id="orge3fb5ab">
+<pre class="example" id="org4a01183">
 $ ghci
 ghci&gt; :load Add4Run
 ghci&gt; :main
@@ -452,7 +452,7 @@ See the GHC User Guide for details.
 If you get a message saying that there are "hidden packages", copy the
 following into a file named <code>.ghci</code>
 </p>
-<pre class="example" id="org328f435">
+<pre class="example" id="org5098b47">
 :set -package mtl
 :set -package parsec
 :set -package ansi-terminal
@@ -476,7 +476,7 @@ arguments on the <code>cabal run</code> command, which you cannot do with the
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="date">Created: 2022-09-29 Thu 13:58</p>
+<p class="date">Created: 2022-09-29 Thu 14:23</p>
 <p class="validation"><a href="https://validator.w3.org/check?uri=referer">Validate</a></p>
 </div>
 </body>
