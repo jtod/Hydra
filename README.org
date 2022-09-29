@@ -110,13 +110,12 @@ unpack it, using the correct version number for your download:
 - On Linux: tar -xzf Hydra-3.5.1.tar.gz
 - On Windows use zip, 7zip or tar
 
-This will create a directory that contains documentation (=docs=
-directory and =examples= directory), the source code (=src=
-directory), and build tools.  Install using these commands (using the
-right version number for Hydra):
+This will create a directory named Hydra that contains documentation
+(=docs= directory and =examples= directory), the source code (=src=
+directory), and build tools.  Install using these commands:
 
 #+BEGIN_EXAMPLE
-cd Hydra-3.5.1
+cd Hydra
 cabal install --lib
 cabal haddock
 #+END_EXAMPLE
