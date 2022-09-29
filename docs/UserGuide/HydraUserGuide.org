@@ -149,9 +149,11 @@ cd examples/simple
 ghc -e main SimpleCircRun
 #+END_EXAMPLE
 
+
 * README
 
 #+INCLUDE: "../../README.org"
+
 
 * Connecting components with signals
 
@@ -164,8 +166,8 @@ signals rather than wires.
 
 The information carried by a signal may be represented as an
 individual bit or a cluster comprising several bits.  We can also
-describe circuits at a higher level, where signals represent integers
-or other data types.
+describe circuits at a higher level, where signals represent natural
+numbers, integers, or other data types.
 
 A bit (binary digit) can have one of two distinct values.  Several
 names are commonly used for these values, including 0/1, Low/High,
@@ -333,8 +335,6 @@ consistent with each other.  To do this,
 - The wire may be connected to one or more component inputs.
 
 ** Defining equation names a signal
-
-** A defining equation names a signal
 
 Sometimes it's useful to give a name to a signal, rather than using it
 anonymously.  A named signal can be used as an input to several
@@ -522,14 +522,6 @@ most important building blocks for larger systems.  There are many
 varieties of multiplexer; here we look at the 1-bit multiplexer,
 called =mux1=.
 
-** Example: multiplexer
-
-The /multiplexer/ is an example of a circuit that can be defined by
-conecting several logic gates together. The multiplexer is one of the
-most important building blocks for larger systems.  There are many
-varieties of multiplexer; here we look at the 1-bit multiplexer,
-called =mux1=.
-
 Files:
 - =examples/mux/Mux1.hs=
 - =examples/mux/Mux1Run.hs=
@@ -661,48 +653,6 @@ line up in columns, and to include the expected outputs in comments.
 
 See examples/mux/Mux1Run.hs')
 
-** Producing several outputs: halfAdd
-
-The circuits we have looked at so far have just one output.  We need a
-way to allow circuits to produce any number of outputs.
-
-Files: *examples/adder/HalfAdd.hs* and *examples/adder/HalfAddRun.hs*
-
-A half adder circuit takes two inputs *x* and *y*, and produces a pair
-of outputs, the carry output and the sum output.  The carry is the
-logical *and* of *x* and *y*, while the sum is their exclusive *or*.
-Here is the circuit specification (file *HalfAdd.hs*):
-
-The module statement gives a name to this module, and the import
-statement brings in the essential Hydra library definitions.  The
-circuit definition is a one-line equation which says *halfAdd* is a
-circuit, gives names *x* and *y* to its inputs, and calculates the
-outputs using *and2* and *xor2* logic gates.
-
-To see the circuit working, we can simulate it.  This requires
-three things, all provided in *HalfAddRun.hs*:
-
-  * Suitable test data, expressed as a list of *[x,y]* inputs
-
-  * A [Simulation driver](#simulation-drivers), which converts between
-    human readable input and output and the internal signal
-    representations.  The simulation driver is not part of the
-    circuit; it's simply formatting inputs and outputs.
-
-  * A main program that runs the simulation driver on the test data.
-
-See `examples/adder/HalfAddRun.hs'
-
-Run the simulation using any of the methods given above, e.g. enter
-*ghc -e main HalfAddRun*.  Here is the result:
-
-#+BEGIN_EXAMPLE
-$ ghc -e main HalfAddRun
-Input: x = 0 y = 0  Output: c = 0 s = 0
-Input: x = 0 y = 1  Output: c = 0 s = 1
-Input: x = 1 y = 0  Output: c = 0 s = 1
-Input: x = 1 y = 1  Output: c = 1 s = 0
-#+END_EXAMPLE
 
 * Defining new circuits
 
@@ -918,6 +868,7 @@ equation for this circuit is =simpleCirc x y = and2 x y=.  This says
 - The output of that logic gate is the output of the circuit
 
 ** Modules and files
+
 
 * Circuit simulation
 

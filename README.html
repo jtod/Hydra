@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2022-09-26 Mon 12:32 -->
+<!-- 2022-09-29 Thu 13:58 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>&lrm;</title>
@@ -221,10 +221,10 @@
 <div id="content">
 <h1>Hydra README</h1>
 
-<div id="outline-container-orgc7d3c24" class="outline-2">
-<h2 id="orgc7d3c24">About Hydra</h2>
-<div class="outline-text-2" id="text-orgc7d3c24">
-version: 3.5.0
+<div id="outline-container-org39e62ae" class="outline-2">
+<h2 id="org39e62ae">About Hydra</h2>
+<div class="outline-text-2" id="text-org39e62ae">
+version: 3.5.1
 Copyright (c) 2022 John T. O'Donnell
 
 <p>
@@ -238,8 +238,12 @@ language implemented using Haskell.
 </p>
 
 <ul class="org-ul">
-<li>The <i>User Guide</i> explains how to use the language; it is available
-in <a href="./docs/UserGuide/HydraUserGuide.html">./docs/UserGuide/HydraUserGuide.html</a></li>
+<li>The <i>User Guide</i> is available online at
+<a href="https://jtod.github.io/home/Hydra/UserGuide/HydraUserGuide.html">https://jtod.github.io/home/Hydra/UserGuide/HydraUserGuide.html</a>.
+The Guide is in development, and this online link may give a newer
+version than the one in the installation directory.</li>
+<li>The User Guide is also available in the installation directory
+<a href="./docs/UserGuide/HydraUserGuide.html">./docs/UserGuide/HydraUserGuide.html</a></li>
 <li>The <i>API reference</i> gives types of the exported definitions.  If you
 build using cabal, it will be in the the <code>dist-newstyle</code> directory.
 The path depends on software versions, but may be something like
@@ -267,18 +271,18 @@ GPL-3 license.  See LICENSE.txt.</li>
 </div>
 </div>
 
-<div id="outline-container-orga9fca7f" class="outline-2">
-<h2 id="orga9fca7f">Installation</h2>
-<div class="outline-text-2" id="text-orga9fca7f">
+<div id="outline-container-org9262be2" class="outline-2">
+<h2 id="org9262be2">Installation</h2>
+<div class="outline-text-2" id="text-org9262be2">
 <p>
 Hydra runs in a shell using a command line interface.  Any shell can
 be used; the examples use the bash shell.
 </p>
 </div>
 
-<div id="outline-container-org4537b9f" class="outline-3">
-<h3 id="org4537b9f">Haskell</h3>
-<div class="outline-text-3" id="text-org4537b9f">
+<div id="outline-container-org68ce4a4" class="outline-3">
+<h3 id="org68ce4a4">Haskell</h3>
+<div class="outline-text-3" id="text-org68ce4a4">
 <p>
 Hydra requires the ghc toolset for Haskell, including ghc and cabal.
 Haskell installers for Macintosh, Windows, and Linux are available at
@@ -293,7 +297,7 @@ easily.  Run these commands in Windows PowerShell with administrator
 privileges:
 </p>
 
-<pre class="example" id="org3195ee1">
+<pre class="example" id="org1d4127c">
 choco install ghc --force -y
 choco install cabal --force -y
 </pre>
@@ -310,7 +314,7 @@ installing after a failed installation attempt.</li>
 <i>Verify that Haskell is working</i>
 </p>
 
-<pre class="example" id="org2155041">
+<pre class="example" id="org5e355cb">
 $ ghc --version
 The Glorious Glasgow Haskell Compilation System, version 9.2.3
 $ cabal --version
@@ -327,15 +331,15 @@ If you have a previous installation of ghc, and a new installation
 fails, the following might work:
 </p>
 
-<pre class="example" id="org2eee5ed">
+<pre class="example" id="orgc6e339d">
 choco upgrade ghc cabal -y
 </pre>
 </div>
 </div>
 
-<div id="outline-container-org66c46cf" class="outline-3">
-<h3 id="org66c46cf">Hydra</h3>
-<div class="outline-text-3" id="text-org66c46cf">
+<div id="outline-container-org54ebdef" class="outline-3">
+<h3 id="org54ebdef">Hydra</h3>
+<div class="outline-text-3" id="text-org54ebdef">
 <p>
 The Hydra source code is available at <a href="https://github.com/jtod/Hydra">https://github.com/jtod/Hydra</a>.
 See the Releases section on the right side of the page and click on
@@ -358,7 +362,7 @@ directory), and build tools.  Install using these commands (using the
 right version number for Hydra):
 </p>
 
-<pre class="example" id="orga31600f">
+<pre class="example" id="org0bf798e">
 cd Hydra-3.5.1
 cabal install --lib
 cabal haddock
@@ -373,7 +377,7 @@ The following commands should simulate a 4-bit word adder for several
 clock cycles, with different inputs during each cycle.
 </p>
 
-<pre class="example" id="orgf942d63">
+<pre class="example" id="org058d06a">
 $ cd examples/adder
 $ ghc -e main Add4Run
 </pre>
@@ -397,14 +401,14 @@ username and the right version numbers):
 <p>
 Linux:
 </p>
-<pre class="example" id="orgd5925de">
+<pre class="example" id="org84e856a">
 ~/.ghc/x86_64-linux-8.8.3/environments/default 
 </pre>
 
 <p>
 Windows:
 </p>
-<pre class="example" id="org4c33c9c">
+<pre class="example" id="org5387952">
 C:/Users/username/AppData/Roaming/ghc/x86_64-mingw32-9.2.3/environments/default
 </pre>
 
@@ -413,7 +417,7 @@ Open this file in a text editor and find the line containing an entry
 for hydra, which should look something like this:
 </p>
 
-<pre class="example" id="orgf68df2b">
+<pre class="example" id="org181b6ba">
 package-id hydra-3.4.5-VeryLongHashKey
 </pre>
 
@@ -432,7 +436,7 @@ Add4Run is the name of a simulation driver), an alternative is to use
 the interactive Haskell interpreter:
 </p>
 
-<pre class="example" id="orgf438fff">
+<pre class="example" id="orge3fb5ab">
 $ ghci
 ghci&gt; :load Add4Run
 ghci&gt; :main
@@ -448,7 +452,7 @@ See the GHC User Guide for details.
 If you get a message saying that there are "hidden packages", copy the
 following into a file named <code>.ghci</code>
 </p>
-<pre class="example" id="org5011bdb">
+<pre class="example" id="org328f435">
 :set -package mtl
 :set -package parsec
 :set -package ansi-terminal
@@ -472,7 +476,7 @@ arguments on the <code>cabal run</code> command, which you cannot do with the
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="date">Created: 2022-09-26 Mon 12:32</p>
+<p class="date">Created: 2022-09-29 Thu 13:58</p>
 <p class="validation"><a href="https://validator.w3.org/check?uri=referer">Validate</a></p>
 </div>
 </body>

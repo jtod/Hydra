@@ -5,7 +5,7 @@
 #+HTML_HEAD: <link rel="stylesheet" type="text/css" href="./docs/doc.css" />
 #+OPTIONS: toc:nil
 #+OPTIONS: num:nil
-
+ 
 #+BEGIN_EXPORT html
 <h1>Hydra README</h1>
 #+END_EXPORT
@@ -24,8 +24,12 @@ for simulating circuits, generating netlists, and emulating
 instruction set architectures. It is an embedded domain specific
 language implemented using Haskell.
 
-- The /User Guide/ explains how to use the language; it is available
-  in [[./docs/UserGuide/HydraUserGuide.html]]
+- The /User Guide/ is available online at
+  [[https://jtod.github.io/home/Hydra/UserGuide/HydraUserGuide.html]].
+  The Guide is in development, and this online link may give a newer
+  version than the one in the installation directory.
+- The User Guide is also available in the installation directory
+  [[./docs/UserGuide/HydraUserGuide.html]]
 - The /API reference/ gives types of the exported definitions.  If you
   build using cabal, it will be in the the =dist-newstyle= directory.
   The path depends on software versions, but may be something like
