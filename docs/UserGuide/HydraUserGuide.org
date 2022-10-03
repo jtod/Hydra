@@ -187,57 +187,22 @@ thousands of F and T characters -- they can be hard to tell apart!.
 
 ** Components
 
-The simplest circuits are primitive components.  There are two kinds:
-combinational components (called logic gates) and sequential
-components (called latches or flip flops).  Every circuit is either a
-primitive component, or a number of circuits connected by wires.
+To design a new circuit, you need to take a set of existing circuits
+and connect them with signals.  The simplest circuits are primitive
+components.  Every circuit is either a primitive component, or a
+number of circuits connected by wires.
 
-The simplest logic gate is the inverter, which takes one input and
-produces one output.  The inverter outputs 0 if its input is 1, and
-outputs 1 if its input is 0.  The name of the inverter is =inv=.
+There are two kinds of primitive: combinational components (called
+logic gates) and sequential components (called latches or flip flops).
+Here are a few of the most commonly used logic gates:
 
-| Gate          | Description       |
-|---------------+-------------------|
-| buf a         | buffer            |
-| inv a         | inverter          |
-| and2 a b      | 2-input and gate  |
-| and3 a b c    | 3-input and gate  |
-| and4 a b c d  | 4-input and gate  |
-| or2 a b       | 2-input or gate   |
-| or3 a b c     | 3-input or gate   |
-| or4 a b c d   | 4-input or gate   |
-| xor2 a b      | 2-input xor gate  |
-| xor3 a b c    | 3-input xor gate  |
-| xor4 a b c d  | 4-input xor gate  |
-| nand2 a b     | 2-input nand gate |
-| nand3 a b c   | 3-input nand gate |
-| nand4 a b c d | 4-input nand gate |
-| nor2 a b      | 2-input nor gate  |
-| nor3 a b c    | 3-input nor gate  |
-| nor4 a b c d  | 4-input nor gate  |
-| xnor2 a b     | 2-input xnor gate |
-| xnor3 a b c   | 3-input xnor gate |
-| xnor4 a b c d | 4-input xnor gate |
- 
-The buffer produces an output that is the same as the input; it is the
-identify function.  The inverter outputs 0 if its input is 1, and
-outputs 1 if its input is 0.
-
-Many of the logical operations can be performed on any number of
-inputs.  For example, there is the logical conjunction (=and=) of two,
-three, or four inputs.  These correspond to distinct logic gates: the
-=and2= gate has two input ports and there is no way to connect three
-inputs to it.  Therefore Hydra doesn't have an =and= gate; it has
-distinct =and2=, =and3=, =and4= gates.  This doesn't go on
-indefinitely; Hydra does not define the =and5= gate or the =and73=
-to use =andw=.
-
-Most of these logic gates are provided for convenience; only a few of
-them are necessary.  For example, you can replace =and3 a b c= by
-=and2 a (and2 b c)=.  However, logic gates with several inputs can be
-fabricated on chips, they are slightly more efficient, and most
-importantly, it's more readable to use =and3= rather than two =and2=
-gates.
+- The simplest logic gate is the inverter, which takes one input and
+  produces one output.  The inverter outputs 0 if its input is 1, and
+  outputs 1 if its input is 0.  The name of the inverter is =inv=.
+- The =and2= gate takes two inputs and outputs 1 if both inputs are 1;
+  otherwise it outputs 0.
+- The =or2= gate takes two inputs and outputs 1 if either (or both)
+  input is 1; it outputs 0 if all inputs are 0.
 
 ** Connecting a circuit to inputs
 
@@ -293,8 +258,8 @@ course is a named signal.  The following notation would be wrong:
 and2 inv x y   -- Wrong!
 #+END_EXAMPLE
 
-This says that the =and2= gate is being given three inputs, and the
-first input (=inv=) isn't even a signal.
+This wrong expression says that the =and2= gate is being given three
+inputs, and the first input (=inv=) isn't even a signal.
 
 Parentheses are used for grouping, just as in mathematics.  You don't
 need to use parentheses just to specify the arguments to a function
@@ -310,13 +275,72 @@ nand3 (x, and2 (p,q), z);   -- Wrong!
 
 In Hydra (as in Haskell) you don't need the extra parentheses and
 commas, and they will lead to error messages.  Use parentheses only
-when they are necessary to get the right grouping:
+when they are necessary to get the right grouping.  Here is the
+correct notation:
 
 #+BEGIN_EXAMPLE
 inv x
 and2 a b
 nand3 x (and2 p q) z
 #+END_EXAMPLE
+
+** Standard logic gates and flip flops
+
+The following table lists all of the standard logic gates.  Each gate
+is shown applied to input signals named =a=, =b=, etc.
+
+| Gate          | Description       |
+|---------------+-------------------|
+| buf a         | buffer            |
+| inv a         | inverter          |
+| and2 a b      | 2-input and gate  |
+| and3 a b c    | 3-input and gate  |
+| and4 a b c d  | 4-input and gate  |
+| or2 a b       | 2-input or gate   |
+| or3 a b c     | 3-input or gate   |
+| or4 a b c d   | 4-input or gate   |
+| xor2 a b      | 2-input xor gate  |
+| xor3 a b c    | 3-input xor gate  |
+| xor4 a b c d  | 4-input xor gate  |
+| nand2 a b     | 2-input nand gate |
+| nand3 a b c   | 3-input nand gate |
+| nand4 a b c d | 4-input nand gate |
+| nor2 a b      | 2-input nor gate  |
+| nor3 a b c    | 3-input nor gate  |
+| nor4 a b c d  | 4-input nor gate  |
+| xnor2 a b     | 2-input xnor gate |
+| xnor3 a b c   | 3-input xnor gate |
+| xnor4 a b c d | 4-input xnor gate |
+
+The buffer produces an output that is the same as the input; it is the
+identify function.
+
+Many of the logical operations can be performed on any number of
+inputs.  For example, there is the logical conjunction (=and=) of two,
+three, or four inputs.  These correspond to distinct logic gates: the
+=and2= gate has two input ports and there is no way to connect three
+inputs to it.  Therefore Hydra doesn't have an =and= gate; it has
+distinct =and2=, =and3=, =and4= gates.  This doesn't go on
+indefinitely; Hydra does not define the =and5= gate or  =and73=.
+
+If you want to and together a lot of signals, use =andw=.  For
+example, =andw [a, b, c, d, e, f, g] = acts like =and7= would if it
+existed.  The square bracket notation describes a word, covered in a
+later section.
+
+Most of these logic gates are provided for convenience; only a few of
+them are necessary.  For example, you can replace =and3 a b c= by
+=and2 a (and2 b c)=.  However, logic gates with several inputs can be
+fabricated on chips, they are slightly more efficient, and most
+importantly, it's more readable to use =and3= rather than two =and2=
+gates.
+
+Hydra normally uses just one kind of flip flop: the delay flip flop,
+named =dff=.  It is sometimes called a latch.  This takes one input
+and produces one output: for example, the value of =dff x= is the
+output signal produced by a delay flip flop with input =x=.  All flip
+flops must be connected to the same clock; we do not consider the
+clock to be a data input to the flip flop.
 
 ** Text and schematic
 
@@ -327,12 +351,13 @@ insight, and having both together is often worthwhile.
 It's important to check that the two descriptions of the circuit are
 consistent with each other.  To do this,
 - Check that every box in the diagram corresponds to a circuit
-  (function) in the text
+  (function) in the text, and check that every circuit in the text
+  corresponds to a box in the diagram.
 - Check that each wire in the diagram corresponds to a signal in the
   text.
 - The wire should be connected to exactly one component output, which
-  places a logic value on the wire.
-- The wire may be connected to one or more component inputs.
+  places a logic value on the wire.  The wire may be connected to one
+  or more component inputs.
 
 ** Defining equation names a signal
 
@@ -371,10 +396,11 @@ x = and3 a (inv b) c
 #+END_EXAMPLE
 
 However, in mathematics you can swap the left and right hand sides,
-but a Hydra equation /must/ have the name on the left side and its
-value on the right side.  It's called a /defining equation/ because it
-defines the name on the left hand side to have the value of the right
-hand side.  If you reverse the two sides, you'll get an error:
+but a Hydra defining equation /must/ have the name on the left side
+and its value on the right side.  It's called a /defining equation/
+because it defines the name on the left hand side to have the value of
+the right hand side.  If you reverse the two sides, you'll get an
+error:
 
 #+BEGIN_EXAMPLE
 a = inv b      -- Correct, defines the name a
@@ -383,8 +409,10 @@ inv c = d      -- Error, need a name (not application) on left
 
 Later we will see a technique called /equational reasoning/, which is
 useful for analysing circuits.  This uses equations with a more
-general form.  But to give a name to a signal, you need to use a
-/defining equation/, where the left hand side is always a signal name.
+general form. Both of the two lines in the example above are valid
+equations, but only the first is a valid /defining equation/.  To give
+a name to a signal, you need to use a defining equation, where the
+left hand side is always a signal name.
 
 It's a good idea to write the equations in an order that makes the
 circuit more readable.  If most of the signals are defined before they
@@ -411,6 +439,8 @@ q = inv r
 r = nor2 c d
 #+END_EXAMPLE
 
+Both styles are correct.  Use whichever you find more readable.
+
 ** Constant signals
 
 A constant signal always carries the same value: either it is always
@@ -425,18 +455,15 @@ x = and2 a one   -- Correct, x is same as a
 y = and2 a 1     -- Error, 1 isn't a signal
 #+END_EXAMPLE
 
-** Standard logic gates
+** Standard logic gates and flip flops
 
-To design a new circuit, you need to take a set of existing circuits
-and connect them with signals.  A logic gate is a primitive
-combinational component (combinational means that the output depends
-on the current values of the inputs).  Some of the most commonly used
+A logic gate is a primitive combinational component (combinational
+means that the output depends on the current values of the inputs).
 
-There are several libraries of
-existing circuits that you can start with, and you can also define
-libraries of your own circuits for further use.  The Hydra libraries
-provide as primitives the standard logic gates, summarised in the
-following table.
+There are several libraries of existing circuits that you can use, and
+you can also define libraries of your own circuits for further use.
+The Hydra libraries provide as primitives the standard logic gates,
+summarised in the following table.
 
 | Gate          | Description       |
 |---------------+-------------------|
@@ -471,6 +498,221 @@ fabricated on chips, they are slightly more efficient, and most
 importantly, it's more readable to use =and3= rather than two =and2=
 gates.
 
+* Defining new circuits
+
+To design larger scale systems, we need the ability to define a
+circuit as a new /black box/ component that can be reused to define
+even larger circuits.  A new circuit can be designed by connecting
+together a number of existing ones.  This is similar to using
+abstraction in a programming language by defining a function or
+procedure for a commonly used computation.  A circuit definition
+contains up to three parts:
+
+- Circuit type (optional)
+- Circuit defining equation (mandatory)
+- Internal signals (optional)
+
+Circuit types are discussed in a later section.  The circuit type is a
+line that looks something like this:
+
+#+BEGIN_EXAMPLE
+halfAdd :: Signal a => a -> a -> (a,a)
+#+END_EXAMPLE
+
+** Circuit defining equation
+
+An equation that defines a circuit called =circuit_name= has this
+general form:
+
+#+BEGIN_EXAMPLE
+circuit_name input1 ... inputn = output
+#+END_EXAMPLE
+
+The left hand side of the equation is an application of the circuit's
+name to the names of the input signals, for example =input1=, etc.
+There can be any number of inputs.  The right hand side is the value
+of the circuit's output.
+
+As a simple example: =mycirc= takes two inputs.  It outputs 1 iff the
+first input is 1 and the second is 0:
+
+#+BEGIN_EXAMPLE
+mycirc a b = and2 a (inv b)
+#+END_EXAMPLE
+
+As another example, suppose we want to define a new circuit called
+=and5= that takes five inputs and outputs 1 if and only iff all the
+inputs are 1.  It is a 5-input =and= gate, but =and5= is not one of
+the standard primitives.  This will do it:
+
+#+BEGIN_EXAMPLE
+and5 a b c d e = and2 (and3 a b c) (and2 d e)
+#+END_EXAMPLE
+
+Given this definition, you can use =and5= by applying it to some input
+signals, for example =and5 x y p q r=.
+
+The input names in the circuit defining equation are local.  They are
+in scope only within the definition of the circuit, including the
+right hand side of the circuit defining equation.
+
+** Black boxes with internal signals
+
+The expression that defines the circuit's output can become fairly
+complicated, and it's often simpler to define it using several other
+named signals which are inside the black box.  Each of these needs a
+defining equation.  To do this, write the keyword *where* after the
+circuit defining equation, and after the *where* you can write any
+number of signal defining equations. The general form is:
+
+#+BEGIN_EXAMPLE
+circuit_name input1 ... inputn = output_expression
+  where x = ...
+        y = ...
+        ...
+#+END_EXAMPLE
+
+The definition of =and5= above had a fairly large output expression.
+This can be simplified by defining some internal signals =and5=:
+
+#+BEGIN_EXAMPLE
+and5 a b c d e = and2 p q
+  where p = and3 a b c
+        q = and2 d e
+#+END_EXAMPLE
+
+This definition describes exactly the same circuit as the previous
+version of =and5=; the only difference is that local names =p= and =q=
+are given to the outputs of the internal =and3= and =and2= gates.
+These names are just part of the /description/ of the circuit; both
+versions of =and5= have exactly the same components and wires.
+
+Here is an example of a circuit named c22 that takes three inputs and
+produces one output.
+
+#+BEGIN_EXAMPLE
+c22 a b c = x
+  where
+    x = xor2 p q
+    p = and2 a b
+    q = or2 b c
+#+END_EXAMPLE
+
+The equations should be indented consistently, and there is no extra
+punctuation (no curly braces, no semicolons).  The compiler determines
+the structure of a definition from the indentation, not from
+punctuation.  Therefore 
+
+The indentation is mandatory: it determines which equations are inside
+the black box.  Note that you don't need curly braces around the
+internal equations, and don't need semicolons at the end of each line.
+The essential rules to remember are that
+
+- Each internal equation must be indented relative to the circuit
+  defining equation
+- All the internal equations must start in the same column
+
+The indentation is essential, and if it's wrong then the specification
+will be parsed incorrectly.  There are several indentation styles,
+which differ in the placement of the *where* keyword and what column
+the internal equations start in.  Each of the following examples is
+ok; use whichever you prefer.
+
+#+BEGIN_EXAMPLE
+c22 a b c = x
+  where
+    x = xor2 p q
+    p = and2 a b
+    q = or2 b c
+#+END_EXAMPLE
+
+#+BEGIN_EXAMPLE
+c22 a b c = x
+  where x = xor2 p q
+        p = and2 a b
+        q = or2 b c
+#+END_EXAMPLE
+
+#+BEGIN_EXAMPLE
+c22 a b c = x where
+  x = xor2 p q
+  p = and2 a b
+  q = or2 b c
+#+END_EXAMPLE
+
+
+** Feedback
+
+A register is a circuit with an internal state, and with the ability
+to load an external value into the state and to read out the state.
+
+
+
+#+NAME: reg1
+#+BEGIN_SRC ghci :tangle ../../examples/register/Reg1.hs
+module Reg1 where
+import HDL.Hydra.Core.Lib
+import HDL.Hydra.Circuits.Combinational
+
+reg1 :: CBit a => a -> a -> a
+reg1 ld x = r
+  where r = dff (mux1 ld r x)
+#+END_SRC
+
+The reg1 circuit has a feedback loop: the output of the flip flop is
+connected to one of the inputs to the mux1, whose output in turn is
+input to the flip flop.  Hydra does not allow feedback loops in pure
+combinational logic, but feedback that goes through a flip flop is
+fine.  When a circuit contains a feedback loop, there will be a
+circular path in the schematic diagram, and there will be circular
+equations in its specification.  For the reg1 circuit. the feedback
+loop can be seen in the equation which has r on both the left and
+right hand side.  Thus r is being defined in terms of itself.  The way
+this works, and the reason that r is well-defined, is explained in the
+section on circuit semantics.
+
+#+BEGIN_SRC ghci :tangle ../../examples/register/Reg1Run.hs
+-- Simulation driver for reg1
+module Main where
+import HDL.Hydra.Core.Lib
+import Reg1
+
+main :: IO ()
+main = do
+  runReg1 testdata
+
+testdata :: [[Int]]
+testdata =
+------------------------
+--  ld  x       output
+------------------------
+  [ [1, 1],  -- 0  output in cycle 0 is initial state
+    [0, 0],  -- 1  state changed to 1 at tick between cycles 0/1
+    [0, 1],  -- 1  no change
+    [0, 0],  -- 1  no change
+    [1, 0],  -- 1  still see 1 but at end of cycle, set state to 0
+    [0, 0],  -- 0 during this cycle can see result of state change
+    [1, 1],  -- 0 but set state to 1 on tick at end of cycle
+    [1, 0],  -- 1 the 1 becomes visible in this cycle
+    [0, 0],  -- 0 the 0 now becomes visible
+    [0, 0],  -- 0 no change
+    [0, 0]   -- no comma after last element of list
+  ]
+
+runReg1 input = runAllInput input output
+  where
+-- Input signals
+    ld = getbit input 0
+    x  = getbit input 1
+-- Circuit
+    y = reg1 ld x
+-- Format the input and output signals
+    output =
+      [string "Input ld = ", bit ld,
+       string " x = ", bit x,
+       string "   Output = ", bit y]
+#+END_SRC
+
 ** Producing several outputs: halfAdd
 
 The circuits we have looked at so far have just one output.  We need a
@@ -481,7 +723,7 @@ Files: *examples/adder/HalfAdd.hs* and *examples/adder/HalfAddRun.hs*
 A half adder circuit takes two inputs *x* and *y*, and produces a pair
 of outputs, the carry output and the sum output.  The carry is the
 logical *and* of *x* and *y*, while the sum is their exclusive *or*.
-Here is the circuit specification (file *HalfAdd.hs*):
+The circuit specification is in the file =HalfAdd.hs=.
 
 The module statement gives a name to this module, and the import
 statement brings in the essential Hydra library definitions.  The
@@ -652,150 +894,6 @@ practice to write the test data with clean indentation, so the inputs
 line up in columns, and to include the expected outputs in comments.
 
 See examples/mux/Mux1Run.hs')
-
-
-* Defining new circuits
-
-A new circuit can be designed by connecting together a number of
-existing ones.  The examples given so far consist of logic gates,
-which are primitive components.  To design larger scale systems, we
-need the ability to define a circuit as a new *black box* component
-and reuse it.  This is similar to using abstraction in a programming
-language by defining a function or procedure for a commonly used
-computation.  A circuit definition contains up to three parts:
-
-  1. Circuit type (optional)
-
-  2. Interface (mandatory)
-
-  3. Internal signals (optional)
-
-** Circuit defining equation
-
-** Black boxes with internal signals
-
-Files: *adder/Add4.hs* and *examples/Add4Run.hs*
-
-#+BEGIN_EXAMPLE
-*Main> :main
-  x =  5  y =  8  cin = 0    ==>    cout = 0  s = 13
-  x =  7  y =  3  cin = 0    ==>    cout = 0  s = 10
-  x =  8  y = 12  cin = 0    ==>    cout = 1  s =  4
-  x =  8  y =  1  cin = 0    ==>    cout = 0  s =  9
-  x = 12  y =  1  cin = 1    ==>    cout = 0  s = 14
-  x =  2  y =  3  cin = 1    ==>    cout = 0  s =  6
-  x = 15  y = 15  cin = 1    ==>    cout = 1  s = 15
-(0.00 secs, 252,808 bytes)
-*Main>
-#+END_EXAMPLE
-
-This part of a definition is optional; if present it follows the
-*where* keyword.
-
-The expression that defines the circuit's output can become fairly
-complicated, and it's often simpler to define it using several other
-named signals.  Each of these needs a defining equation which is
-inside the circuit.  To do this, write the keyword *where* after the
-equation, and after the *where* you can write any number of signal
-defining equations.  The general form is:
-
-
-#+BEGIN_EXAMPLE
-circuit_name input1 input2 = output
-  where
-    output = ...
-    x = ... (internal signals...)
-    y = ...
-#+END_EXAMPLE
-
-Here is an example of a circuit named c22 that takes three inputs and
-produces one output.
-
-#+BEGIN_EXAMPLE
-c22 a b c = x
-  where
-    x = xor2 p q
-    p = and2 a b
-    q = or2 b c
-#+END_EXAMPLE
-
-
-The equations should be indented consistently, and there is no extra
-punctuation (no curly braces, no semicolons).  The compiler determines
-the structure of a definition from the indentation, not from
-punctuation.  Therefore the indentation is essential, and if it's
-wrong then the specification will be parsed incorrectly.
-** Feedback
-
-A register is a circuit with an internal state, and with the ability
-to load an external value into the state and to read out the state.
-
-
-
-#+NAME: reg1
-#+BEGIN_SRC ghci :tangle ../../examples/register/Reg1.hs
-module Reg1 where
-import HDL.Hydra.Core.Lib
-import HDL.Hydra.Circuits.Combinational
-
-reg1 :: CBit a => a -> a -> a
-reg1 ld x = r
-  where r = dff (mux1 ld r x)
-#+END_SRC
-
-The reg1 circuit has a feedback loop: the output of the flip flop is
-connected to one of the inputs to the mux1, whose output in turn is
-input to the flip flop.  Hydra does not allow feedback loops in pure
-combinational logic, but feedback that goes through a flip flop is
-fine.  When a circuit contains a feedback loop, there will be a
-circular path in the schematic diagram, and there will be circular
-equations in its specification.  For the reg1 circuit. the feedback
-loop can be seen in the equation which has r on both the left and
-right hand side.  Thus r is being defined in terms of itself.  The way
-this works, and the reason that r is well-defined, is explained in the
-section on circuit semantics.
-
-#+BEGIN_SRC ghci :tangle ../../examples/register/Reg1Run.hs
--- Simulation driver for reg1
-module Main where
-import HDL.Hydra.Core.Lib
-import Reg1
-
-main :: IO ()
-main = do
-  runReg1 testdata
-
-testdata :: [[Int]]
-testdata =
-------------------------
---  ld  x       output
-------------------------
-  [ [1, 1],  -- 0  output in cycle 0 is initial state
-    [0, 0],  -- 1  state changed to 1 at tick between cycles 0/1
-    [0, 1],  -- 1  no change
-    [0, 0],  -- 1  no change
-    [1, 0],  -- 1  still see 1 but at end of cycle, set state to 0
-    [0, 0],  -- 0 during this cycle can see result of state change
-    [1, 1],  -- 0 but set state to 1 on tick at end of cycle
-    [1, 0],  -- 1 the 1 becomes visible in this cycle
-    [0, 0],  -- 0 the 0 now becomes visible
-    [0, 0],  -- 0 no change
-    [0, 0]   -- no comma after last element of list
-  ]
-
-runReg1 input = runAllInput input output
-  where
--- Input signals
-    ld = getbit input 0
-    x  = getbit input 1
--- Circuit
-    y = reg1 ld x
--- Format the input and output signals
-    output =
-      [string "Input ld = ", bit ld,
-       string " x = ", bit x,
-       string "   Output = ", bit y]
-#+END_SRC
 
 
 * Modules and files
@@ -1080,6 +1178,7 @@ ghci
 
 ** Batch and interactive simulation
 
+
 You can run a circuit simulation in batch mode, which will run to
 completion with no intervention by the user.  Alternatively, you can
 run it interactively.  The choice between the modes is determined by
@@ -1097,6 +1196,23 @@ You can try out both approaches with the SimpleCircRun driver.  It
 contains a useData, so it will run in batch mode.  But if you comment
 out the useData, the driver will revert to interactive mode.
 
+Files: *adder/Add4.hs* and *examples/Add4Run.hs*
+
+#+BEGIN_EXAMPLE
+*Main> :main
+  x =  5  y =  8  cin = 0    ==>    cout = 0  s = 13
+  x =  7  y =  3  cin = 0    ==>    cout = 0  s = 10
+  x =  8  y = 12  cin = 0    ==>    cout = 1  s =  4
+  x =  8  y =  1  cin = 0    ==>    cout = 0  s =  9
+  x = 12  y =  1  cin = 1    ==>    cout = 0  s = 14
+  x =  2  y =  3  cin = 1    ==>    cout = 0  s =  6
+  x = 15  y = 15  cin = 1    ==>    cout = 1  s = 15
+(0.00 secs, 252,808 bytes)
+*Main>
+#+END_EXAMPLE
+
+This part of a definition is optional; if present it follows the
+*where* keyword.
 
 * Syntax
 
