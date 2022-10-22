@@ -30,6 +30,7 @@ module HDL.Hydra.Core.Driver
 -- * New from step driver
    call, noContinuation, bitsBin,
 --   logFileName,
+   clockTick,
    conditional, cmdLogging,
    tryRead, maybeRead, mkFullPath,
    intToBits,
@@ -611,12 +612,25 @@ cycleCmd args = do
     --      printLine ("cycleCmd mfmt = fs, running format")
 --          runFormat True True
           runFormat FormatNormal
-      advanceInPorts
-      advanceOutPorts
-      advancePeeks
-      advanceFlagTable
-      s <- get
-      put (s {cycleCount = i+1})
+      clockTick
+--      advanceInPorts
+--      advanceOutPorts
+--      advancePeeks
+--      advanceFlagTable
+--      advanceFormat
+--      incrementCycleCount
+--      s <- get
+--      put (s {cycleCount = i+1})
+
+clockTick :: StateT (SysState b) IO ()
+clockTick = do
+  advanceInPorts
+  advanceOutPorts
+  advancePeeks
+  advanceFlagTable
+  advanceFormat
+  incrementCycleCount
+
 
 ---------------------------------------------------------------------------
 -- Phase 1: Establish inputs
