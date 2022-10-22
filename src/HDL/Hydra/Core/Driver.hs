@@ -119,7 +119,7 @@ import System.Console.ANSI
 ---------------------------------------------------------------------------
 
 hydraVersion :: String
-hydraVersion = "3.4.16.2"
+hydraVersion = "3.5.2"
 
 defaultLogFileName :: String
 defaultLogFileName = "logCircuit.txt"
