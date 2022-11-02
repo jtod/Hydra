@@ -54,7 +54,7 @@ runCount4 circ x = driver $ do
   reset <- inputBit "reset"
 
 -- Circuit
-  let y = count4by3 reset
+  let y = circ reset
 
 -- Outputs
   outputWord "y" y
