@@ -44,42 +44,25 @@ setVersion:
 
 .PHONY : build
 build :
-	echo ${MDHEADER}
-	make docs/userguide/HydraUserGuide.html
-	make index.html
+	make setVersion
+	make docs
 
 #----------------------------------------------------------------------
-# User guide: generate html from the source .org file
+# User guide and README: generate html and tex from .org using emacs
 
-docs/userguide/HydraUserGuide.html : docs/userguide/HydraUserGuide.org \
-	  docs/userguide/userguide-template.html \
-	  Hydra.cabal
-	pandoc --standalone \
-          --from=org \
-          --to=html \
-          --metadata title="Hydra User Guide" \
-          --template=docs/userguide/userguide-template.html \
-          --table-of-contents --toc-depth=4 \
-	  --variable=mdheader:${MDHEADER} \
-          --variable=css:./HydraUserGuide.css \
-          --output=docs/userguide/HydraUserGuide.html \
-	  docs/userguide/HydraUserGuide.org
+.PHONY : docs
+docs :
+	make README.pdf
+	make docs/UserGuide/HydraUserGuide.pdf
+
+README.pdf: README.tex
+	pdflatex README
+	pdflatex README
+
+docs/UserGuide/HydraUserGuide.pdf : docs/UserGuide/HydraUserGuide.tex
+	pdflatex docs/UserGuide/HydraUserGuide
 
 #----------------------------------------------------------------------
-# generate index.html from README.md
-
-index.html : README.md \
-	  docs/userguide/userguide-template.html
-	pandoc --standalone \
-          --from=markdown \
-          --to=html \
-	  --metadata pagetitle="Hydra hardware description langauge" \
-          --template=docs/userguide/userguide-template.html \
-	  --variable=mdheader:${MDHEADER} \
-          --variable=css:index.css \
-          --output=index.html \
-	  README.md
-
 .PHONY : clean
 clean :
 	find . \( -name '*~' \
@@ -93,5 +76,37 @@ clean :
 	rm -f m1output.txt
 	rm -f m1write.txt
 
-#	rm -f docs/M1_System_Circuit.tex
+# deprecated: make build
+#	echo ${MDHEADER}
+#	make docs/userguide/HydraUserGuide.html
+#	make index.html
 
+# deprecated
+index.html : README.md \
+	  docs/userguide/userguide-template.html
+	pandoc --standalone \
+          --from=markdown \
+          --to=html \
+	  --metadata pagetitle="Hydra hardware description langauge" \
+          --template=docs/userguide/userguide-template.html \
+	  --variable=mdheader:${MDHEADER} \
+          --variable=css:index.css \
+          --output=index.html \
+	  README.md
+
+# deprecated	rm -f docs/M1_System_Circuit.tex
+
+# deprecated; using org to generate html
+docs/userguide/HydraUserGuide.html : docs/userguide/HydraUserGuide.org \
+	  docs/userguide/userguide-template.html \
+	  Hydra.cabal
+	pandoc --standalone \
+          --from=org \
+          --to=html \
+          --metadata title="Hydra User Guide" \
+          --template=docs/userguide/userguide-template.html \
+          --table-of-contents --toc-depth=4 \
+	  --variable=mdheader:${MDHEADER} \
+          --variable=css:./HydraUserGuide.css \
+          --output=docs/userguide/HydraUserGuide.html \
+	  docs/userguide/HydraUserGuide.org

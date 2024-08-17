@@ -6,3 +6,7 @@ temp*
 *.temp
 *.o
 *.hi
+*.aux
+*.log
+*.out
+*.toc

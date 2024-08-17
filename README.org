@@ -1,5 +1,5 @@
 # Hydra README
-# Copyright (c) 2022 John T. O'Donnell.
+# Copyright (c) 2023 John T. O'Donnell.
 # License: GNU GPL Version 3. See Hydra/README.md, LICENSE.txt
 
 #+HTML_HEAD: <link rel="stylesheet" type="text/css" href="./docs/doc.css" />
@@ -7,7 +7,7 @@
 #+OPTIONS: num:nil
  
 #+BEGIN_EXPORT html
-<h1>Hydra README</h1>
+<h1>Hydra Hardware Description Language</h1>
 #+END_EXPORT
 #+HTML_HEAD: <link rel="stylesheet" type="text/css" href="./docs/doc.css" />
 
@@ -17,12 +17,12 @@
 #+INCLUDE: "./COPYRIGHT.txt" export html
 
 Hydra is a functional computer hardware description language for
-specifying the structure and behavior of digital circuits. It supports
-several levels of abstraction, including logic gates, register
-transfer level, datapath and control, and processors. There are tools
-for simulating circuits, generating netlists, and emulating
-instruction set architectures. It is an embedded domain specific
-language implemented using Haskell.
+specifying the structure and behavior of synchronous digital
+circuits. It supports several levels of abstraction, including logic
+gates, register transfer level, datapath and control, and
+processors. There are tools for simulating circuits, generating
+netlists, and emulating instruction set architectures. It is an
+embedded domain specific  language implemented using Haskell.
 
 - The /User Guide/ is available online at
   [[https://jtod.github.io/home/Hydra/UserGuide/HydraUserGuide.html]].
@@ -43,7 +43,7 @@ license.
 
 - Author: John T. O'Donnell, School of Computing Science, University
   of Glasgow
-- Copyright (c) 2022 John T. O'Donnell
+- Copyright (c) 2023 John T. O'Donnell
 - Author's home page: [[https://jtod.github.io/index.html]]
 - License: This software is free and open source, released under the
   GPL-3 license.  See LICENSE.txt.
@@ -55,7 +55,7 @@ license.
 Hydra runs in a shell using a command line interface.  Any shell can
 be used; the examples use the bash shell.
 
-** Haskell
+** Install Haskell
 
 Hydra requires the ghc toolset for Haskell, including ghc and cabal.
 Haskell installers for Macintosh, Windows, and Linux are available at
@@ -97,27 +97,27 @@ fails, the following might work:
 choco upgrade ghc cabal -y
 #+END_EXAMPLE
 
-** Hydra
+** Install Hydra
 
 The Hydra source code is available at [[https://github.com/jtod/Hydra]].
 See the Releases section on the right side of the page and click on
 the latest release.  Download the source code file (in the Assets
 section), which is available in both =zip= and =.tar.gz= format.  The
 installation file is Hydra-i.j.k.zip (or .tgz), where i.j.k is the
-version number (for example, Hydra-3.5.2.zip).  Put the file somewhere
+version number (for example, Hydra-3.5.4.zip).  Put the file somewhere
 in your user workspace and unpack it, using the correct version
 number:
 
-- On Linux: tar -xzf Hydra-3.5.2.tar.gz
+- On Linux: tar -xzf Hydra-3.5.4.tar.gz
 - On Windows use zip, 7zip or tar
 
-This will create a directory named Hydra-3.5.2 that contains
+This will create a directory named Hydra-3.5.4 that contains
 documentation (=docs= directory and =examples= directory), the source
 code (=src= directory), and build tools.  Install using these commands
 (but use the right version number for Hydra):
 
 #+BEGIN_EXAMPLE
-cd Hydra-3.5.2
+cd Hydra-3.5.4
 cabal install --lib
 cabal haddock
 #+END_EXAMPLE
