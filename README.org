@@ -11,7 +11,7 @@
 #+END_EXPORT
 #+HTML_HEAD: <link rel="stylesheet" type="text/css" href="./docs/doc.css" />
 
-* About Hydra
+* Hydra functional computer hardware description language
 
 #+INCLUDE: "./VERSION.txt" export html
 #+INCLUDE: "./COPYRIGHT.txt" export html
@@ -26,8 +26,6 @@ embedded domain specific  language implemented using Haskell.
 
 - The /User Guide/ is available online at
   [[https://jtod.github.io/home/Hydra/UserGuide/HydraUserGuide.html]].
-  The Guide is in development, and this online link may give a newer
-  version than the one in the installation directory.
 - The User Guide is also available in the installation directory
   [[./docs/UserGuide/HydraUserGuide.html]]
 - The /API reference/ gives types of the exported definitions.  If you
@@ -59,7 +57,8 @@ be used; the examples use the bash shell.
 
 Hydra requires the ghc toolset for Haskell, including ghc and cabal.
 Haskell installers for Macintosh, Windows, and Linux are available at
-[[https://www.haskell.org/ghcup/]].
+[[https://www.haskell.org/ghcup/]].  This is the recommended way to
+install Haskell.
 
 For Windows, an alternative way to install Haskell is to use
 chocolatey; see [[https://hub.zhox.com/posts/introducing-haskell-dev/]].
@@ -78,20 +77,22 @@ choco install cabal --force -y
 - =--force= shouldn't be necessary but seems to be needed if
   installing after a failed installation attempt.
 
-/Verify that Haskell is working/
+** Verify that Haskell is working
 
 #+BEGIN_EXAMPLE
 $ ghc --version
-The Glorious Glasgow Haskell Compilation System, version 9.2.3
-$ cabal --version
-cabal-install version 3.6.2.0
-compiled using version 3.6.2.0 of the Cabal library
+The Glorious Glasgow Haskell Compilation System, version 9.4.8
+cabal --version
+cabal-install version 3.10.3.0
+compiled using version 3.10.3.0 of the Cabal library 
 #+END_EXAMPLE
 
-/In case of difficulty/
+*** In case of difficulty
 
 If you have a previous installation of ghc, and a new installation
-fails, the following might work:
+fails, try uninstalling the older version.
+
+If you installed using chocolatey, the following might work:
 
 #+BEGIN_EXAMPLE
 choco upgrade ghc cabal -y
@@ -109,7 +110,7 @@ in your user workspace and unpack it, using the correct version
 number:
 
 - On Linux: tar -xzf Hydra-i.j.k.tar.gz
-- On Windows use zip, 7zip or tar
+- On Windows, right click and extract, or use zip, 7zip or tar
 
 This will create a directory named Hydra-i.j.k that contains
 documentation (=docs= directory and =examples= directory), the source
@@ -119,6 +120,16 @@ code (=src= directory), and build tools.  Install using these commands
 #+BEGIN_EXAMPLE
 cd Hydra-i.j.k
 cabal install --lib
+#+END_EXAMPLE
+
+In a directory where you are running circuits, create a file named
+.ghci containing the following lines:
+
+#+BEGIN_EXAMPLE
+:set -package mtl
+:set -package parsec
+:set -package filepath
+:set -package containers
 #+END_EXAMPLE
 
 ** Verify that Hydra is working
@@ -131,16 +142,15 @@ $ cd examples/adder
 $ ghc -e main Add4Run
 #+END_EXAMPLE
 
-** In case of difficulty
+*** In case of difficulty
 
 See the user guides for ghc and cabal for more information.  The
 =ghc-pkg list= command shows the installed packages.
 
-*** Hidden package
+**** Hidden package
 
-If you get an error message from ghc or ghci saying that a package is
-needed but is hidden, you can create a file named .ghci containing the
-following lines:
+If you get a message saying that there are "hidden packages", copy the
+following into a file named =.ghci= in your circuit directory:
 
 #+BEGIN_EXAMPLE
 :set -package mtl
@@ -149,9 +159,10 @@ following lines:
 :set -package containers
 #+END_EXAMPLE
 
-*** Missing library
+**** Missing library
 
-On some versions of Linux, you may get an error message like this:
+On some versions of Linux, the cabal install --lib command may fail
+with an error message like this:
 
 #+BEGIN_EXAMPLE
 /usr/bin/ld.gold: error: cannot find -lgmp
@@ -167,7 +178,7 @@ install:
 sudo apt-get install libgmp3-dev
 #+END_EXAMPLE
 
-*** Conflict with previous installation
+**** Conflict with previous installation
 
 Sometimes an installation may fail if there was a previous
 installation.  If this happens, find the ghc environment default file,
@@ -176,7 +187,7 @@ username and the right version numbers):
 
 Linux:
 #+BEGIN_EXAMPLE
-~/.ghc/x86_64-linux-8.8.3/environments/default 
+~/.ghc/x86_64-linux-9.4.8/environments/default 
 #+END_EXAMPLE
 
 Windows:
@@ -196,9 +207,12 @@ Delete the lines for hydra, save the =default= file, and try the
 
 ** Alternative: using ghci
 
-Instead of using the batch command =ghc -e main Add4Run= (where
-Add4Run is the name of a simulation driver), an alternative is to use
-the interactive Haskell interpreter:
+The normal way to run a circuit, say Add4Run, is to enter =ghc -e main
+Add4Run=.  (It is conventional for the  name of a circuit's simulation
+driver to end in Run, so the circuit =Add4= has a driver =Add4Run=.)
+
+An alternative is to use ghci instead; this is the interactive Haskell
+interpreter:
 
 #+BEGIN_EXAMPLE
 $ ghci
@@ -209,22 +223,3 @@ ghci> :quit
 
 The ghci interpreter offers a number of debugging and tracing tools.
 See the GHC User Guide for details.
-
-If you get a message saying that there are "hidden packages", copy the
-following into a file named =.ghci=
-#+BEGIN_EXAMPLE
-:set -package mtl
-:set -package parsec
-:set -package filepath
-:set -package containers
-#+END_EXAMPLE
-
-/Alternative: using cabal/
-
-You can turn a directory with a circuit and simulation driver into a
-cabal package by defining some metadata files.  Once this is done, you
-can then execute the driver using the command =cabal run driver=,
-where =driver= is replaced by the actual name of the simulation
-driver.  One advantage of this method is that you can put command line
-arguments on the =cabal run= command, which you cannot do with the
-=ghc -e main=.  See the M1 processor circuit directory for an example.
