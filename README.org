@@ -104,25 +104,24 @@ See the Releases section on the right side of the page and click on
 the latest release.  Download the source code file (in the Assets
 section), which is available in both =zip= and =.tar.gz= format.  The
 installation file is Hydra-i.j.k.zip (or .tgz), where i.j.k is the
-version number (for example, Hydra-3.5.6.zip).  Put the file somewhere
+version number (for example, Hydra-3.5.7.zip).  Put the file somewhere
 in your user workspace and unpack it, using the correct version
 number:
 
-- On Linux: tar -xzf Hydra-3.5.6.tar.gz
+- On Linux: tar -xzf Hydra-i.j.k.tar.gz
 - On Windows use zip, 7zip or tar
 
-This will create a directory named Hydra-3.5.6 that contains
+This will create a directory named Hydra-i.j.k that contains
 documentation (=docs= directory and =examples= directory), the source
 code (=src= directory), and build tools.  Install using these commands
 (but use the right version number for Hydra):
 
 #+BEGIN_EXAMPLE
-cd Hydra-3.5.6
+cd Hydra-i.j.k
 cabal install --lib
-cabal haddock
 #+END_EXAMPLE
 
-/Verify that Hydra is working/
+** Verify that Hydra is working
 
 The following commands should simulate a 4-bit word adder for several
 clock cycles, with different inputs during each cycle.
@@ -132,10 +131,43 @@ $ cd examples/adder
 $ ghc -e main Add4Run
 #+END_EXAMPLE
 
-/In case of difficulty/
+** In case of difficulty
 
 See the user guides for ghc and cabal for more information.  The
 =ghc-pkg list= command shows the installed packages.
+
+*** Hidden package
+
+If you get an error message from ghc or ghci saying that a package is
+needed but is hidden, you can create a file named .ghci containing the
+following lines:
+
+#+BEGIN_EXAMPLE
+:set -package mtl
+:set -package parsec
+:set -package filepath
+:set -package containers
+#+END_EXAMPLE
+
+*** Missing library
+
+On some versions of Linux, you may get an error message like this:
+
+#+BEGIN_EXAMPLE
+/usr/bin/ld.gold: error: cannot find -lgmp
+collect2: error: ld returned 1 exit status
+`gcc' failed in phase `Linker'. (Exit code: 1)
+Error: cabal: Failed to build hydra-3.5.7.
+#+END_EXAMPLE
+
+This means the linker was unable to find a library, which you can
+install:
+
+#+BEGIN_EXAMPLE
+sudo apt-get install libgmp3-dev
+#+END_EXAMPLE
+
+*** Conflict with previous installation
 
 Sometimes an installation may fail if there was a previous
 installation.  If this happens, find the ghc environment default file,
@@ -162,7 +194,7 @@ package-id hydra-3.4.5-VeryLongHashKey
 Delete the lines for hydra, save the =default= file, and try the
 =cabal install --lib= command again.
 
-/Alternative: using ghci/
+** Alternative: using ghci
 
 Instead of using the batch command =ghc -e main Add4Run= (where
 Add4Run is the name of a simulation driver), an alternative is to use
@@ -183,7 +215,8 @@ following into a file named =.ghci=
 #+BEGIN_EXAMPLE
 :set -package mtl
 :set -package parsec
-:set -package ansi-terminal
+:set -package filepath
+:set -package containers
 #+END_EXAMPLE
 
 /Alternative: using cabal/
