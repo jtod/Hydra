@@ -37,6 +37,7 @@ userinstall :
 
 # make setVersion
 
+
 .PHONY: setVersion
 setVersion:
 	echo "$(VERSION)" > VERSION.txt

@@ -112,14 +112,14 @@ import System.Environment
 import System.FilePath
 import System.IO
 import System.IO.Unsafe
-import System.Console.ANSI
+-- import System.Console.ANSI
 
 ---------------------------------------------------------------------------
 -- Configuration
 ---------------------------------------------------------------------------
 
 hydraVersion :: String
-hydraVersion = "3.5.2"
+hydraVersion = "3.5.5"
 
 defaultLogFileName :: String
 defaultLogFileName = "logCircuit.txt"
@@ -1536,6 +1536,10 @@ readIfReady = do
 --  testTextColors
 testTextColors :: IO ()
 testTextColors = do
+  putStrLn "testTextColors is disabled"
+  return ()
+
+{-  
   setSGR [SetColor Foreground Vivid Red]
 --  setSGR [SetColor Background Vivid Blue]
   putStrLn "This text is red"
@@ -1545,6 +1549,7 @@ testTextColors = do
   putStrLn "This text is blue"
   setSGR [Reset]  -- Reset to default colour scheme
   putStrLn "Back to the default colors"
+-}
 
 ---------------------------------------------------------------------------
 -- Utilities

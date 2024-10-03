@@ -1,9 +1,9 @@
 cabal-version: 3.6
 name: hydra
-version: 3.5.4
+version: 3.5.5
 synopsis: Computer hardware description language
 author: John T. O'Donnell
-copyright: (c) 2023 John T. O'Donnell
+copyright: (c) 2024 John T. O'Donnell
 maintainer: john.t.odonnell9@gmail.com
 license: GPL-3.0-only
 license-file: LICENSE.txt
@@ -39,7 +39,6 @@ library
                     mtl,
                     containers,
                     filepath,
-                    ansi-terminal,
                     parsec
   hs-source-dirs:   src
   exposed-modules:
