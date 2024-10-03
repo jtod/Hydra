@@ -119,7 +119,7 @@ import System.IO.Unsafe
 ---------------------------------------------------------------------------
 
 hydraVersion :: String
-hydraVersion = "3.5.5"
+hydraVersion = "3.5.6"
 
 defaultLogFileName :: String
 defaultLogFileName = "logCircuit.txt"
