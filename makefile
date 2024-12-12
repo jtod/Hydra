@@ -3,8 +3,14 @@
 #----------------------------------------------------------------------
 
 #  make userinstall     user requires ghc and cabal
+#  make dev
 #  make devinstall      developer requires ghc, cabal, pandoc
 #  make clean           delete temp files but keep documentation
+
+# to do
+#   dev: use environment variables for components of path
+#   Driver: generate hydraVersion automatically in SetVersion
+#   link user guide and haddock index
 
 #----------------------------------------------------------------------
 # Calculate parameters: don't need to edit these
@@ -27,26 +33,46 @@ MDHEADER=$(MDVERSION).\ $(MDCOPYRIGHT).\ $(MDLATEST).
 #----------------------------------------------------------------------
 # User installation
 
-.PHONY : userinstall
-userinstall :
+.PHONY : UserInstall
+UserInstall :
+	cabal update
+	cabal install --lib
+	cabal haddock
+
+.PHONY : dev
+	make RemoveOldHydra
+	cabal install --lib
+	cabal haddock
+
+.PHONY : olduserinstall
+olduserinstall :
 	cabal v2-update
 	cabal v2-install --lib
 	cabal v2-haddock
 
 # Developer: build files to be disseminated
 
-# make setVersion
+# make SetVersion
 
 
-.PHONY: setVersion
-setVersion:
+.PHONY: SetVersion
+SetVersion:
 	echo "$(VERSION)" > VERSION.txt
 	echo "Copyright (c) $(YEAR) John T. O'Donnell" > COPYRIGHT.txt
 
 .PHONY : build
 build :
-	make setVersion
+	make SetVersion
 	make docs
+
+RemoveOldHydra :
+	cd c:/Users/johnt ; \
+	  pwd ; \
+	  cd AppData/Roaming/ghc/x86_64-mingw32-9.2.3/environments ; \
+	  pwd ; \
+	  cat ./default ; \
+	  sed -i.bak '/package-id hydra-/d' ./default ; \
+	  cat ./default
 
 #----------------------------------------------------------------------
 # User guide and README: generate html and tex from .org using emacs

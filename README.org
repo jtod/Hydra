@@ -132,6 +132,31 @@ In a directory where you are running circuits, create a file named
 :set -package containers
 #+END_EXAMPLE
 
+** Hydra installation problems
+
+If you have a previous installation of Hydra, you are likely to get
+errors either on the cabal install --lib command, or when you run a
+circuit using a ghc command.
+
+(See RemoveOldHydra in makefile.)
+
+Open the installed package list in a text editor.
+
+- On Windows, the file may have a path like this:
+=c:/Users/LOGINNAME/AppData/Roaming/ghc/x86_64-mingw32-9.2.3/environments/default/=
+- On Linux...
+- On Macintosh...
+  
+Look for a line that looks like this:
+
+=package-id hydra-3.6.0-d409d1bd27eed5f13043a9ceb4699ee79e9625c3=
+
+There might be several similar lines.  Delete those lines, and save
+the file.  Now try again
+
+- (In Hydra directory) cabal install --lib command
+- (In Circuits directory) ghc -e main M1/M1run
+
 ** Verify that Hydra is working
 
 The following commands should simulate a 4-bit word adder for several

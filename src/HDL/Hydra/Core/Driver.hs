@@ -119,7 +119,7 @@ import System.IO.Unsafe
 ---------------------------------------------------------------------------
 
 hydraVersion :: String
-hydraVersion = "3.5.7"
+hydraVersion = "3.6.0e"  -- Automate this in make SetVersion
 
 defaultLogFileName :: String
 defaultLogFileName = "logCircuit.txt"
