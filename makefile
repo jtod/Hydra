@@ -40,6 +40,7 @@ UserInstall :
 	cabal haddock
 
 .PHONY : dev
+dev :
 	make RemoveOldHydra
 	cabal install --lib
 	cabal haddock
