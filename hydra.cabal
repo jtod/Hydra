@@ -13,17 +13,19 @@ homepage: https://github.com/jtod/Hydra
 build-type: Simple
 tested-with: GHC == 9.2.8
 
-description: Hydra is a functional computer hardware description
-             language for specifying the structure and behavior of
-             synchronous digital circuits.  It supports several levels
-             of abstraction, including logic gates and flip flops,
-             register transfer level, datapath and control, and
-             processors.  It provides readable specifications of
-             circuits, and can simulate circuits, generate netlists,
-             and emulate instruction set architectures.  Documentation
-             includes a User Guide in the docs directory, an API
-             reference in the dist directory, and a collection of
-             examples.
+description: Hydra is a functional computer hardware
+             description language for specifying the
+             structure and behavior of synchronous digital
+             circuits.  It supports several levels of
+             abstraction, including logic gates and flip
+             flops, register transfer level, datapath and
+             control, and processors.  It provides readable
+             specifications of circuits, and can simulate
+             circuits, generate netlists, and emulate
+             instruction set architectures.  Documentation
+             includes a User Guide in the docs directory, an
+             API reference in the dist directory, and a
+             collection of examples.
 
 extra-doc-files: docs/UserGuide/HydraUserGuide.html,
                  docs/UserGuide/ugstyle.css
