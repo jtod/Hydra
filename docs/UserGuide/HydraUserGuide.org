@@ -1,19 +1,19 @@
 #+TITLE: Hydra User Guide
 #+AUTHOR: John T. O'Donnell
-# Copyright (c) 2022 John T. O'Donnell
+# Copyright (c) 2025 John T. O'Donnell
 
 # License: GNU GPL Version 3. See Hydra/README, LICENSE.txt
 
-# This file is part of Hydra.  Hydra is free software: you can
-# redistribute it and/or modify it under the terms of the GNU General
-# Public License as published by the Free Software Foundation, either
-# version 3 of the License, or (at your option) any later version.
-# Sigma16 is distributed in the hope that it will be useful, but
-# WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-# General Public License for more details.  You should have received a
-# copy of the GNU General Public License along with Sigma16.  If not,
-# see <https://www.gnu.org/licenses/>.
+# This file is part of Hydra.  Hydra is free software: you
+# can redistribute it and/or modify it under the terms of the
+# GNU General Public License as published by the Free
+# Software Foundation, Version 3.  Sigma16 is distributed in
+# the hope that it will be useful, but WITHOUT ANY WARRANTY;
+# without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General
+# Public License for more details.  You should have received
+# a copy of the GNU General Public License along with
+# Sigma16.  If not, see <https://www.gnu.org/licenses/>.
 
 #+HTML_HEAD: <link rel="stylesheet" type="text/css" href="./ugstyle.css" />
 
@@ -28,6 +28,8 @@
 #+END_EXPORT
 
 * Introduction
+
+901
 
 Hydra is a computer hardware description language (CHDL or HDL) that
 enables you to design, analyse, and simulate digital circuits.  It
