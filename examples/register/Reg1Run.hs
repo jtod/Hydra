@@ -2,7 +2,7 @@
 -- This file is part of Hydra. See README and https://github.com/jtod/Hydra
 -- Copyright (c) 2022 John T. O'Donnell
 
-Module Main where
+module Main where
 import HDL.Hydra.Core.Lib
 import Reg1
 
