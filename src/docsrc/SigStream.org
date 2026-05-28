@@ -3,7 +3,7 @@
 
 ** SigStream
 
-#+BEGIN_SRC hydra :tangle ../codesrc/Hydra/Core/SigStream.hs
+#+BEGIN_SRC hydra :tangle ../Hydra/Core/SigStream.hs
 module Hydra.Core.SigStream where
 
 import Hydra.Core.Signal

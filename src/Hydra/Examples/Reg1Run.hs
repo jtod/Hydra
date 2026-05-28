@@ -1,4 +1,4 @@
--- Hydra/Examples/Reg1Run.hs
+-- Examples/Reg1Run.hs
 
 module Main where
 import Hydra.Core

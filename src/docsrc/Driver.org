@@ -138,7 +138,7 @@ reg1Driver = driver $ do
 **** a driver
 
 
-#+BEGIN_SRC hydra :tangle ../codesrc/Hydra/Core/Driver.hs
+#+BEGIN_SRC hydra :tangle ../Hydra/Core/Driver.hs
 -- Driver: device drivers for Hydra circuits
 -- This file is part of Hydra.  See README, https://github.com/jtod/Hydra
 -- Copyright (c) 2022 John T. O'Donnell

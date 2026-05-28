@@ -4,7 +4,7 @@ module Main where
 import Hydra.Core
 
 -- Usage: in circuits directory, enter  
---   ghc -e main HDL/Hydra/Examples/DriverRun
+--   ghc -e main HDL/Examples/DriverRun
 
 -- Demonstrate a basic device driver, with conversions for bits,
 -- binary, two's complement, etc.  The device driver merely

@@ -167,7 +167,7 @@ the files or directories in =cscode=, as that could prevent some
 of the circuits from working.
 
 A collection of examples can be found in this directory:\\
-=cscode/circuits/HDL/Hydra/Examples=
+=cscode/circuits/HDL/Examples=
 
 To run circuit simulations, you always need to be in the
 =circuits= directory.  If you're in some other directory, it
@@ -175,7 +175,7 @@ won't work.
 
 Here is an example of a very simple circuit, which consists of
 just a couple of logic gates.  Thie file is
-=circuits/HDL/Hydra/Examples/SimpleCirc.hs=.  This example is
+=circuits/HDL/Examples/SimpleCirc.hs=.  This example is
 explained in detail later, but in a nutshell, the first line
 describes the circuit's interface, and the second line names the
 inputs and describes the components.
@@ -187,19 +187,19 @@ simpleCirc x y = and2 (inv x) y     -- circuit
 
 To simulate the circuit, you need a device driver that provides a
 text interface to the circuit.  This is in
-=circuits/HDL/Hydra/Examples/SimpleCircRun.hs=.  The following
+=circuits/HDL/Examples/SimpleCircRun.hs=.  The following
 commands will run a simulation of the circuit, using input data
 provided in the driver.  As always, you must be in the =circuits=
 directory.
 
 #+BEGIN_EXAMPLE
-ghc -e main HDL/Hydra/Examples/SimpleCircRun
+ghc -e main HDL/Examples/SimpleCircRun
 #+END_EXAMPLE
 
 Here is the output:
 
 #+BEGIN_EXAMPLE
-$ ghc -e main HDL/Hydra/Examples/SimpleCircRun
+$ ghc -e main HDL/Examples/SimpleCircRun
 Hydra version 5.0.3
 Batch mode
 -----------------------------------------------------------------
@@ -555,7 +555,7 @@ nand3 x (and2 p q) z
 The circuits we have looked at so far have just one output.  We need a
 way to allow circuits to produce any number of outputs.
 
-#+BEGIN_SRC ghci :tangle ../codesrc/Hydra/Examples/HalfAdd.hs
+#+BEGIN_SRC ghci :tangle ../Hydra/Examples/HalfAdd.hs
 module Hydra.Examples.HalfAdd where
 
 -- HalfAdd: add two bits, produce carry and sum
@@ -596,7 +596,7 @@ three things, all provided in *HalfAddRun.hs*:
   and outputs.
 - A main program that runs the simulation driver on the test data.
 
-#+BEGIN_SRC ghci :tangle ../codesrc/Hydra/Examples/HalfAddRun.hs
+#+BEGIN_SRC ghci :tangle ../Hydra/Examples/HalfAddRun.hs
 module Hydra.Examples.HalfAddRun where
 -- Device driver for half adder
 
@@ -814,7 +814,7 @@ Circuit definitions are discussed in more detail later, as well as the
 rest of the file:
 
 #+NAME: mux1
-#+BEGIN_SRC hydra :tangle ../codesrc/Hydra/Examples/Mux1.hs
+#+BEGIN_SRC hydra :tangle ../Hydra/Examples/Mux1.hs
 module Hydra.Examples.Mux1 where
 import Hydra.Core
 
@@ -826,11 +826,11 @@ mux1 c x y = or2 (and2 (inv c) x) (and2 c y)
 To run the simulation, enter this command (you must be in the
 =circuits= diretory):
 #+BEGIN_EXAMPLE
-$ ghc -e main HDL/Hydra/Examples/Mux1Run
+$ ghc -e main HDL/Examples/Mux1Run
 #+END_EXAMPLE
 
 #+NAME: mux1-driver
-#+BEGIN_SRC hydra :tangle ../codesrc/Hydra/Examples/Mux1Run.hs
+#+BEGIN_SRC hydra :tangle ../Hydra/Examples/Mux1Run.hs
 -- Mux1Run: test the mux1 circuit
 module Main where
 import Hydra.Core
@@ -976,7 +976,7 @@ to load an external value into the state and to read out the state.
 
 
 #+NAME: reg1
-#+BEGIN_SRC ghci :tangle ../codesrc/Hydra/Examples/Reg1.hs
+#+BEGIN_SRC ghci :tangle ../Hydra/Examples/Reg1.hs
 module Hydra.Examples.Reg1 where
 import Hydra.Core
 import Hydra.Examples.Mux1
@@ -1004,12 +1004,12 @@ To run the Reg1Run driver, enter this command (you must be in the
 =circuits= directory):
 
 #+BEGIN_EXAMPLE
-$ ghc -e main HDL/Hydra/Examples/Reg1Run
+$ ghc -e main HDL/Examples/Reg1Run
 #+END_EXAMPLE
 
 
-#+BEGIN_SRC ghci :tangle ../codesrc/Hydra/Examples/Reg1Run.hs
--- Hydra/Examples/Reg1Run.hs
+#+BEGIN_SRC ghci :tangle ../Hydra/Examples/Reg1Run.hs
+-- Examples/Reg1Run.hs
 
 module Main where
 import Hydra.Core
@@ -1075,7 +1075,7 @@ to call the driver =MyCircRun.hs=.
 The circuit is defined in a module =SimpleCirc=, which is in the file
 named =SimpleCirc.hs=.
 
-#+BEGIN_SRC hydra :tangle ../codesrc/Hydra/Examples/SimpleCirc.hs
+#+BEGIN_SRC hydra :tangle ../Hydra/Examples/SimpleCirc.hs
 -- SimpleCirc: minimal example of a circuit specification
 
 module Hydra.Examples.SimpleCirc where
@@ -1203,10 +1203,10 @@ To run the SimpleCircRun driver, enter this command (you must be in the
 =circuits= directory):
 
 #+BEGIN_EXAMPLE
-$ ghc -e main HDL/Hydra/Examples/SimpleCircRun
+$ ghc -e main HDL/Examples/SimpleCircRun
 #+END_EXAMPLE
 
-#+BEGIN_SRC hydra :tangle ../codesrc/Hydra/Examples/SimpleCircRun.hs
+#+BEGIN_SRC hydra :tangle ../Hydra/Examples/SimpleCircRun.hs
 -- SimpleCircmRun:  device driver for SimpleCirc
 -- Usage: $ ghc -e main Examples/SimpleCircRun
 
@@ -1220,7 +1220,7 @@ required.  The data is given as a list of strings.  Each string
 corresponds to one clock cycle, and it gives the values of the
 inputs during that cycle.
 
-#+BEGIN_SRC hydra :tangle ../codesrc/Hydra/Examples/SimpleCircRun.hs
+#+BEGIN_SRC hydra :tangle ../Hydra/Examples/SimpleCircRun.hs
 testdata1 :: [String]
 testdata1=
 ------------------------------
@@ -1237,7 +1237,7 @@ The file defines a function =main= that will run the simulation.
 These two lines are boiler plate and every driver should contain
 them:
 
-#+BEGIN_SRC hydra :tangle ../codesrc/Hydra/Examples/SimpleCircRun.hs
+#+BEGIN_SRC hydra :tangle ../Hydra/Examples/SimpleCircRun.hs
 main :: IO ()
 main = driver $ do
 -- Input data
@@ -1489,14 +1489,14 @@ more compact and more readable by defining a format.
 
 **** SimDriverRun.hs
 
-#+BEGIN_SRC ghci :tangle ../codesrc/Hydra/Examples/DriverRun.hs
+#+BEGIN_SRC ghci :tangle ../Hydra/Examples/DriverRun.hs
 -- DriverRun: demonstrate a device driver
 
 module Main where
 import Hydra.Core
 
 -- Usage: in circuits directory, enter  
---   ghc -e main HDL/Hydra/Examples/DriverRun
+--   ghc -e main HDL/Examples/DriverRun
 
 -- Demonstrate a basic device driver, with conversions for bits,
 -- binary, two's complement, etc.  The device driver merely

@@ -5,7 +5,7 @@
 
 *This may be redundant; some at least is defined in Driver*
 
-#+BEGIN_SRC hydra :tangle ../../../cscode/circuits/Hydra/Core/SigState.hs
+#+BEGIN_SRC hydra :tangle ../Hydra/Core/SigState.hs
 {-# LANGUAGE MultiParamTypeClasses, FunctionalDependencies,
       DeriveDataTypeable, RankNTypes #-}
 

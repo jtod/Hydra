@@ -239,7 +239,7 @@ fanoutbuf4 x = (y,y,y,y)
 
 
 
-#+BEGIN_SRC hydra :tangle ../codesrc//Hydra/Core/Pattern.hs
+#+BEGIN_SRC hydra :tangle ..//Hydra/Core/Pattern.hs
 {-|
 Module       : Hydra.Core.Pattern
 Description  : Combinators for regular circuit patterns

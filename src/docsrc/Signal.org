@@ -3,7 +3,7 @@
 # Tangle:  C-c C-v C-t
 ** Signal
 
-#+BEGIN_SRC hydra :tangle ../codesrc/Hydra/Core/Signal.hs
+#+BEGIN_SRC hydra :tangle ../Hydra/Core/Signal.hs
 {-|
 
 The Signal module defines several type classes for signals.  The

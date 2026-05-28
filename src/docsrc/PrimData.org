@@ -3,7 +3,7 @@
 
 ** PrimData
 
-#+BEGIN_SRC hydra :tangle ../codesrc/Hydra/Core/PrimData.hs
+#+BEGIN_SRC hydra :tangle ../Hydra/Core/PrimData.hs
 {-|
 Module       : Hydra.Circuits.PrimData
 Description  : Data types for signal values
