@@ -1,0 +1,1721 @@
+#+TITLE: Overview of Hydra
+#+INCLUDE: ../../tools/DefsChapter.org
+
+
+
+** Overview of Hydra
+
+**** hydra.cabal
+
+#+BEGIN_EXAMPLE
+cabal-version: 3.6
+name: hydra
+version: 3.7.0
+synopsis: Computer hardware description language
+author: John T. O'Donnell
+copyright: (c) 2025 John T. O'Donnell
+maintainer: john.t.odonnell9@gmail.com
+license: GPL-3.0-only
+license-file: LICENSE.txt
+category: Language Hardware Circuit
+stability: experimental
+homepage: https://github.com/jtod/Hydra
+build-type: Simple
+tested-with: GHC == 9.2.8
+
+description: Hydra is a functional computer hardware
+             description language for specifying the
+             structure and behavior of synchronous digital
+             circuits.  It supports several levels of
+             abstraction, including logic gates and flip
+             flops, register transfer level, datapath and
+             control, and processors.  It provides readable
+             specifications of circuits, and can simulate
+             circuits, generate netlists, and emulate
+             instruction set architectures.  Documentation
+             includes a User Guide in the docs directory, an
+             API reference in the dist directory, and a
+             collection of examples.
+
+extra-doc-files: docs/UserGuide/HydraUserGuide.html,
+                 docs/UserGuide/ugstyle.css
+             
+source-repository head
+  type:     git
+  location: https://github.com/jtod/Hydra
+
+library
+  default-language: Haskell2010
+  build-depends:    base >= 4 && < 5,
+                    transformers >= 0.3 && < 0.6,
+                    mtl,
+                    containers,
+                    filepath,
+                    parsec
+  hs-source-dirs:   src
+  exposed-modules:
+                    HDL.Hydra,
+                    HDL.Hydra.Core.Lib,
+                    HDL.Hydra.Circuits.Combinational,
+                    HDL.Hydra.Circuits.Register,
+                    HDL.Hydra.Circuits.RegFile
+  other-modules:    HDL.Hydra.Core.Signal,
+                    HDL.Hydra.Core.SigStream,
+                    HDL.Hydra.Core.CombTools,
+                    HDL.Hydra.Core.Driver,
+                    HDL.Hydra.Core.SigBool,
+                    HDL.Hydra.Core.PrimData,
+                    HDL.Hydra.Core.Pattern,
+                    HDL.Hydra.Core.RTL
+#+END_EXAMPLE
+
+**** makefile
+
+# ----------------------------------------------------------------------
+# makefile for Hydra
+# ----------------------------------------------------------------------
+
+#+BEGIN_EXAMPLE
+
+#  make userinstall     user requires ghc and cabal
+#  make dev
+#  make devinstall      developer requires ghc, cabal, pandoc
+#  make clean           delete temp files but keep documentation
+
+# to do
+#   dev: use environment variables for components of path
+#   Driver: generate hydraVersion automatically in SetVersion
+#   link user guide and haddock index
+
+#----------------------------------------------------------------------
+# Calculate parameters: don't need to edit these
+
+# Obtain version number from cabal file to use in generated html
+# documentation
+VERSION != grep < Hydra.cabal ^version
+
+# Define dates in several formats, for inclusion in the app and user guide
+YEAR=$(shell date +"%Y")
+MONTHYEAR=$(shell date +"%B %Y")
+MONTHYEARDAY=$(shell date +"%F")
+
+# Define metadata line to put at top of html
+MDVERSION="$(VERSION), $(MONTHYEAR)"
+MDCOPYRIGHT="Copyright $(YEAR) John T. O&apos;Donnell"
+MDLATEST="For latest version, see <a href='https://github.com/jtod/Hydra' target='_blank'>https://github.com/jtod/Hydra</a>"
+MDHEADER=$(MDVERSION).\ $(MDCOPYRIGHT).\ $(MDLATEST).
+
+#----------------------------------------------------------------------
+# User installation
+
+.PHONY : UserInstall
+UserInstall :
+	cabal update
+	cabal install --lib
+	cabal haddock
+
+.PHONY : dev
+dev :
+	make RemoveOldHydra
+	cabal install --lib
+	cabal haddock
+
+.PHONY : olduserinstall
+olduserinstall :
+	cabal v2-update
+	cabal v2-install --lib
+	cabal v2-haddock
+
+# Developer: build files to be disseminated
+
+# make SetVersion
+
+
+.PHONY: SetVersion
+SetVersion:
+	echo "$(VERSION)" > VERSION.txt
+	echo "Copyright (c) $(YEAR) John T. O'Donnell" > COPYRIGHT.txt
+
+.PHONY : build
+build :
+	make SetVersion
+	make docs
+
+RemoveOldHydra :
+	cd c:/Users/johnt ; \
+	  pwd ; \
+	  cd AppData/Roaming/ghc/x86_64-mingw32-9.2.3/environments ; \
+	  pwd ; \
+	  cat ./default ; \
+	  sed -i.bak '/package-id hydra-/d' ./default ; \
+	  cat ./default
+
+#----------------------------------------------------------------------
+# User guide and README: generate html and tex from .org using emacs
+
+.PHONY : docs
+docs :
+	make README.pdf
+	make docs/UserGuide/HydraUserGuide.pdf
+
+README.pdf: README.tex
+	pdflatex README
+	pdflatex README
+
+docs/UserGuide/HydraUserGuide.pdf : docs/UserGuide/HydraUserGuide.tex
+	pdflatex docs/UserGuide/HydraUserGuide
+
+#----------------------------------------------------------------------
+.PHONY : clean
+clean :
+	find . \( -name '*~' \
+	  -o -name '*.hi' \
+	  -o -name '*.log' \
+	  -o -name '*.aux' \
+	  -o -name '*.out' \
+	  -o -name '*.toc' \
+	  -o -name '*.bak' \) -delete
+	rm -rf docs/auto
+	rm -f m1output.txt
+	rm -f m1write.txt
+
+# deprecated: make build
+#	echo ${MDHEADER}
+#	make docs/userguide/HydraUserGuide.html
+#	make index.html
+
+# deprecated
+index.html : README.md \
+	  docs/userguide/userguide-template.html
+	pandoc --standalone \
+          --from=markdown \
+          --to=html \
+	  --metadata pagetitle="Hydra hardware description langauge" \
+          --template=docs/userguide/userguide-template.html \
+	  --variable=mdheader:${MDHEADER} \
+          --variable=css:index.css \
+          --output=index.html \
+	  README.md
+
+# deprecated	rm -f docs/M1_System_Circuit.tex
+
+# deprecated; using org to generate html
+docs/userguide/HydraUserGuide.html : docs/userguide/HydraUserGuide.org \
+	  docs/userguide/userguide-template.html \
+	  Hydra.cabal
+	pandoc --standalone \
+          --from=org \
+          --to=html \
+          --metadata title="Hydra User Guide" \
+          --template=docs/userguide/userguide-template.html \
+          --table-of-contents --toc-depth=4 \
+	  --variable=mdheader:${MDHEADER} \
+          --variable=css:./HydraUserGuide.css \
+          --output=docs/userguide/HydraUserGuide.html \
+	  docs/userguide/HydraUserGuide.org
+#+END_EXAMPLE
+
+**** README.org
+
+#+BEGIN_EXAMPLE
+
+# Hydra README
+# Copyright (c) 2024 John T. O'Donnell.
+# License: GNU GPL Version 3. See Hydra/README.md, LICENSE.txt
+
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="./docs/doc.css" />
+#+OPTIONS: toc:nil
+#+OPTIONS: num:nil
+ 
+#+BEGIN_EXPORT html
+<h1>Hydra Hardware Description Language</h1>
+#+END_EXPORT
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="./docs/doc.css" />
+#+END_EXAMPLE
+
+* Hydra functional computer hardware description language
+
+# #+INCLUDE: "./VERSION.txt" export html
+# #+INCLUDE: "./COPYRIGHT.txt" export html
+
+Hydra is a functional computer hardware description language for
+specifying the structure and behavior of synchronous digital
+circuits. It supports several levels of abstraction, including logic
+gates, register transfer level, datapath and control, and
+processors. There are tools for simulating circuits, generating
+netlists, and emulating instruction set architectures. It is an
+embedded domain specific  language implemented using Haskell.
+
+- The /User Guide/ is available online at
+  [[https://jtod.github.io/home/Hydra/UserGuide/HydraUserGuide.html]].
+- The User Guide is also available in the installation directory
+  [[./docs/UserGuide/HydraUserGuide.html]]
+- The /API reference/ gives types of the exported definitions.  If you
+  build using cabal, it will be in the the =dist-newstyle= directory.
+  The path depends on software versions, but may be something like
+  this:
+  [[./dist-newstyle/build/x86_64-windows/ghc-9.2.3/hydra-3.4.16/doc/html/hydra/index.html]].
+  If you install using cabal, it should also be placed in the standard
+  location for Haskell API references.
+
+This is free and open source software released under the GPL-3
+license.
+
+- Author: John T. O'Donnell, School of Computing Science, University
+  of Glasgow
+- Copyright (c) 2024 John T. O'Donnell
+- Author's home page: [[https://jtod.github.io/index.html]]
+- License: This software is free and open source, released under the
+  GPL-3 license.  See LICENSE.txt.
+- Source code repository: [[https://github.com/jtod/Hydra]]
+- Version: see Hydra.cabal
+
+* Installation
+
+Hydra runs in a shell using a command line interface.  Any shell can
+be used; the examples use the bash shell.
+
+** Install Haskell
+
+Hydra requires the ghc toolset for Haskell, including ghc and cabal.
+Haskell installers for Macintosh, Windows, and Linux are available at
+[[https://www.haskell.org/ghcup/]].  This is the recommended way to
+install Haskell.
+
+For Windows, an alternative way to install Haskell is to use
+chocolatey; see [[https://hub.zhox.com/posts/introducing-haskell-dev/]].
+If you have chocolatey installed, you can use it to install Haskell
+easily.  Run these commands in Windows PowerShell with administrator
+privileges:
+
+#+BEGIN_EXAMPLE
+choco install ghc --force -y
+choco install cabal --force -y
+#+END_EXAMPLE
+
+- =-y= tells choco to answer with y automatically when it needs
+  permission to do something.  Without the -y, it doesn't actually ask
+  permission and the whole installation fails.
+- =--force= shouldn't be necessary but seems to be needed if
+  installing after a failed installation attempt.
+
+** Verify that Haskell is working
+
+#+BEGIN_EXAMPLE
+$ ghc --version
+The Glorious Glasgow Haskell Compilation System, version 9.4.8
+cabal --version
+cabal-install version 3.10.3.0
+compiled using version 3.10.3.0 of the Cabal library 
+#+END_EXAMPLE
+
+*** In case of difficulty
+
+If you have a previous installation of ghc, and a new installation
+fails, try uninstalling the older version.
+
+If you installed using chocolatey, the following might work:
+
+#+BEGIN_EXAMPLE
+choco upgrade ghc cabal -y
+#+END_EXAMPLE
+
+** Install Hydra
+
+The Hydra source code is available at [[https://github.com/jtod/Hydra]].
+See the Releases section on the right side of the page and click on
+the latest release.  Download the source code file (in the Assets
+section), which is available in both =zip= and =.tar.gz= format.  The
+installation file is Hydra-i.j.k.zip (or .tgz), where i.j.k is the
+version number (for example, Hydra-3.5.7.zip).  Put the file somewhere
+in your user workspace and unpack it, using the correct version
+number:
+
+- On Linux: tar -xzf Hydra-i.j.k.tar.gz
+- On Windows, right click and extract, or use zip, 7zip or tar
+
+This will create a directory named Hydra-i.j.k that contains
+documentation (=docs= directory and =examples= directory), the source
+code (=src= directory), and build tools.  Install using these commands
+(but use the right version number for Hydra):
+
+#+BEGIN_EXAMPLE
+cd Hydra-i.j.k
+cabal install --lib
+#+END_EXAMPLE
+
+In a directory where you are running circuits, create a file named
+.ghci containing the following lines:
+
+#+BEGIN_EXAMPLE
+:set -package mtl
+:set -package parsec
+:set -package filepath
+:set -package containers
+#+END_EXAMPLE
+
+** Hydra installation problems
+
+If you have a previous installation of Hydra, you are likely to get
+errors either on the cabal install --lib command, or when you run a
+circuit using a ghc command.
+
+(See RemoveOldHydra in makefile.)
+
+Open the installed package list in a text editor.
+
+- On Windows, the file may have a path like this:
+=c:/Users/LOGINNAME/AppData/Roaming/ghc/x86_64-mingw32-9.2.3/environments/default/=
+- On Linux...
+- On Macintosh...
+  
+Look for a line that looks like this:
+
+=package-id hydra-3.6.0-d409d1bd27eed5f13043a9ceb4699ee79e9625c3=
+
+There might be several similar lines.  Delete those lines, and save
+the file.  Now try again
+
+- (In Hydra directory) cabal install --lib command
+- (In Circuits directory) ghc -e main M1/M1run
+
+** Verify that Hydra is working
+
+The following commands should simulate a 4-bit word adder for several
+clock cycles, with different inputs during each cycle.
+
+#+BEGIN_EXAMPLE
+$ cd examples/adder
+$ ghc -e main Add4Run
+#+END_EXAMPLE
+
+*** In case of difficulty
+
+See the user guides for ghc and cabal for more information.  The
+=ghc-pkg list= command shows the installed packages.
+
+**** Hidden package
+
+If you get a message saying that there are "hidden packages", copy the
+following into a file named =.ghci= in your circuit directory:
+
+#+BEGIN_EXAMPLE
+:set -package mtl
+:set -package parsec
+:set -package filepath
+:set -package containers
+#+END_EXAMPLE
+
+**** Missing library
+
+On some versions of Linux, the cabal install --lib command may fail
+with an error message like this:
+
+#+BEGIN_EXAMPLE
+/usr/bin/ld.gold: error: cannot find -lgmp
+collect2: error: ld returned 1 exit status
+`gcc' failed in phase `Linker'. (Exit code: 1)
+Error: cabal: Failed to build hydra-3.5.7.
+#+END_EXAMPLE
+
+This means the linker was unable to find a library, which you can
+install:
+
+#+BEGIN_EXAMPLE
+sudo apt-get install libgmp3-dev
+#+END_EXAMPLE
+
+**** Conflict with previous installation
+
+Sometimes an installation may fail if there was a previous
+installation.  If this happens, find the ghc environment default file,
+which is located at a path similar to the following (with your
+username and the right version numbers):
+
+Linux:
+#+BEGIN_EXAMPLE
+~/.ghc/x86_64-linux-9.4.8/environments/default 
+#+END_EXAMPLE
+
+Windows:
+#+BEGIN_EXAMPLE
+C:/Users/username/AppData/Roaming/ghc/x86_64-mingw32-9.2.3/environments/default
+#+END_EXAMPLE
+
+Open this file in a text editor and find the line containing an entry
+for hydra, which should look something like this:
+
+#+BEGIN_EXAMPLE
+package-id hydra-3.4.5-VeryLongHashKey
+#+END_EXAMPLE
+
+Delete the lines for hydra, save the =default= file, and try the
+=cabal install --lib= command again.
+
+** Alternative: using ghci
+
+The normal way to run a circuit, say Add4Run, is to enter =ghc -e main
+Add4Run=.  (It is conventional for the  name of a circuit's simulation
+driver to end in Run, so the circuit =Add4= has a driver =Add4Run=.)
+
+An alternative is to use ghci instead; this is the interactive Haskell
+interpreter:
+
+#+BEGIN_EXAMPLE
+$ ghci
+ghci> :load Add4Run
+ghci> :main
+ghci> :quit
+#+END_EXAMPLE
+
+The ghci interpreter offers a number of debugging and tracing tools.
+See the GHC User Guide for details.
+
+**** src/.ghci
+
+This is not enough...
+
+#+BEGIN_EXAMPLE
+:set -package mtl
+:set -package parsec
+#+END_EXAMPLE
+
+**** src/HDL/Hydra.hs
+
+#+BEGIN_EXAMPLE
+
+module HDL.Hydra where
+
+import HDL.Hydra.Core.Lib
+import HDL.Hydra.Circuits.Combinational
+import HDL.Hydra.Circuits.Register
+import HDL.Hydra.Circuits.RegFile
+#+END_EXAMPLE
+
+
+**** src/HDL/Hydra/Circuits/ Combinational.hs
+
+#+BEGIN_EXAMPLE
+
+{-|
+Module       : HDL.Hydra.Circuits.Combinational
+Description  : Standard combinational circuits
+Copyright    : (c) John O'Donnell 2019
+License      : GPL-3
+Maintainer   : john.t.odonnell9@gmail.com
+Stability    : experimental
+
+Specifications of a collection of standard small combinational
+building block circuits.  -}
+
+module HDL.Hydra.Circuits.Combinational
+  (
+
+-- * Generating constant signals
+   boolword,
+
+-- * Logic on words
+   invw, andw, orw,
+   winv,  -- alternative name for invw (deprecated)
+
+-- * Addressing
+
+-- ** Multiplexers
+   mux1, mux2, mux3,
+   mux22,
+   mux1w, mux2w,
+
+-- ** Demultiplexers
+   demux1, demux2,
+   demux1w, demux2w, demux3w, demux4w,
+
+-- * Shifting
+   shr, shl,
+   
+-- * Arithmetic
+   halfAdd, bsum, bcarry, fullAdd,
+   rippleAdd,
+   addSub,
+   rippleCmp
+  
+  ) where
+
+
+import HDL.Hydra.Core.Signal
+import HDL.Hydra.Core.Pattern
+
+
+----------------------------------------------------------------------
+--			    Logic on words
+----------------------------------------------------------------------
+
+-- |Word inverter: invw takes a word and inverts each of its bits.
+
+invw :: Bit a => [a] -> [a]
+invw = map inv
+
+-- |(Deprecated) same as invw; winv will be removed in future
+--  versions.
+
+winv :: Bit a => [a] -> [a]
+winv = map inv
+
+
+
+-- And/Or over a word: Determine whether there exists a 1 in a word,
+-- or whether all the bits are 0.  A tree fold can do this in log
+-- time, but for simplicity this is just a linear time fold.
+
+-- |Logical and of all the bits in a word.  The result if 1 if and
+-- only iff every bit in the word is 1.
+
+andw :: Bit a => [a] -> a
+andw = foldl and2 one
+
+orw :: Bit a => [a] -> a
+orw = foldl or2 zero
+
+-- Building a constant integer word
+
+-- Representing a boolean bit as a word: boolword takes a bit x, and
+-- pads it to the left with 0s to form a word.  If the input x is
+-- False (0), the result is the integer 0 (i.e. n 0-bits), and if x is
+-- True (1) the result is the integer 1 (rightmost bit is 1, all
+-- others are 0).
+
+boolword :: Bit a => Int -> a -> [a]
+boolword n x = fanout (n-1) zero ++ [x]
+
+
+---------------------------------------------------------------------
+--			     Conditionals
+---------------------------------------------------------------------
+
+-- Multiplexers
+
+mux1 :: Bit a => a -> a -> a -> a
+mux1 p a b = x
+  where x = or2 (and2 (inv p) a) (and2 p b)
+
+
+mux2 :: Bit a => (a,a) -> a -> a -> a -> a -> a
+mux2 (c,d) p q r s =
+  mux1 c  (mux1 d p q)
+          (mux1 d r s)
+
+mux3
+  :: Bit a
+  => (a,a,a)
+  -> a -> a -> a -> a -> a-> a -> a -> a -> a
+
+mux3 (c0,c1,c2) a0 a1 a2 a3 a4 a5 a6 a7 =
+  mux1 c0
+    (mux1 c1
+      (mux1 c2 a0 a1)
+      (mux1 c2 a2 a3))
+    (mux1 c1
+      (mux1 c2 a4 a5)
+      (mux1 c2 a6 a7))
+
+mux22 :: Bit a => (a,a) -> (a,a) -> (a,a) -> (a,a) -> (a,a) -> (a,a)
+mux22 (p0,p1) (a0,a1) (b0,b1) (c0,c1) (d0,d1) = (x,y)
+  where x = mux2 (p0,p1) a0 b0 c0 d0
+        y = mux2 (p0,p1) a1 b1 c1 d1
+
+mux1w :: Bit a => a -> [a] -> [a] -> [a]
+mux1w c x y = map2 (mux1 c) x y
+
+mux2w cc = map4 (mux2 cc)
+
+
+-- Demultiplexers
+
+demux1 :: Bit a => a -> a -> (a,a)
+demux1 c x = (and2 (inv c) x, and2 c x)
+
+demux2 :: Bit a => (a,a) -> a -> (a,a,a,a)
+demux2 (c0,c1) x = (y0,y1,y2,y3)
+  where  (p,q) = demux1 c0 x
+         (y0,y1) = demux1 c1 p
+         (y2,y3) = demux1 c1 q
+
+demux1w :: Bit a => [a] -> a -> [a]
+demux1w [c0] x =
+  let (a0,a1) = demux1 c0 x
+  in [a0,a1]
+
+demux2w :: Bit a => [a] -> a -> [a]
+demux2w [c0,c1] x =
+  let (a0,a1) = demux1 c0 x
+      w0 = demux1w [c1] a0
+      w1 = demux1w [c1] a1
+  in w0++w1
+
+demux3w :: Bit a => [a] -> a -> [a]
+demux3w [c0,c1,c2] x =
+  let (a0,a1) = demux1 c0 x
+      w0 = demux2w [c1,c2] a0
+      w1 = demux2w [c1,c2] a1
+  in w0++w1
+
+demux4w :: Bit a => [a] -> a -> [a]
+demux4w [c0,c1,c2,c3] x =
+  let (a0,a1) = demux1 c0 x
+      w0 = demux3w [c1,c2,c3] a0
+      w1 = demux3w [c1,c2,c3] a1
+  in w0++w1
+
+
+----------------------------------------------------------------------
+--			      Arithmetic
+----------------------------------------------------------------------
+
+-- Combinational shifting
+
+-- Shift a word to the right (shr) or to the left (shl).  In both
+-- cases, this is just a wiring pattern.  A 0 is brought in on one
+-- side, and the bit on the other side is just thrown away.
+
+shr x = zero : [x!!i | i <- [0..k-2]]
+  where k = length x
+shl x = [x!!i | i <- [1..k-1]] ++ [zero]
+  where k = length x
+
+
+-- Bit addition
+
+-- A half adder adds two bits x and y, and produces a 2-bit result
+-- (carry,sum).  The value of x+y can be any of 0, 1, or 2, and this
+-- is the binary value of the 2-bit result.
+
+halfAdd :: Bit a => a -> a -> (a,a)
+halfAdd x y = (and2 x y, xor2 x y)
+
+-- A full adder adds three bits x, y, and c, and produces a 2-bit
+-- result (carry,sum).  This is a building block for circuits that add
+-- words, where a carry input c must be added to the x and y bits.
+-- The value of x+y+c can be any of 0, 1, 2, or 3, and this is the
+-- binary value of the 2-bit result.  It is convenient to group the x
+-- and y bits into a pair, and to treat the carry input c as a
+-- separate input; this makes it easier to use fullAdd with the mscanr
+-- combinator.
+
+fullAdd :: Bit a => (a,a) -> a -> (a,a)
+fullAdd (x,y) c = (bcarry (x,y) c, bsum (x,y) c)
+
+-- The carry and sum results from adding x+y+c are calculated by bsum
+-- and bcarry.  For most purposes it would be more concise just to
+-- define the fullAdd circuit directly, but for fast adders it is
+-- helpful to organize the full adder using separate bcarry and bsum
+-- subcircuits.  The bit sum is a parity calculation, while the carry
+-- is a majority.
+
+bsum, bcarry :: Bit a => (a,a) -> a -> a
+bsum (x,y) c = xor3 x y c
+bcarry (x,y) c = or3 (and2 x y) (and2 x c) (and2 y c)
+
+
+-- Ripple carry addition
+
+rippleAdd :: Bit a => a -> [(a,a)] -> (a,[a])
+rippleAdd = mscanr fullAdd
+
+
+-- Addition and subtraction
+
+addSub :: Bit a => a -> [(a,a)] -> (a,[a])
+addSub sub xy = rippleAdd sub (map f xy)
+  where f (x,y) = (x, xor2 sub y)
+
+
+-- Binary comparison
+
+-- Ripple comparison
+
+rippleCmp :: Bit a => [(a,a)] -> (a,a,a)
+rippleCmp = foldl cmp1 (zero,one,zero)
+
+-- Building block for comparing bits
+
+cmp1 :: Bit a => (a,a,a) -> (a,a) -> (a,a,a)
+cmp1 (lt,eq,gt) (x,y) =
+  (or2 lt (and3 eq (inv x) y),
+   and2 eq (inv (xor2 x y)),
+   or2 gt (and3 eq x (inv y))
+  )
+
+#+END_EXAMPLE
+
+
+
+**** src/HDL/Hydra/Circuits/ RegFile.hs
+
+#+BEGIN_EXAMPLE
+
+{-|
+Module       : HDL.Hydra.Circuits.RegFile
+Description  : Standard stateful circuits
+Copyright    : (c) John O'Donnell 2022
+License      : GPL-3.0
+Maintainer   : john.t.odonnell9@gmail.com
+Stability    : experimental
+
+A collection of register circuits. -}
+
+module HDL.Hydra.Circuits.RegFile
+  (
+
+-- * Register files
+   regfile1, regfile
+  ) where
+
+import HDL.Hydra.Core.Signal
+import HDL.Hydra.Core.SigStream
+import HDL.Hydra.Core.Pattern
+import HDL.Hydra.Circuits.Combinational
+import HDL.Hydra.Circuits.Register
+
+
+
+------------------------------------------------------------------------
+-- Register files
+
+regfile1 :: CBit a => Int -> a -> [a] -> [a] -> [a] -> a -> (a,a)
+
+regfile1 k ld d sa sb x
+  | k==0 = (r,r)
+  | k>0  = (a,b)
+  where
+    r = reg1 ld x
+    (a0,b0) = regfile1 (k-1) ld0 ds sas sbs x
+    (a1,b1) = regfile1 (k-1) ld1 ds sas sbs x
+    (ld0,ld1) = demux1 d1 ld
+    a = mux1 sa1 a0 a1
+    b = mux1 sb1 b0 b1
+    (d1:ds) = d
+    (sa1:sas) = sa
+    (sb1:sbs) = sb
+
+regfile :: CBit a => Int -> Int
+  -> a -> [a] -> [a] -> [a] -> [a] -> ([a],[a])
+
+regfile n k ld d sa sb x =
+   unbitslice2 [regfile1 k ld d sa sb (x!!i)  | i <- [0..n-1]]
+
+{-
+-- * Latches
+   latch1, latch,
+
+-- * Registers
+   reg1, reg,
+
+------------------------------------------------------------------------
+-- Latches
+
+-- | latch1 is a bit latch; it is just an alternative name for a delay
+-- flip flop.  A latch1 takes an input bit signal and produces an
+-- output bit signal.  The latch has in internal state of 1 bit.  The
+-- output always gives the current value of the state.  At a clock
+-- tick, the state is discarded and replaced with the current value of
+-- the input.
+
+latch1 :: CBit a => a -> a
+latch1 = dff
+
+-- |A word latch has a size parameter k which determines how many bits
+-- it contains.  The latch has a k-bit state, which is output
+-- continuously.  At each clock tick the old state is discarded and
+-- replaced by the value of the k-bit input word.
+
+latch :: CBit a => Int -> [a] -> [a]
+latch k x = mapn dff k x
+
+------------------------------------------------------------------------
+-- Registers
+
+-- |reg1 is a register with a state of one bit.  It is used as a building
+-- block for word registers.
+-- Example: y = reg1 ld x
+
+reg1 :: CBit a => a -> a -> a
+reg1 ld x = r
+  where r = dff (mux1 ld r x)
+
+-- |A word register with a size parameter k and a state of k bits.  It
+-- is used as a building block for word registers.  Example: y = reg1
+-- ld x
+
+reg
+  :: CBit a
+  => Int        -- k = the word size
+  -> a          -- ld = the load control signal
+  -> [a]        -- x = input word of size k
+  -> [a]        -- y = output is the register state
+
+reg k ld x = mapn (reg1 ld) k x
+-}
+
+#+END_EXAMPLE
+
+
+**** src/HDL/Hydra/Circuits/ Register 2021.hs
+#+BEGIN_EXAMPLE
+
+{-|
+Module       : HDL.Hydra.Circuits.Register
+Description  : Standard stateful circuits
+Copyright    : (c) John O'Donnell 2020
+License      : GPL-3.0-or-later
+Maintainer   : john.t.odonnell9@gmail.com
+Stability    : experimental
+
+A collection of register circuits. -}
+
+module HDL.Hydra.Circuits.Register
+  (
+
+-- * Latches
+   latch1, latch,
+
+-- * Registers
+   reg1, reg,
+
+
+  ) where
+
+import HDL.Hydra.Core.Signal
+import HDL.Hydra.Core.SigStream
+import HDL.Hydra.Core.Pattern
+import HDL.Hydra.Circuits.Combinational
+
+------------------------------------------------------------------------
+-- Latches
+
+-- | latch1 is a bit latch; it is just an alternative name for a delay
+-- flip flop.  A latch1 takes an input bit signal and produces an
+-- output bit signal.  The latch has in internal state of 1 bit.  The
+-- output always gives the current value of the state.  At a clock
+-- tick, the state is discarded and replaced with the current value of
+-- the input.
+
+latch1 :: CBit a => a -> a
+latch1 = dff
+
+-- |A word latch has a size parameter k which determines how many bits
+-- it contains.  The latch has a k-bit state, which is output
+-- continuously.  At each clock tick the old state is discarded and
+-- replaced by the value of the k-bit input word.
+
+latch :: CBit a => Int -> [a] -> [a]
+latch k x = mapn dff k x
+
+------------------------------------------------------------------------
+-- Registers
+
+-- |reg1 is a register with a state of one bit.  It is used as a building
+-- block for word registers.
+-- Example: y = reg1 ld x
+
+reg1 :: CBit a => a -> a -> a
+reg1 ld x = r
+  where r = dff (mux1 ld r x)
+
+-- |A word register with a size parameter k and a state of k bits.  It
+-- is used as a building block for word registers.  Example: y = reg1
+-- ld x
+
+reg
+  :: CBit a
+  => Int        -- k = the word size
+  -> a          -- ld = the load control signal
+  -> [a]        -- x = input word of size k
+  -> [a]        -- y = output is the register state
+
+reg k ld x = mapn (reg1 ld) k x
+
+
+
+**** src/HDL/Hydra/Circuits/ RegisterGit.hs~
+
+{-|
+Module       : HDL.Hydra.Circuits.Register
+Description  : Standard stateful circuits
+Copyright    : (c) John O'Donnell 2020
+License      : GPL-3.0-or-later
+Maintainer   : john.t.odonnell9@gmail.com
+Stability    : experimental
+
+A collection of register circuits. -}
+
+module HDL.Hydra.Circuits.Register
+  (
+
+-- * Latches
+   latch1, latch,
+
+-- * Registers
+   reg1, reg,
+
+-- * Register files
+   regfile1, regfile
+  ) where
+
+import HDL.Hydra.Core.Signal
+import HDL.Hydra.Core.SigStream
+import HDL.Hydra.Core.Pattern
+import HDL.Hydra.Circuits.Combinational
+
+------------------------------------------------------------------------
+-- Latches
+
+-- | latch1 is a bit latch; it is just an alternative name for a delay
+-- flip flop.  A latch1 takes an input bit signal and produces an
+-- output bit signal.  The latch has in internal state of 1 bit.  The
+-- output always gives the current value of the state.  At a clock
+-- tick, the state is discarded and replaced with the current value of
+-- the input.
+
+latch1 :: CBit a => a -> a
+latch1 = dff
+
+-- |A word latch has a size parameter k which determines how many bits
+-- it contains.  The latch has a k-bit state, which is output
+-- continuously.  At each clock tick the old state is discarded and
+-- replaced by the value of the k-bit input word.
+
+latch :: CBit a => Int -> [a] -> [a]
+latch k x = mapn dff k x
+
+------------------------------------------------------------------------
+-- Registers
+
+-- |reg1 is a register with a state of one bit.  It is used as a building
+-- block for word registers.
+-- Example: y = reg1 ld x
+
+reg1 :: CBit a => a -> a -> a
+reg1 ld x = r
+  where r = dff (mux1 ld r x)
+
+-- |A word register with a size parameter k and a state of k bits.  It
+-- is used as a building block for word registers.  Example: y = reg1
+-- ld x
+
+reg
+  :: CBit a
+  => Int        -- k = the word size
+  -> a          -- ld = the load control signal
+  -> [a]        -- x = input word of size k
+  -> [a]        -- y = output is the register state
+
+reg k ld x = mapn (reg1 ld) k x
+
+
+------------------------------------------------------------------------
+-- Register files
+
+regfile1 :: CBit a => Int -> a -> [a] -> [a] -> [a] -> a -> (a,a)
+
+regfile1 k ld d sa sb x
+  | k==0 = (r,r)
+  | k>0  = (a,b)
+  where
+    r = reg1 ld x
+    (a0,b0) = regfile1 (k-1) ld0 ds sas sbs x
+    (a1,b1) = regfile1 (k-1) ld1 ds sas sbs x
+    (ld0,ld1) = demux1 d1 ld
+    a = mux1 sa1 a0 a1
+    b = mux1 sb1 b0 b1
+    (d1:ds) = d
+    (sa1:sas) = sa
+    (sb1:sbs) = sb
+
+regfile :: CBit a => Int -> Int
+  -> a -> [a] -> [a] -> [a] -> [a] -> ([a],[a])
+
+regfile n k ld d sa sb x =
+   unbitslice2 [regfile1 k ld d sa sb (x!!i)  | i <- [0..n-1]]
+#+END_EXAMPLE
+
+
+
+
+**** src/HDL/Hydra/Circuits/
+#+BEGIN_EXAMPLE
+
+{-|
+Module       : HDL.Hydra.Circuits.Register
+Description  : Standard stateful circuits
+Copyright    : (c) John O'Donnell 2020
+License      : GPL-3.0-or-later
+Maintainer   : john.t.odonnell9@gmail.com
+Stability    : experimental
+
+A collection of register circuits. -}
+
+module HDL.Hydra.Circuits.Register
+  (
+
+-- * Latches
+   latch1, latch,
+
+-- * Registers
+   reg1, reg,
+
+
+  ) where
+
+import HDL.Hydra.Core.Signal
+import HDL.Hydra.Core.SigStream
+import HDL.Hydra.Core.Pattern
+import HDL.Hydra.Circuits.Combinational
+
+------------------------------------------------------------------------
+-- Latches
+
+-- | latch1 is a bit latch; it is just an alternative name for a delay
+-- flip flop.  A latch1 takes an input bit signal and produces an
+-- output bit signal.  The latch has in internal state of 1 bit.  The
+-- output always gives the current value of the state.  At a clock
+-- tick, the state is discarded and replaced with the current value of
+-- the input.
+
+latch1 :: CBit a => a -> a
+latch1 = dff
+
+-- |A word latch has a size parameter k which determines how many bits
+-- it contains.  The latch has a k-bit state, which is output
+-- continuously.  At each clock tick the old state is discarded and
+-- replaced by the value of the k-bit input word.
+
+latch :: CBit a => Int -> [a] -> [a]
+latch k x = mapn dff k x
+
+------------------------------------------------------------------------
+-- Registers
+
+-- |reg1 is a register with a state of one bit.  It is used as a building
+-- block for word registers.
+-- Example: y = reg1 ld x
+
+reg1 :: CBit a => a -> a -> a
+reg1 ld x = r
+  where r = dff (mux1 ld r x)
+
+-- |A word register with a size parameter k and a state of k bits.  It
+-- is used as a building block for word registers.  Example: y = reg1
+-- ld x
+
+reg
+  :: CBit a
+  => Int        -- k = the word size
+  -> a          -- ld = the load control signal
+  -> [a]        -- x = input word of size k
+  -> [a]        -- y = output is the register state
+
+reg k ld x = mapn (reg1 ld) k x
+#+END_EXAMPLE
+
+
+**** HDL/Hydra/Testing/HydraTest.hs
+
+#+BEGIN_SRC hydra :tangle ../../../cscode/circuits/HDL/Hydra/Core/Testing.hs
+  ( module HDL.Hydra.Core.Lib
+  , module HDL.Hydra.Testing.TestSigState
+  ) where
+
+import HDL.Hydra.Core.Lib
+import HDL.Hydra.Testing.TestSigState
+#+END_SRC
+
+**** HDL/Hydra/Testing/TestSigState.hs
+
+#+BEGIN_SRC hydra :tangle ../../../cscode/circuits/HDL/Hydra/Core/TestingSigState.hs
+module HDL.Hydra.Testing.TestSigState where
+
+import Data.IORef
+import Data.List
+import Data.Maybe
+import Data.Typeable
+import Data.Data
+import Data.Generics
+import Generics.SYB
+
+import HDL.Hydra.Core.Lib
+import HDL.Hydra.Core.SigState
+
+------------------------------------------------------------
+-- Some helper functions for testing the SYB traversal
+------------------------------------------------------------
+
+{- need to fix node type
+
+doNode
+  :: Node Bool MDstring TagString
+  -> IO (Node Bool MDstring TagString)
+doNode n = do
+  xs <- showNode n
+  putStrLn ("doNode: " ++ xs)
+  return n
+-}
+
+
+doInt :: Int -> IO Int
+doInt n = do
+  putStrLn ("doInt " ++ show n)
+  return (n + 1000)
+
+----------------------------------------------------------------------
+-- test1: inports and logic gates, no feedback
+----------------------------------------------------------------------
+
+{-
+
+test1 = do
+  putStrLn "test1"
+
+  let a = inport "a"
+  (nodeA, tagsA) <- dfs [] a
+--  putStrLn ("\nnodeA = " ++ showNode nodeA)
+  putStrLn ("tagsA = " ++ showTags tagsA)
+
+  let b = inport "b"
+  (nodeB, tagsB) <- dfs tagsA b
+--  putStrLn ("\nnodeB = " ++ showNode nodeB)
+  putStrLn ("tagsB = " ++ showTags tagsB)
+
+  let c = inv "c" a
+  (nodeC, tagsC) <- dfs tagsB c
+--  putStrLn ("\nnodeC = " ++ showNode nodeC)
+  putStrLn ("tagsC = " ++ showTags tagsC)
+
+  let d = and2 "d" b c
+  (nodeD, tagsD) <- dfs tagsC d
+--  putStrLn ("\nnodeD = " ++ showNode nodeD)
+  putStrLn ("tagsD = " ++ showTags tagsD)
+
+  let e = xor2 "e" b c
+  (nodeE, tagsE) <- dfs tagsD e
+--  putStrLn ("\nnodeE = " ++ showNode nodeE)
+  putStrLn ("tagsE = " ++ showTags tagsE)
+
+  putStrLn "finished"
+-}
+
+----------------------------------------------------------------------
+-- test2: dff with no feedback
+----------------------------------------------------------------------
+
+{-
+
+test2 = do
+  putStrLn "test2"
+
+  let a = inport "a"
+  (nodeA, tagsA) <- dfs [] a
+--  putStrLn ("\nnodeA = " ++ showNode nodeA)
+  putStrLn ("tagsA = " ++ showTags tagsA)
+
+  let b = dff False "b" a
+  (nodeB, tagsB) <- dfs tagsA b
+--  putStrLn ("\nnodeB = " ++ showNode nodeB)
+  putStrLn ("tagsB = " ++ showTags tagsB)
+
+  putStrLn "finished"
+-}
+
+
+----------------------------------------------------------------------
+-- test3: feedback going through dff
+----------------------------------------------------------------------
+
+{-
+
+circ3 :: MyBit -> MyBit
+circ3 a = r
+  where r = dff False "r" q
+        q = xor2 "q" a r
+
+test3 = do
+  putStrLn "test3"
+
+  let x = inport "x"
+  let y = circ3 x
+  
+  (nodeY, tagsY) <- dfs [] y
+--  putStrLn ("\nnodeY = " ++ showNode nodeY)
+  putStrLn ("tagsY = " ++ showTags tagsY)
+
+  putStrLn "finished"
+-}
+
+
+----------------------------------------------------------------------
+-- test4: settle for inport and logic gate
+----------------------------------------------------------------------
+
+{-
+
+test4 = do
+  putStrLn "test4"
+
+  let a = inport "a"
+  (nodeA, tagsA) <- dfs [] a
+--  putStrLn ("\nnodeA = " ++ showNode nodeA)
+  putStrLn ("tagsA = " ++ showTags tagsA)
+
+  let b = inport "b"
+  (nodeB, tagsB) <- dfs tagsA b
+--  putStrLn ("\nnodeB = " ++ showNode nodeB)
+  putStrLn ("tagsB = " ++ showTags tagsB)
+  
+  let c = inv "c" a
+  (nodeC, tagsC) <- dfs tagsB c
+--  putStrLn ("\nnodeC = " ++ showNode nodeC)
+  putStrLn ("tagsC = " ++ showTags tagsC)
+  
+  let d = xor2 "d" b c
+  (nodeD, tagsD) <- dfs tagsC d
+--  putStrLn ("\nnodeD = " ++ showNode nodeD)
+  putStrLn ("tagsD = " ++ showTags tagsD)
+
+  av <- settle nodeA
+  putStrLn ("av = " ++ show av)
+  bv <- settle nodeB
+  putStrLn ("bv = " ++ show bv)
+  cv <- settle nodeC
+  putStrLn ("cv = " ++ show cv)
+  dv <- settle nodeD
+  putStrLn ("dv = " ++ show dv)
+
+  putStrLn "finished"
+-}
+
+
+----------------------------------------------------------------------
+-- test5: feedback going through dff, settle and advance
+----------------------------------------------------------------------
+
+{-
+
+circ5 :: MyBit -> MyBit
+circ5 a = r
+  where r = dff False "r" q
+        q = xor2 "q" a r
+
+test5 = do
+  putStrLn "test5"
+
+  let x = inport "x"
+  let y = circ3 x
+  
+  (nodeY, tagsY) <- dfs [] y
+--  putStrLn ("\nnodeY = " ++ showNode nodeY)
+  putStrLn ("tagsY = " ++ showTags tagsY)
+
+  putStrLn "about to settle y0"
+  y0 <- settle nodeY
+  putStrLn "y0 settled"
+  putStrLn ("y0 = " ++ show y0)
+
+  putStrLn "about to advance y"
+  advance nodeY
+  putStrLn "y advanced"
+  y1 <- settle nodeY
+  putStrLn ("y1 = " ++ show y1)
+
+  advance nodeY
+  y2 <- settle nodeY
+  putStrLn ("y2 = " ++ show y2)
+
+  advance nodeY
+  y3 <- settle nodeY
+  putStrLn ("y3 = " ++ show y3)
+
+  advance nodeY
+  y4 <- settle nodeY
+  putStrLn ("y4 = " ++ show y4)
+
+  advance nodeY
+  y5 <- settle nodeY
+  putStrLn ("y5 = " ++ show y5)
+  looper5 nodeY 0
+
+  putStrLn "finished"
+
+looper5 nodeY cycle
+  | cycle >= 20 = return ()
+  | otherwise = do
+      y <- settle nodeY
+      putStrLn ("cycle " ++ show cycle ++ ".  y = " ++ show y)
+      advance nodeY
+      looper5 nodeY (cycle+1)
+-}
+
+----------------------------------------------------------------------
+-- test6: a chain of dff/logic/dff/logic without feedback
+----------------------------------------------------------------------
+
+{-
+
+-- are all the internal dff found and handled by settle and advance?
+
+circ6 :: MyBit -> MyBit
+circ6 x = y
+  where y = dff False "105" (dff False "104" (dff False "103"
+              (dff False "102" (dff False "101"
+                (dff False "100" x)))))
+
+test6 = do
+  putStrLn "test6"
+  let x = inport "x"
+  let y = circ6 x
+  (nodeX, tagsX) <- dfs [] x
+  (nodeY, tagsY) <- dfs tagsX y
+--  putStrLn ("\nnodeX = " ++ showNode nodeX)
+  putStrLn ("tagsX = " ++ showTags tagsX)
+--  putStrLn ("\nnodeY = " ++ showNode nodeY)
+  putStrLn ("tagsY = " ++ showTags tagsY)
+  looper6 nodeX nodeY 0
+
+looper6 nodeX nodeY cycle
+  | cycle >= 40 = return ()
+  | otherwise = do
+      putStrLn ("\nCycle " ++ show cycle)
+      x <- settle nodeX
+      y <- settle nodeY
+      putStrLn ("  x = " ++ show x ++ ",    y = " ++ show y)
+      advance nodeY
+      looper6 nodeX nodeY (cycle+1)
+-}
+
+----------------------------------------------------------------------
+-- test 7: a chain with some feedback
+----------------------------------------------------------------------
+
+{-
+
+circ7 :: MyBit -> MyBit
+circ7 x = y
+  where y = dff False "105" (inv "104" (dff False "103"
+              (inv "102" (dff False "101" (xor2 "100" x y)))))
+
+test7 = do
+  putStrLn "test7"
+  let x = inport "x"
+  let y = circ7 x
+  (nodeX, tagsX) <- dfs [] x
+  (nodeY, tagsY) <- dfs tagsX y
+--  putStrLn ("\nnodeX = " ++ showNode nodeX)
+  putStrLn ("tagsX = " ++ showTags tagsX)
+--  putStrLn ("\nnodeY = " ++ showNode nodeY)
+  putStrLn ("tagsY = " ++ showTags tagsY)
+  looper7 nodeX nodeY 0
+
+looper7 nodeX nodeY cycle
+  | cycle >= 40 = return ()
+  | otherwise = do
+      putStrLn ("\nCycle " ++ show cycle)
+      x <- settle nodeX
+      y <- settle nodeY
+      putStrLn ("  x = " ++ show x ++ ",    y = " ++ show y)
+      advance nodeY
+      looper7 nodeX nodeY (cycle+1)
+
+-}
+
+----------------------------------------------------------------------
+-- test8 is a register
+----------------------------------------------------------------------
+
+-- circ8 :: B -> B -> B
+-- regCirc :: CBit a => a -> a -> a
+
+{-
+circ8 :: MyBit -> MyBit -> MyBit
+circ8 ld x = r
+  where r = dff False "dff"
+             (or2 "or2"
+                (and2 "and_r" (inv "inv_ld" ld) r)
+                (and2 "and_x" ld x))
+-}
+
+{-
+circ8a :: B -> B -> B
+circ8a ld x = r
+  where r = dffStateInitial False (mkMD "dff") (strTag "r")
+             (or2
+                (and2 (inv ld) r)
+                (and2  ld x))
+
+ -- It would be more general, though less convenient, to define dff so
+--  it would take a general tag rather than a string; in this case a
+--  tag of (TagString "r") rather than just "r".  But this is what
+--  dfftag is for!  Maybe I should swap the names of dfftag and dff,
+--  so the dff always requires a tag.
+
+circ8b :: B -> B -> B
+circ8b ld x = r
+  where r = dfftag (strTag "r")
+             (or2
+                (and2 (inv ld) r)
+                (and2  ld x))
+
+test8 = do
+  putStrLn "test8, reg1"
+  let ld = inport (strTag "ld") :: B
+  let x = inport (strTag "x")
+  let r = circ8b ld x
+  (nodeLd, tagsLd) <- dfs [] ld
+  (nodeX, tagsX) <- dfs tagsLd x
+  (nodeR, tagsR) <- dfs tagsX r
+  xs <- showNode nodeLd
+  putStrLn ("\nnodeLd = " ++ xs)
+  putStrLn ("tagsLd = " ++ showTags tagsLd)
+  xs <- showNode nodeX
+  putStrLn ("\nnodeX = " ++ xs)
+  putStrLn ("tagsX = " ++ showTags tagsX)
+  xs <- showNode nodeR
+  putStrLn ("\nnodeR = " ++ xs)
+  putStrLn ("tagsR = " ++ showTags tagsR)
+  looper8 nodeLd nodeX nodeR 0
+  return ()
+
+
+looper8 nodeLd nodeX nodeR cycle
+  | cycle >= 40 = return ()
+  | otherwise = do
+      putStrLn ("\nCycle " ++ show cycle)
+      ld <- settle nodeLd
+      x <- settle nodeX
+      r <- settle nodeR
+      putStrLn ("   ld = " ++ showSig ld
+                 ++ ",  x = " ++ showSig x
+                 ++ ",  r = " ++ showSig r)
+      advance nodeLd
+      advance nodeX
+      advance nodeR
+      looper8 nodeLd nodeX nodeR (cycle+1)
+-}
+
+----------------------------------------------------------------------
+-- test9 (testit2), syb traversal of a tuple
+----------------------------------------------------------------------
+
+-- Use syb to traverse a data structure containing some nodes.  From
+-- testit4, it looks as if the IORefs will act as stopper, so I should
+-- be able to use the ordinary everywhereM monadic traversal, and
+-- don't need everywhereButM, which isn't defined by syb.
+
+{-
+testit2 :: IO ()
+testit2 = do
+  putStrLn "building a = inport"
+  let a = inportState defaultReader (mkMD "inport_a") (mkTag "a")
+            :: S
+  (nodeA, tagsA) <- dfs [] a
+  let nodeXX = nodeA :: N
+  nodeAstr <- showNode nodeA
+  putStrLn ("nodeA = " ++ nodeAstr)
+  putStrLn ("tagsA = " ++ showTags tagsA)
+
+  putStrLn "building b = inport"
+  let b = inportState defaultReader (mkMD "inport_b") (mkTag "b")
+            :: S
+  (nodeB, tagsB) <- dfs tagsA b
+  nodeBstr <- showNode nodeB
+  putStrLn ("nodeB = " ++ nodeBstr)
+  putStrLn ("tagsB = " ++ showTags tagsB)
+
+  putStrLn "building c = inv a"
+  let c = inv a
+            :: S
+  (nodeC, tagsC) <- dfs tagsB c
+  nodeCstr <- showNode nodeC
+  putStrLn ("nodeC = " ++ nodeCstr)
+  putStrLn ("tagsC = " ++ showTags tagsC)
+
+  putStrLn "building d = dff b"
+  let d = dfftag (strTag "dff_d") b
+            :: S
+  (nodeD, tagsD) <- dfs tagsC d
+  nodeDstr <- showNode nodeD
+  putStrLn ("nodeD = " ++ nodeDstr)
+  putStrLn ("tagsD = " ++ showTags tagsD)
+  let components = (a,b,c,d)
+  let nodes = ( -- nodeXX,
+               2::Int, 3::Int,  nodeA, nodeB,
+               4::Int, nodeC, nodeD)
+        :: (Int, Int, Node Bool MDstring TagString,
+             Node Bool MDstring TagString,
+             Int,
+             Node Bool MDstring TagString,
+             Node Bool MDstring TagString)
+
+--  let aa1 = everywhere (mkT noticeComponent) components
+--  putStrLn (show aa1)
+  
+  putStrLn "starting syb traversal components"
+  y <- everywhereM
+         (mkM doNode)
+         components
+  putStrLn "starting syb traversal nodes looking for Ints"
+  z <- everywhereM
+         (mkM doInt)
+         nodes
+  putStrLn "starting syb traversal nodes looking for Nodes"
+  z <- everywhereM
+         (mkM doNode)
+         nodes
+  putStrLn "ending syb traversal"
+  putStrLn "ending testit2 with Nodes"
+  return ()
+-}
+
+----------------------------------------------------------------------
+-- test10: circuit with tuples, manual lists of signals and nodes
+----------------------------------------------------------------------
+
+{-
+myHalfAdd x y = (and2 x y, xor2 x y)
+
+test10 :: IO ()
+test10 = do
+  putStrLn "test10: half adder, not using syb"
+  let a = myInp "a"
+  let b = myInp "b"
+  let out@(c,s) = myHalfAdd a b
+
+-- Here is the manual way to create nodes, one by one, but we won't
+-- actually use these for the simulation...
+
+  (nodeC,tagsC) <- dfs [] c
+  (nodeS,tagsS) <- dfs tagsC s
+  let nodesManual = [nodeC, nodeS]
+  putStrLn "Check that the manually produced nodes"
+  ys <- everywhereM (mkM doNode) (nodesManual :: [N])
+
+-- Using the list traversal to create the nodes more easily, but again
+-- these aren't actually used...
+
+  let inputs = [a,b]
+  let outputs = [c,s]
+  (nodes,tags) <- myMkNodesList [] outputs
+  putStrLn "Check the nodes produced by myMkNodes"
+  zs <- everywhereM (mkM doNode) nodes
+
+-- Use the format specification, which the user needs to write anyway
+-- to get any output, so provide an easily traversable data structure
+-- which can be used first to generate the nodes, and later to settle
+-- and advance the signals
+
+  let fmtSigs =
+        [ FormatString "a =", FormatBit a
+        , FormatString "b =", FormatBit b
+        , FormatString "   =>  "
+        , FormatString "c =", FormatBit c
+        , FormatString "s =", FormatBit s
+        ]
+  (fmtNodes,tags) <- fmtMakeNodes fmtSigs
+  looper10 0 fmtNodes
+  putStrLn "test10 finished"
+  return ()
+
+looper10 cycle fmtNodes
+  | cycle >= 10 = return ()
+  | otherwise = do
+      putStrLn ("\nCycle " ++ show cycle)
+      settleFmt fmtNodes
+      printFmt fmtNodes
+      advanceFmt fmtNodes
+      looper10 (cycle+1) fmtNodes
+-}
+
+--      rs <- mySettleList nodes  -- used with mkNodesList
+--      putStrLn (show rs)  -- used with mkNodesList
+--      myShowNodeList nodes  -- used with mkNodesList
+--      myAdvanceList nodes  -- used with mkNodesList
+
+----------------------------------------------------------------------
+-- test11: inv4, no tags on the individual signals
+----------------------------------------------------------------------
+
+{-
+myInv4 [x0,x1,x2,x3] = [inv x0, inv x1, inv x2, inv x3]
+
+test11 :: IO ()
+test11 = do
+  putStrLn "test11: inv4 using Format for traversal"
+  let x0 = myInp "x0"
+  let x1 = myInp "x1"
+  let x2 = myInp "x2"
+  let x3 = myInp "x3"
+
+  let out@[y0,y1,y2,y3] = myInv4 [x0,x1,x2,x3]
+
+  let fmtSigs =
+        [ FormatString "x = "
+        , FormatBit x0, FormatBit x1, FormatBit x2, FormatBit x3
+        , FormatString "   y = "
+        , FormatBit y0, FormatBit y1, FormatBit y2, FormatBit y3
+        ]
+  (fmtNodes,tags) <- fmtMakeNodes fmtSigs
+  looper11 0 fmtNodes
+  putStrLn "test11 finished"
+
+looper11 cycle fmtNodes
+  | cycle >= 5 = return ()
+  | otherwise = do
+      putStrLn ("\nCycle " ++ show cycle)
+      runFormat fmtNodes
+      looper11 (cycle+1) fmtNodes
+-}
+
+----------------------------------------------------------------------
+-- test12: reg4, tags on the individual signals
+----------------------------------------------------------------------
+
+myReg1 tag ld x = r
+  where r = dff_ tag
+              (or2 (and2 (inv ld) r)
+                   (and2 ld x))
+ 
+myReg4 tag ld [x0,x1,x2,x3] =
+  [ myReg1 (t 0) ld x0
+  , myReg1 (t 1) ld x1
+  , myReg1 (t 2) ld x2
+  , myReg1 (t 3) ld x3
+  ]
+  where t i = indexTag (stringToTag "myReg4") i
+
+-- myInp :: String -> Component Bool
+myInp xs = inport (stringToTag xs)
+
+test12 :: IO ()
+test12 = do
+  putStrLn "test12: reg4, manually tagged, Format traversal"
+  let ld = myInp "ld" :: Component Bool
+  let x0 = myInp "x0"
+  let x1 = myInp "x1"
+  let x2 = myInp "x2"
+  let x3 = myInp "x3"
+
+  let out@[y0,y1,y2,y3] = myReg4 (stringToTag "rtag") ld [x0,x1,x2,x3]
+
+  let fmtSigs =
+        [ FormatString "x = "
+        , FormatBit x0, FormatBit x1, FormatBit x2, FormatBit x3
+        , FormatString "   y = "
+        , FormatBit y0, FormatBit y1, FormatBit y2, FormatBit y3
+        ]
+  (fmtNodes,tags) <- fmtMakeNodes fmtSigs
+  looper12 0 fmtNodes
+  putStrLn "test11 finished"
+
+looper12 cycle fmtNodes
+  | cycle >= 5 = return ()
+  | otherwise = do
+      putStrLn ("\nCycle " ++ show cycle)
+      runFormat fmtNodes
+      looper12 (cycle+1) fmtNodes
+#+END_SRC

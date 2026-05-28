@@ -1,0 +1,25 @@
+#+TITLE: Hydra Cabal
+#+INCLUDE: ../../tools/DefsChapter.org
+
+** Hydra Cabal
+
+Code needed to complete a cabal package for Hydra
+
+# License: GNU GPL Version 3. See Hydra/README, LICENSE.txt
+
+# This file is part of Hydra.  Hydra is free software: you can
+# redistribute it and/or modify it under the terms of the GNU
+# General Public License as published by the Free Software
+# Foundation, Version 3.  Sigma16 is distributed in the hope that
+# it will be useful, but WITHOUT ANY WARRANTY; without even the
+# implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+# PURPOSE.  See the GNU General Public License for more details.
+# You should have received a copy of the GNU General Public
+# License along with Sigma16.  If not, see
+# <https://www.gnu.org/licenses/>.
+
+
+This is free and open source software; see README and LICENSE for
+details.  To use the system you need the ghc compiler suite for
+Haskell, which is also free software.  The README section explains how
+to download, install, and run the system.

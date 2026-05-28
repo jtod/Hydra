@@ -1,0 +1,57 @@
+% Created 2025-11-29 Sat 20:57
+% Intended LaTeX compiler: pdflatex
+\documentclass[]{svmono}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{graphicx}
+\usepackage{longtable}
+\usepackage{wrapfig}
+\usepackage{rotating}
+\usepackage[normalem]{ulem}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{capt-of}
+\usepackage{hyperref}
+\usepackage{../../style/compsys}
+\author{John T. O'Donnell}
+\date{Draft 2025-11-29}
+\title{Hydra hardware description language}
+\hypersetup{
+ pdfauthor={John T. O'Donnell},
+ pdftitle={Hydra hardware description language},
+ pdfkeywords={},
+ pdfsubject={},
+ pdfcreator={Emacs 30.1 (Org mode 9.7.11)}, 
+ pdflang={English}}
+\begin{document}
+
+\maketitle
+\setcounter{tocdepth}{6}
+\tableofcontents
+
+\setlength\evensidemargin{25pt}
+\setlength\oddsidemargin{25pt}
+\part*{Computer Systems}
+\label{sec:org07ec685}
+
+\emph{This is DefsChapter.org}
+\chapter*{Hydra HDL}
+\label{sec:orgecb9c2d}
+
+\begin{verbatim}
+module HDL.Hydra where
+
+import HDL.Hydra.Core.Lib
+import HDL.Hydra.Circuits.Combinational
+import HDL.Hydra.Circuits.Register
+import HDL.Hydra.Circuits.RegFile
+\end{verbatim}
+
+\begin{verbatim}
+module HDL.Hydra.Core.HydraVersion (hydraVersion) where
+
+hydraVersion :: String
+hydraVersion = "4 1.1"
+  -- Automate this in make SetVersion
+\end{verbatim}
+\end{document}
