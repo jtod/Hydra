@@ -1,0 +1,45 @@
+#+TITLE: Hydra hardware description language
+
+
+** Hydra Hardware Description Language
+
+#+BEGIN_SRC hydra :tangle ../codesrc/Hydra/Core.hs
+module Hydra.Core (
+    module Hydra.Core.CombTools,
+    module Hydra.Core.Driver,
+    module Hydra.Core.HydraVersion,
+    module Hydra.Core.Pattern,
+    module Hydra.Core.SigBool,
+    module Hydra.Core.Signal,
+--    module Hydra.Core.SigState,
+    module Hydra.Core.PrimData,
+    module Hydra.Core.SigStream
+  ) where
+
+import Hydra.Core.CombTools
+import Hydra.Core.Driver
+import Hydra.Core.HydraVersion
+import Hydra.Core.Pattern
+import Hydra.Core.SigBool
+import Hydra.Core.Signal
+-- import Hydra.Core.SigState
+import Hydra.Core.PrimData
+-- import Hydra.Core.SigStepper
+import Hydra.Core.SigStream
+
+-- import Data.Generics
+#+END_SRC
+
+
+#+BEGIN_SRC hydra :tangle ../codesrc/Hydra/Core/HydraVersion.hs
+module Hydra.Core.HydraVersion (hydraVersion) where
+
+hydraVersion :: String
+hydraVersion = "4 1.1"
+  -- Automate this in make SetVersion
+#+END_SRC
+
+-- import HDL.Hydra.Core.Lib
+-- import HDL.Hydra.Circuits.Combinational
+-- import HDL.Hydra.Circuits.Register
+-- import HDL.Hydra.Circuits.RegFile
