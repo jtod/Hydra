@@ -2,7 +2,7 @@
 #+INCLUDE: ../../../tools/DefsChapter.org
 
 
-#+BEGIN_SRC hydra :tangle ../../../cscode/circuits/HDL/Hydra/Core/Lib.hs
+#+BEGIN_SRC hydra :tangle ../cscode/circuits/Hydra/Core/Lib.hs
 
 
 

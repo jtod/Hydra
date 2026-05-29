@@ -3,7 +3,7 @@
 
 ** SigBool
 
-#+BEGIN_SRC hydra :tangle ../Hydra/Core/SigBool.hs
+#+BEGIN_SRC hydra :tangle ../cscode/circuits/Hydra/Core/SigBool.hs
 module Hydra.Core.SigBool
 
   (

@@ -2,7 +2,7 @@
 
 ** Core CombTools
 
-#+BEGIN_SRC hydra :tangle ../Hydra/Core/CombTools.hs
+#+BEGIN_SRC hydra :tangle ../cscode/circuits/Hydra/Core/CombTools.hs
 {-|
 Module       : Hydra.Core.CombTools
 Description  : Tools for working with combinational circuits

@@ -3,7 +3,14 @@
 
 ** Hydra Hardware Description Language
 
-#+BEGIN_SRC hydra :tangle ../Hydra/Core.hs
+#+BEGIN_SRC hydra :tangle ../cscode/circuits/.ghci
+:set -package mtl
+:set -package parsec
+:set -package containers
+:set -package filepath
+#+END_SRC
+
+#+BEGIN_SRC hydra :tangle ../cscode/circuits/Hydra/Core.hs
 module Hydra.Core (
     module Hydra.Core.CombTools,
     module Hydra.Core.Driver,
@@ -31,7 +38,7 @@ import Hydra.Core.SigStream
 #+END_SRC
 
 
-#+BEGIN_SRC hydra :tangle ../Hydra/Core/HydraVersion.hs
+#+BEGIN_SRC hydra :tangle ../cscode/circuits/Hydra/Core/HydraVersion.hs
 module Hydra.Core.HydraVersion (hydraVersion) where
 
 hydraVersion :: String

@@ -1,12 +1,3 @@
-#+TITLE: State Step Driver
-#+INCLUDE: ../../tools/DefsChapter.org
-
-
-
-** StepDriver
-
-#+BEGIN_SRC hydra :tangle ../../../cscode/circuits/Hydra/Core/StepDriver.hs
-
 -- Hydra: StepDriver.hs
 -- Copyright (c) 2021 John T. O'Donnell
 -- email: john.t.odonnell9@gmail.com
@@ -427,4 +418,3 @@ doNtimes i f
   | otherwise = do
       f
       doNtimes (i-1) f
-#+END_SRC

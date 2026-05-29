@@ -1,9 +1,3 @@
-#+TITLE: Signal Stepper
-#+INCLUDE: ../../tools/DefsChapter.org
-
-** Core SigStepper
-
-#+BEGIN_SRC hydra :tangle ../../../cscode/circuits/Hydra/Core/SigStepper.hs
 module Hydra.Core.SigStepper where
 
 -- In src/circuits:
@@ -48,5 +42,4 @@ constSig x = do
   return box
 
 foo x = do
-  q <- newIORef 
-#+END_SRC
+  q <- newIORef
