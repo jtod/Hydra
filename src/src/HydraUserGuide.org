@@ -556,7 +556,7 @@ nand3 x (and2 p q) z
 The circuits we have looked at so far have just one output.  We need a
 way to allow circuits to produce any number of outputs.
 
-#+BEGIN_SRC ghci :tangle ../cscode/circuits/Hydra/Examples/HalfAdd.hs
+#+BEGIN_SRC ghci :tangle ../cscode/circuits/Hydra/Examples/adder/HalfAdd.hs
 module Hydra.Examples.HalfAdd where
 
 -- HalfAdd: add two bits, produce carry and sum
@@ -597,7 +597,7 @@ three things, all provided in *HalfAddRun.hs*:
   and outputs.
 - A main program that runs the simulation driver on the test data.
 
-#+BEGIN_SRC ghci :tangle ../cscode/circuits/Hydra/Examples/HalfAddRun.hs
+#+BEGIN_SRC ghci :tangle ../cscode/circuits/Hydra/Examples/adder/HalfAddRun.hs
 module Hydra.Examples.HalfAddRun where
 -- Device driver for half adder
 
@@ -815,7 +815,7 @@ Circuit definitions are discussed in more detail later, as well as the
 rest of the file:
 
 #+NAME: mux1
-#+BEGIN_SRC hydra :tangle ../cscode/circuits/Hydra/Examples/Mux1.hs
+#+BEGIN_SRC hydra :tangle ../cscode/circuits/Hydra/Examples/mux/Mux1.hs
 module Hydra.Examples.Mux1 where
 import Hydra.Core
 
@@ -831,7 +831,7 @@ $ ghc -e main HDL/Examples/Mux1Run
 #+END_EXAMPLE
 
 #+NAME: mux1-driver
-#+BEGIN_SRC hydra :tangle ../cscode/circuits/Hydra/Examples/Mux1Run.hs
+#+BEGIN_SRC hydra :tangle ../cscode/circuits/Hydra/Examples/mux/Mux1Run.hs
 -- Mux1Run: test the mux1 circuit
 module Main where
 import Hydra.Core
@@ -977,7 +977,7 @@ to load an external value into the state and to read out the state.
 
 
 #+NAME: reg1
-#+BEGIN_SRC ghci :tangle ../cscode/circuits/Hydra/Examples/Reg1.hs
+#+BEGIN_SRC ghci :tangle ../cscode/circuits/Hydra/Examples/reg/Reg1.hs
 module Hydra.Examples.Reg1 where
 import Hydra.Core
 import Hydra.Examples.Mux1
@@ -1009,7 +1009,7 @@ $ ghc -e main HDL/Examples/Reg1Run
 #+END_EXAMPLE
 
 
-#+BEGIN_SRC ghci :tangle ../cscode/circuits/Hydra/Examples/Reg1Run.hs
+#+BEGIN_SRC ghci :tangle ../cscode/circuits/Hydra/Examples/reg/Reg1Run.hs
 -- Examples/Reg1Run.hs
 
 module Main where
@@ -1076,7 +1076,7 @@ to call the driver =MyCircRun.hs=.
 The circuit is defined in a module =SimpleCirc=, which is in the file
 named =SimpleCirc.hs=.
 
-#+BEGIN_SRC hydra :tangle ../cscode/circuits/Hydra/Examples/SimpleCirc.hs
+#+BEGIN_SRC hydra :tangle ../cscode/circuits/Hydra/Examples/simple/SimpleCirc.hs
 -- SimpleCirc: minimal example of a circuit specification
 
 module Hydra.Examples.SimpleCirc where
@@ -1207,7 +1207,7 @@ To run the SimpleCircRun driver, enter this command (you must be in the
 $ ghc -e main HDL/Examples/SimpleCircRun
 #+END_EXAMPLE
 
-#+BEGIN_SRC hydra :tangle ../cscode/circuits/Hydra/Examples/SimpleCircRun.hs
+#+BEGIN_SRC hydra :tangle ../cscode/circuits/Hydra/Examples/simple/SimpleCircRun.hs
 -- SimpleCircmRun:  device driver for SimpleCirc
 -- Usage: $ ghc -e main Examples/SimpleCircRun
 
@@ -1490,7 +1490,7 @@ more compact and more readable by defining a format.
 
 **** SimDriverRun.hs
 
-#+BEGIN_SRC ghci :tangle ../cscode/circuits/Hydra/Examples/DriverRun.hs
+#+BEGIN_SRC ghci :tangle ../cscode/circuits/Hydra/Examples/driver/DriverRun.hs
 -- DriverRun: demonstrate a device driver
 
 module Main where
